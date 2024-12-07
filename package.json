@@ -6,17 +6,20 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "eslint . --fix",
+    "lint": "turbo lint",
+    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp",
+    "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.11.2",
-    "@unocss/eslint-plugin": "^0.64.1",
+    "@unocss/eslint-plugin": "^0.65.1",
     "eslint": "^9.16.0",
     "lint-staged": "^15.2.10",
-    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
     "simple-git-hooks": "^2.11.1",
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "typescript": "5.6.2"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
