@@ -7,7 +7,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "clean:top": "rimraf */**/dist */**/types */dist coverage dwt* temp",
+    "clean:top": "rimraf */**/dist */**/types */dist */**/.turbo coverage dwt* temp",
     "clean:modules": "rimraf node_modules **/node_modules **/**/node_modules",
     "prepare": "simple-git-hooks"
   },

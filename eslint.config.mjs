@@ -2,6 +2,8 @@ import antfu from '@antfu/eslint-config';
 
 export default antfu({
   vue: true,
+  // monorepo暂时不懂怎么弄，一直报错
+  unocss: false,
   rules: {
     'no-new': 'off',
     'no-console': 'off',
