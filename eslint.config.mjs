@@ -1,5 +1,40 @@
-import antfu from '@antfu/eslint-config'
+import antfu from '@antfu/eslint-config';
 
 export default antfu({
-  unocss: false,
-})
+  vue: true,
+  rules: {
+    'no-new': 'off',
+    'no-console': 'off',
+    'ts/ban-ts-comment': 'off',
+    'ts/no-require-imports': 'off',
+    'eqeqeq': 'off',
+    'vue/eqeqeq': 'off',
+    'regexp/no-misleading-capturing-group': 'off',
+  },
+  typescript: true,
+  stylistic: {
+    semi: true,
+    jsx: true,
+    overrides: {},
+  },
+  ignores: [
+    '.prettierrc',
+    '**/.prettierrc/**',
+    'pnpm*',
+    '**/pnpm*/**',
+    '!commitlint.config.js',
+    '!**/commitlint.config.js/**',
+    '.babel.config.js',
+    '**/.babel.config.js/**',
+    '!.umirc.ts',
+    '!**/.umirc.ts/**',
+    '*.md',
+    '**/*.md/**',
+    '*.drawio',
+    '*.html',
+    '**/*.html/**',
+    'docs/**',
+    '**/compiled/**',
+    'commitlint.config.ts',
+  ],
+});
