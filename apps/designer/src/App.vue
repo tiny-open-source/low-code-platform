@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue';
 import Framework from './layouts/Framework.vue';
 </script>
 
 <template>
-  <Framework>
-    <div>Hello World</div>
-  </Framework>
+  <Framework />
 </template>
 
-<style scoped>
+<style>
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
 </style>
