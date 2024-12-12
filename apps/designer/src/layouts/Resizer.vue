@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import type { GetColumnWidth, Services } from '@/type';
 import Gesto from 'gesto';
 
 defineOptions({
   name: 'Resizer',
 });
-
+const props = defineProps<{
+  type: 'left' | 'right';
+}>();
+const services = inject<Services>('services');
 const target = ref<HTMLElement | null>(null);
 
 let getso: Gesto;
@@ -17,9 +21,23 @@ onMounted(() => {
     container: window,
     pinchOutside: true,
   }).on('drag', (e) => {
-    if (!target.value)
+    if (!target.value || !services)
       return;
-    console.log(e.deltaX);
+    let { left, right } = {
+      ...toRaw(services.uiService.get<GetColumnWidth>('columnWidth')),
+    };
+
+    if (props.type === 'left') {
+      left += e.deltaX;
+    }
+    else if (props.type === 'right') {
+      right -= e.deltaX;
+    }
+
+    services.uiService.set('columnWidth', {
+      left,
+      right,
+    });
   });
 });
 onUnmounted(() => {

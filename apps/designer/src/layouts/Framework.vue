@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue';
+import type { GetColumnWidth, Services } from '@/type';
 import Resizer from './Resizer.vue';
 
-const columnWidth = ref({
-  left: '200px',
-  center: '500px',
-  right: '200px',
-});
+const { uiService } = inject<Services>('services')!;
+const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'));
 </script>
 
 <template>
@@ -15,15 +12,15 @@ const columnWidth = ref({
       <slot />
     </div>
     <div class="content w-full h-[calc(100%-35px)]" flex="~ justify-between">
-      <div class="left" :style="{ width: columnWidth.left }">
+      <div class="left" :style="{ width: `${columnWidth.left}px` }">
         <slot name="sidebar" />
       </div>
       <Resizer type="left" />
-      <div class="center relative transform-gpu flex-1 h-full" :style="{ width: columnWidth.center }">
+      <div class="center relative transform-gpu flex-1 h-full" :style="{ width: `${columnWidth.center}px` }">
         <slot name="workspace" />
       </div>
       <Resizer type="right" />
-      <div class="right" :style="{ width: columnWidth.right }">
+      <div class="right" :style="{ width: `${columnWidth.right}px` }">
         <div class="h-full overflow-auto scrollbar scrollbar-rounded scrollbar-w-8px scrollbar-radius-2 scrollbar-track-radius-4 scrollbar-thumb-radius-4">
           <slot name="propsPanel" />
         </div>
