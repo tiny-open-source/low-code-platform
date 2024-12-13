@@ -1,0 +1,30 @@
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
+import pkg from './package.json';
+
+const deps = Object.keys(pkg.dependencies);
+export default defineConfig({
+  plugins: [
+    dts({
+      outDir: 'dist/types',
+      include: ['src/**/*'],
+      staticImport: true,
+      insertTypesEntry: true,
+    }),
+  ],
+  build: {
+    sourcemap: true,
+
+    lib: {
+      entry: 'src/index.ts',
+      name: 'LowCodeUtils',
+      fileName: 'lowcode-utils',
+    },
+    rollupOptions: {
+      // 确保外部化处理那些你不想打包进库的依赖
+      external(id: string) {
+        return deps.some(k => new RegExp(`^${k}`).test(id));
+      },
+    },
+  },
+});

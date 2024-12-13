@@ -112,8 +112,71 @@ importers:
         specifier: 2.0.29
         version: 2.0.29(typescript@5.6.2)
 
+  packages/core:
+    dependencies:
+      events:
+        specifier: ^3.3.0
+        version: 3.3.0
+    devDependencies:
+      '@lowcode/schema':
+        specifier: workspace:*
+        version: link:../schema
+      '@types/node':
+        specifier: ^20.17.9
+        version: 20.17.9
+      vite:
+        specifier: ^6.0.3
+        version: 6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1)
+      vite-plugin-dts:
+        specifier: ^4.3.0
+        version: 4.3.0(@types/node@20.17.9)(rollup@4.28.1)(typescript@5.6.2)(vite@6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1))
+
+  packages/runtime/vue3:
+    dependencies:
+      axios:
+        specifier: ^1.7.9
+        version: 1.7.9
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.6.2)
+    devDependencies:
+      '@lowcode/schema':
+        specifier: workspace:^
+        version: link:../../schema
+      '@types/node':
+        specifier: ^20.17.9
+        version: 20.17.9
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.1(vite@6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.2))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^4.1.1
+        version: 4.1.1(vite@6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.2))
+      vite:
+        specifier: ^6.0.3
+        version: 6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1)
+
   packages/schema:
     devDependencies:
+      '@types/node':
+        specifier: ^20.17.9
+        version: 20.17.9
+      vite:
+        specifier: ^6.0.3
+        version: 6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1)
+      vite-plugin-dts:
+        specifier: ^4.3.0
+        version: 4.3.0(@types/node@20.17.9)(rollup@4.28.1)(typescript@5.6.2)(vite@6.0.3(@types/node@20.17.9)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1))
+
+  packages/utils:
+    dependencies:
+      moment:
+        specifier: ^2.30.1
+        version: 2.30.1
+    devDependencies:
+      '@lowcode/schema':
+        specifier: workspace:^
+        version: link:../schema
       '@types/node':
         specifier: ^20.17.9
         version: 20.17.9
@@ -1544,6 +1607,9 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
+
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
@@ -2167,6 +2233,15 @@ packages:
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
 
+  follow-redirects@1.15.9:
+    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+
   foreground-child@3.3.0:
     resolution: {integrity: sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg==}
     engines: {node: '>=14'}
@@ -2780,6 +2855,9 @@ packages:
   mlly@1.7.3:
     resolution: {integrity: sha512-xUsx5n/mN0uQf4V548PKQ+YShA4/IW0KI1dZhrNrPCLG+xizETbHTkOa1f8/xut9JRPp8kQuMnz0oqwkTiLo/A==}
 
+  moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -3014,6 +3092,9 @@ packages:
 
   proto-list@1.2.4:
     resolution: {integrity: sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==}
+
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -5304,6 +5385,14 @@ snapshots:
 
   asynckit@0.4.0: {}
 
+  axios@1.7.9:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   balanced-match@1.0.2: {}
 
   binary-extensions@2.3.0: {}
@@ -6052,6 +6141,8 @@ snapshots:
       keyv: 4.5.4
 
   flatted@3.3.2: {}
+
+  follow-redirects@1.15.9: {}
 
   foreground-child@3.3.0:
     dependencies:
@@ -6814,6 +6905,8 @@ snapshots:
       pkg-types: 1.2.1
       ufo: 1.5.4
 
+  moment@2.30.1: {}
+
   mrmime@2.0.0: {}
 
   ms@2.1.3: {}
@@ -7029,6 +7122,8 @@ snapshots:
       parse-ms: 4.0.0
 
   proto-list@1.2.4: {}
+
+  proxy-from-env@1.1.0: {}
 
   punycode@2.3.1: {}
 

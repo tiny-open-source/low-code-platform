@@ -1,0 +1,39 @@
+{
+  "name": "@lowcode/core",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "keywords": [
+    "vue"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/lowcode-core.es.js",
+      "require": "./dist/lowcode-core.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    },
+    "./*": "./*"
+  },
+  "main": "dist/lowcode-core.umd.js",
+  "module": "dist/lowcode-core.es.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "events": "^3.3.0"
+  },
+  "devDependencies": {
+    "@lowcode/schema": "workspace:*",
+    "@types/node": "^20.17.9",
+    "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}

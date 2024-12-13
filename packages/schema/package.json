@@ -7,7 +7,8 @@
   "license": "ISC",
   "keywords": [],
   "main": "dist/lowcode-schema.umd.js",
-  "module": "dist/lowcode-schema.es.js",
+  "module": "dist/lowcode-schema.js",
+  "types": "dist/types/src/index.d.ts",
   "engines": {
     "node": ">=18"
   },
