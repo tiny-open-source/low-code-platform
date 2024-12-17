@@ -4,7 +4,8 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "turbo build",
+    "build": "turbo --filter=@lowcode/* build",
+    "build:playground": "turbo --filter=!@lowcode/* build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "clean:top": "rimraf */**/dist */**/types */dist */**/.turbo coverage dwt* temp",
