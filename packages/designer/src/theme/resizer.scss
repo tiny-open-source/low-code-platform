@@ -1,0 +1,16 @@
+.lc-resizer {
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  width: 8px;
+  margin: 0 -5px;
+  height: 100%;
+  opacity: 0.9;
+  background: padding-box #d8dee8;
+  box-sizing: border-box;
+  cursor: col-resize;
+  z-index: 1;
+
+  &:hover {
+    border-color: #d8dee8;
+  }
+}

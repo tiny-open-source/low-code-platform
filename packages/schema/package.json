@@ -6,6 +6,17 @@
   "author": "",
   "license": "ISC",
   "keywords": [],
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/lowcode-schema.js",
+      "require": "./dist/lowcode-schema.umd.cjs"
+    },
+    "./style": {
+      "import": "./dist/lowcode-schema.css",
+      "require": "./dist/lowcode-schema.css"
+    }
+  },
   "main": "dist/lowcode-schema.umd.js",
   "module": "dist/lowcode-schema.js",
   "types": "dist/types/src/index.d.ts",
@@ -13,7 +24,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "build:watch": "vite build --watch"
   },
   "dependencies": {
   },

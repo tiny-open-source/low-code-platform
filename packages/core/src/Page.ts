@@ -11,11 +11,13 @@ class Page extends Node {
 
   constructor(options: ConfigOptions) {
     super(options.config);
+    this.setNode(options.config.id, this);
+    this.initNode(options.config);
   }
 
   initNode(config: MComponent | MContainer) {
     const node = new Node(config);
-    this.nodes.set(config.id, node);
+    this.setNode(config.id, node);
 
     config.items?.forEach((element: MComponent | MContainer) => {
       this.initNode(element);

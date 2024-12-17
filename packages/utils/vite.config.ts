@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import pkg from './package.json';
@@ -12,6 +13,11 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
   ],
+  resolve: {
+    alias: [
+      { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../../packages/$1/src') },
+    ],
+  },
   build: {
     sourcemap: true,
 

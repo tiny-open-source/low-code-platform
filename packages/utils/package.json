@@ -4,18 +4,20 @@
   "version": "1.0.0",
   "exports": {
     ".": {
+      "types": "./dist/types/src/index.d.ts",
       "import": "./dist/lowcode-utils.js",
       "require": "./dist/lowcode-utils.umd.cjs"
     }
   },
-  "main": "dist/tmagic-utils.umd.cjs",
-  "module": "dist/tmagic-utils.js",
+  "main": "dist/lowcode-utils.umd.cjs",
+  "module": "dist/lowcode-utils.js",
   "types": "dist/types/src/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "build:watch": "vite build --watch"
   },
   "dependencies": {
     "moment": "^2.30.1"
