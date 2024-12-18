@@ -4,9 +4,9 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "build": "turbo --filter=@lowcode/* build",
-    "build:playground": "turbo --filter=!@lowcode/* build",
-    "dev": "turbo dev",
+    "build": "turbo build --filter=@lowcode/* ",
+    "build:playground": "turbo build --filter=!@lowcode/*",
+    "dev": "pnpm build && turbo dev",
     "lint": "turbo lint",
     "clean:top": "rimraf */**/dist */**/types */dist */**/.turbo coverage dwt* temp",
     "clean:modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",

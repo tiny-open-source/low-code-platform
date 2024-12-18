@@ -1,9 +1,9 @@
 import path from 'node:path';
+import process from 'node:process';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import pkg from './package.json';
 
-const deps = Object.keys(pkg.dependencies);
 export default defineConfig({
   plugins: [
     dts({
@@ -15,22 +15,25 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: [
-      { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../../packages/$1/src') },
-    ],
+    alias: process.env.NODE_ENV === 'production'
+      ? []
+      : [{ find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../$1/src') }],
   },
   build: {
     sourcemap: true,
-
+    cssCodeSplit: false,
+    minify: false,
+    target: 'esnext',
     lib: {
       entry: 'src/index.ts',
-      name: 'LowCodeUtils',
-      fileName: 'lowcode-utils',
+      name: 'LowCodeStage',
+      fileName: 'lowcode-stage',
     },
+
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external(id: string) {
-        return deps.some(k => new RegExp(`^${k}`).test(id));
+        return Object.keys(pkg.dependencies).some(k => new RegExp(`^${k}`).test(id));
       },
     },
   },

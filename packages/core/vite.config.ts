@@ -1,4 +1,5 @@
 import path from 'node:path';
+import process from 'node:process';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import pkg from './package.json';
@@ -10,12 +11,14 @@ export default defineConfig({
       include: ['src/**/*'],
       staticImport: true,
       insertTypesEntry: true,
+      pathsToAliases: false,
     }),
   ],
   resolve: {
-    alias: [
-      { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../packages/$1/src') },
-    ],
+    alias:
+      process.env.NODE_ENV === 'production'
+        ? []
+        : [{ find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../$1/src') }],
   },
   build: {
     sourcemap: true,

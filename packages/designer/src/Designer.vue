@@ -1,17 +1,28 @@
 <script setup lang="ts">
+import type { MApp } from '@lowcode/schema';
 import type { Services } from './type';
+import designerService from '@designer/services/designer.service';
+import historyService from '@designer/services/history.service';
 import uiService from '@designer/services/ui.service';
-import { provide } from 'vue';
+import { provide, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 
 defineOptions({
   name: 'LowCodeDesigner',
 });
-
 const services: Services = {
   uiService,
+  historyService,
+  designerService,
 };
+const modelValue = defineModel<MApp>({ required: true });
+
+watch(modelValue, (n) => {
+  designerService.set('root', toRaw(n));
+}, {
+  immediate: true,
+});
 
 provide<Services>('services', services);
 </script>

@@ -18,13 +18,13 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@lowcode/core": "workspace:*",
-    "@lowcode/utils": "workspace:*",
+    "@lowcode/core": "workspace:^1.0.0",
+    "@lowcode/utils": "workspace:^1.0.0",
     "axios": "^1.7.9",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@lowcode/schema": "workspace:*",
+    "@lowcode/schema": "workspace:^1.0.0",
     "@types/node": "^20.17.9",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",

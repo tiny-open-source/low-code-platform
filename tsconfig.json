@@ -15,14 +15,15 @@
     "moduleResolution": "node",
     "paths": {
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
-      "@lowcode/*": ["packages/*/src"],
-      "@designer/*": ["packages/designer/src/*"]
+      "@lowcode/*": ["./packages/*/src"],
+      "@designer/*": ["./packages/designer/src/*"]
     },
     "resolveJsonModule": true,
     "types": [
       "node"
     ],
     "strict": true,
+    "declaration": true,
     "importHelpers": true,
     "noEmit": true,
     "sourceMap": true,

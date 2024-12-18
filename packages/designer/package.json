@@ -1,7 +1,7 @@
 {
   "name": "@lowcode/designer",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "style": "dist/low-code-designer.css",
   "exports": {
     ".": {
@@ -26,13 +26,16 @@
     "vue": "^3.5.13"
   },
   "dependencies": {
+    "@lowcode/stage": "workspace:^1.0.0",
     "events": "^3.3.0",
-    "gesto": "^1.19.4"
+    "gesto": "^1.19.4",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/events": "^3.0.3",
     "@types/jsdom": "^21.1.7",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.17.9",
     "@unocss/reset": "^0.65.1",
     "@vitejs/plugin-vue": "^5.2.1",

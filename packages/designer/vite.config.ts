@@ -1,4 +1,5 @@
-import { fileURLToPath, URL } from 'node:url';
+import path from 'node:path';
+import process from 'node:process';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
@@ -8,8 +9,8 @@ import dts from 'vite-plugin-dts';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import pkg from './package.json';
 // https://vite.dev/config/
+const alias = [{ find: /@designer/, replacement: path.join(__dirname, './src') }];
 export default defineConfig({
-  base: '/lowcode',
   css: {
     preprocessorOptions: {
       scss: {
@@ -26,9 +27,12 @@ export default defineConfig({
     resolvers: [AntDesignVueResolver()],
   })],
   resolve: {
-    alias: {
-      '@designer': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: process.env.NODE_ENV === 'production'
+      ? alias
+      : [
+          ...alias,
+          { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../$1/src') },
+        ],
   },
   build: {
     cssCodeSplit: false,

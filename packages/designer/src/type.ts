@@ -1,10 +1,16 @@
+import type { HistoryService } from '@designer/services/history.service';
 import type { UiService } from '@designer/services/ui.service';
+import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
+import type StageCore from '@lowcode/stage';
+import type { DesignerService } from './services/designer.service';
 
 export interface InstallOptions {
   [key: string]: any;
 }
 export interface Services {
   uiService: UiService;
+  historyService: HistoryService;
+  designerService: DesignerService;
 }
 export interface SetColumnWidth {
   left?: number;
@@ -19,6 +25,16 @@ export interface GetColumnWidth {
 export interface StageRect {
   width: number;
   height: number;
+}
+export interface StoreState {
+  root: MApp | null;
+  page: MPage | null;
+  parent: MContainer | null;
+  node: MNode | null;
+  highlightNode: MNode | null;
+  stage: StageCore | null;
+  modifiedNodeIds: Map<Id, Id>;
+  pageLength: number;
 }
 export interface UiState {
   /** 当前点击画布是否触发选中，true: 不触发，false: 触发，默认为false */

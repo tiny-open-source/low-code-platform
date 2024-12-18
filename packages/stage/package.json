@@ -1,5 +1,5 @@
 {
-  "name": "@lowcode/core",
+  "name": "@lowcode/stage",
   "type": "module",
   "version": "1.0.0",
   "description": "",
@@ -10,8 +10,8 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/lowcode-core.js",
-      "require": "./dist/lowcode-core.umd.cjs"
+      "import": "./dist/lowcode-stage.js",
+      "require": "./dist/lowcode-stage.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -19,8 +19,8 @@
     },
     "./*": "./*"
   },
-  "main": "dist/lowcode-core.umd.cjs",
-  "module": "dist/lowcode-core.js",
+  "main": "dist/lowcode-stage.umd.cjs",
+  "module": "dist/lowcode-stage.js",
   "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=18"
@@ -30,8 +30,10 @@
     "build:watch": "vite build --watch"
   },
   "dependencies": {
+    "@lowcode/core": "workspace:^",
     "@lowcode/schema": "workspace:^1.0.0",
-    "events": "^3.3.0"
+    "events": "^3.3.0",
+    "moveable": "^0.53.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.9",

@@ -1,6 +1,6 @@
 @use "./common/variables";
 
-.lc-framework {
+.#{variables.$namespace}-framework {
   display: flex;
   flex-direction: column;
   width: 100%;

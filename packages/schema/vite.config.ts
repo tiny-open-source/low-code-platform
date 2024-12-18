@@ -8,6 +8,7 @@ export default defineConfig({
       include: ['src/**/*'],
       staticImport: true,
       insertTypesEntry: true,
+      pathsToAliases: false,
     }),
   ],
   build: {

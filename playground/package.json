@@ -13,7 +13,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@lowcode/designer": "workspace:^",
+    "@lowcode/designer": "workspace:^1.0.0",
     "ant-design-vue": "4.x",
     "events": "^3.3.0",
     "gesto": "^1.19.4",

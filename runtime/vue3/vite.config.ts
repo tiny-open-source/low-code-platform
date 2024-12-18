@@ -30,6 +30,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         page: './page.html',
+        playground: './playground.html',
         components: './src/comp-entry.ts',
         config: './src/config-entry.ts',
         value: './src/value-entry.ts',

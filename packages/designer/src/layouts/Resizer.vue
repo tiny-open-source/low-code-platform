@@ -47,7 +47,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span ref="target" class="lc-resizer">
+  <div ref="target" class="lc-d-resizer">
     <slot />
-  </span>
+  </div>
 </template>

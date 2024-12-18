@@ -1,4 +1,6 @@
-.lc-resizer {
+@use "./common/variables";
+
+.#{variables.$namespace}-resizer {
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   width: 8px;

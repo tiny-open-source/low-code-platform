@@ -8,20 +8,20 @@ const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'))
 </script>
 
 <template>
-  <div class="lc-framework">
-    <div class="lc-framework__nav">
+  <div class="lc-d-framework">
+    <div class="lc-d-framework__nav">
       <slot name="header" />
     </div>
-    <div class="lc-framework__content">
-      <div class="lc-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
+    <div class="lc-d-framework__content">
+      <div class="lc-d-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
         <slot name="sidebar" />
       </div>
       <Resizer type="left" />
-      <div class="lc-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
+      <div class="lc-d-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
         <slot name="workspace" />
       </div>
       <Resizer type="right" />
-      <div class="lc-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
+      <div class="lc-d-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
         <slot name="propsPanel" />
       </div>
     </div>
