@@ -22,7 +22,6 @@ onMounted(() => {
     console.log('runtime-ready');
 
     runtime = rt;
-    console.log(root.value);
 
     // toRaw返回的值是一个引用而非快照，需要cloneDeep
     root.value && runtime?.updateRootConfig?.(cloneDeep(toRaw(root.value)));
@@ -31,7 +30,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="stageContainer" class="lc-stage-container" />
+  <div class="lc-d-stage">
+    <div ref="stageContainer" class="lc-d-stage-container" />
+  </div>
 </template>
 
 <style lang="scss" scoped></style>

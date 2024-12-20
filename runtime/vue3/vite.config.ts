@@ -2,17 +2,13 @@ import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import AutoImport from 'unplugin-auto-import/vite';
+import externalGlobals from 'rollup-plugin-external-globals';
 import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   base: '/lowcode/runtime/vue3',
-  plugins: [vue(), vueJsx(), AutoImport({
-    dts: true,
-    imports: [
-      'vue',
-    ],
-  })],
+  plugins: [vue(), vueJsx(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] }),
+  ],
   resolve: {
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },

@@ -9,7 +9,7 @@ import { fillBackgroundImage, style2Obj } from './utils';
 interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
-  platform?: 'editor' | 'mobile' | 'tv' | 'pc';
+  platform?: 'designer' | 'mobile' | 'tv' | 'pc';
   jsEngine?: 'browser';
   curPage?: Id;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
@@ -33,7 +33,7 @@ class App extends EventEmitter {
     options.jsEngine && (this.jsEngine = options.jsEngine);
 
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.platform === 'mobile' || this.platform === 'editor') {
+    if (this.platform === 'mobile' || this.platform === 'designer') {
       const calcFontsize = () => {
         let { width } = document.documentElement.getBoundingClientRect();
         width = Math.min(800, width);

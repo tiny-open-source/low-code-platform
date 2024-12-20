@@ -2,9 +2,10 @@
 import type { MPage } from '@lowcode/schema';
 import LowCodeRuntimeUiComponent from '../../Component.vue';
 import { useApp } from '../../use-app';
+import useCommonMethod from '../../use-common-method';
 
 defineOptions({
-  name: 'LowCodeRuntimeUiPage',
+  name: 'LowCodeRuntimeUiContainer',
 });
 const props = defineProps<{
   config: MPage;
@@ -13,12 +14,22 @@ const props = defineProps<{
 const app = useApp(props);
 
 const style = app?.transformStyle(props.config.style || {});
+
+// const commonMethod = useCommonMethod(props);
+const display = computed(() => {
+  const displayCfg = props.config?.display;
+  if (typeof displayCfg === 'function') {
+    return displayCfg(app);
+  }
+  return displayCfg !== false;
+});
 </script>
 
 <template>
   <div
+    v-if="display"
     :id="`${config.id || ''}`"
-    :class="`lowcode-ui-page${config.className ? ` ${config.className}` : ''}`"
+    :class="`lowcode-ui-container${config.className ? ` ${config.className}` : ''}`"
     :style="style"
   >
     <slot />

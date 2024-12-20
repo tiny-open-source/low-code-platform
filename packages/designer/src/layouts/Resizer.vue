@@ -21,6 +21,7 @@ onMounted(() => {
   getso = new Gesto(target.value, {
     container: window,
     pinchOutside: true,
+    keepDragging: true,
   }).on('drag', (e) => {
     if (!target.value || !services)
       return;

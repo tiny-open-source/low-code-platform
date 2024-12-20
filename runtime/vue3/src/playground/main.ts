@@ -1,27 +1,20 @@
-import Core from '@lowcode/core';
-import { getUrlParam } from '@lowcode/utils';
 import { createApp } from 'vue';
-import entry from '../comp-entry';
 
-import { getLocalConfig } from '../utils';
 import App from './App.vue';
 
-const vm = createApp(App);
+const componentUrl = import.meta.env.MODE === 'development' ? '../comp-entry.ts' : 'http://localhost:10002/lowcode/runtime/vue3/dist/assets/components.js';
 
-Object.values(entry.components).forEach((component: any) => {
-  vm.component(component.name, component);
+import(/* @vite-ignore */ componentUrl).then(() => {
+  const vm = createApp(App);
+
+  const { components, plugins } = window.lowcodePresetComponents;
+  Object.values(components).forEach((component: any) => {
+    vm.component(component.name, component);
+  });
+
+  Object.values(plugins).forEach((plugin: any) => {
+    vm.use(plugin);
+  });
+
+  vm.mount('#app');
 });
-
-Object.values(entry.plugins).forEach((plugin: any) => {
-  vm.use(plugin);
-});
-
-const app = new Core({
-  config: ((getUrlParam('localPreview') ? getLocalConfig() : window.lowcodeDSL) || [])[0] || {},
-  curPage: getUrlParam('page'),
-});
-
-vm.config.globalProperties.app = app;
-vm.provide('app', app);
-
-vm.mount('#app');
