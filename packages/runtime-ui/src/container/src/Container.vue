@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { MPage } from '@lowcode/schema';
+import { computed } from 'vue';
 import LowCodeRuntimeUiComponent from '../../Component.vue';
 import { useApp } from '../../use-app';
-import useCommonMethod from '../../use-common-method';
 
 defineOptions({
   name: 'LowCodeRuntimeUiContainer',

@@ -8,8 +8,8 @@ defineOptions({
 });
 const props = withDefaults(defineProps<{
   config: MText;
-  model: any;
-  vars: any;
+  model?: any;
+  vars?: any;
 }>(), {
   model: {},
   vars: {},

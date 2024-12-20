@@ -44,6 +44,19 @@ class StageCore extends EventEmitter {
 
     this.emit('mounted');
   }
+
+  /**
+   * 销毁实例
+   */
+  public destroy(): void {
+    const { renderer } = this;
+
+    renderer.destroy();
+
+    this.removeAllListeners();
+
+    this.container = undefined;
+  }
 }
 
 export default StageCore;

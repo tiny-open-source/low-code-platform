@@ -75,9 +75,18 @@ export default class StageRenderer extends EventEmitter {
     },
   });
 
-  private loadHandler = async () => {
-    console.log('load');
+  /**
+   * 销毁实例
+   */
+  public destroy(): void {
+    this.iframe?.removeEventListener('load', this.loadHandler);
+    this.contentWindow = null;
+    this.iframe?.remove();
+    this.iframe = undefined;
+    this.removeAllListeners();
+  }
 
+  private loadHandler = async () => {
     this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
     this.contentWindow.lowcode = this.getLowCodeApi();
 

@@ -1,4 +1,4 @@
-import type { GetColumnWidth, SetColumnWidth, UiState } from '@designer/type';
+import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@designer/type';
 import BaseService from '@designer/services/base.service';
 import { reactive, toRaw } from 'vue';
 
@@ -24,7 +24,7 @@ const state = reactive<UiState>({
   },
   stageRect: {
     width: 375,
-    height: 817,
+    height: 750,
   },
   columnWidth: defaultColumnWidth,
   showGuides: true,
@@ -56,9 +56,40 @@ class Ui extends BaseService {
   }
 
   public set<T>(name: keyof typeof state, value: T) {
+    // const mask = designerService.get<StageCore>('stage')?.mask;
     if (name === 'columnWidth') {
       this.setColumnWidth(value as unknown as SetColumnWidth);
     }
+    if (name === 'stageRect') {
+      this.setStageRect(value as unknown as StageRect);
+    }
+    // if (name === 'showGuides') {
+    //   mask?.showGuides(value as unknown as boolean);
+    // }
+
+    // if (name === 'showRule') {
+    //   mask?.showRule(value as unknown as boolean);
+    // }
+
+    (state as any)[name] = value;
+
+    if (name === 'stageContainerRect') {
+      state.zoom = this.calcZoom();
+    }
+  }
+
+  public zoom(zoom: number) {
+    this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
+    if (this.get<number>('zoom') < 0.1)
+      this.set('zoom', 0.1);
+  }
+
+  private setStageRect(value: StageRect) {
+    state.stageRect = {
+      ...state.stageRect,
+      ...value,
+    };
+    state.zoom = this.calcZoom();
   }
 
   private setColumnWidth({ left, center, right }: SetColumnWidth) {
@@ -89,6 +120,17 @@ class Ui extends BaseService {
 
     globalThis.localStorage.setItem(COLUMN_WIDTH_STORAGE_KEY, JSON.stringify(columnWidth));
     state.columnWidth = columnWidth;
+  }
+
+  private calcZoom() {
+    const { stageRect, stageContainerRect } = state;
+    const { height, width } = stageContainerRect;
+    if (!width || !height)
+      return 1;
+    if (width > stageRect.width && height > stageRect.height) {
+      return 1;
+    }
+    return Math.min((width - 100) / stageRect.width || 1, (height - 100) / stageRect.height || 1);
   }
 }
 export type UiService = Ui;

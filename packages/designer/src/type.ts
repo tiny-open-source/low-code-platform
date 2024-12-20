@@ -56,6 +56,22 @@ export interface UiState {
   /** 用于控制该属性配置表单内组件的尺寸 */
   propsPanelSize: 'large' | 'default' | 'small';
 }
+
+/** 容器布局 */
+export enum Layout {
+  FLEX = 'flex',
+  FIXED = 'fixed',
+  RELATIVE = 'relative',
+  ABSOLUTE = 'absolute',
+}
+
+export enum Keys {
+  ESCAPE = 'Space',
+}
+
+export const H_GUIDE_LINE_STORAGE_KEY = '$MagicStageHorizontalGuidelinesData';
+export const V_GUIDE_LINE_STORAGE_KEY = '$MagicStageVerticalGuidelinesData';
+
 declare global {
   interface Window {
     global: any;
