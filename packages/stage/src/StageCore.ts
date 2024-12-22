@@ -2,13 +2,14 @@ import type { CanSelect, Runtime, StageCoreConfig } from './types';
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import { EventEmitter } from 'events';
 import { DEFAULT_ZOOM } from './const';
+import StageMask from './StageMask';
 import StageRenderer from './StageRenderer';
 
 class StageCore extends EventEmitter {
   public config: StageCoreConfig;
   public zoom = DEFAULT_ZOOM;
   public renderer: StageRenderer;
-  // public mask: StageMask;
+  public mask: StageMask;
   public container?: HTMLDivElement;
   private canSelect: CanSelect;
   constructor(config: StageCoreConfig) {
@@ -18,7 +19,7 @@ class StageCore extends EventEmitter {
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
 
     this.renderer = new StageRenderer({ core: this });
-    // this.mask = new StageMask({ core: this });
+    this.mask = new StageMask({ core: this });
 
     this.renderer.on('runtime-ready', (runtime: Runtime) => {
       this.emit('runtime-ready', runtime);
@@ -38,9 +39,10 @@ class StageCore extends EventEmitter {
    */
   public async mount(el: HTMLDivElement) {
     this.container = el;
-    const { renderer } = this;
+    const { renderer, mask } = this;
 
     await renderer.mount(el);
+    mask.mount(el);
 
     this.emit('mounted');
   }

@@ -17,6 +17,9 @@ export interface StageCoreConfig {
   autoScrollIntoView?: boolean;
   updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
 }
+export interface StageMaskConfig {
+  core: StageCore;
+}
 export interface SortEventData {
   src: Id;
   dist: Id;
