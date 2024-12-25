@@ -154,8 +154,6 @@ export class ScrollViewer {
   };
 
   private keydownHandler = (event: KeyboardEvent) => {
-    console.log('keydownHandler', event.code, this.enter, this.targetEnter, this.keydown);
-
     if (event.code === Keys.ESCAPE && this.enter) {
       event.preventDefault();
       event.stopImmediatePropagation();

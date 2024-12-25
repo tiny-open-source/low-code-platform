@@ -34,9 +34,11 @@
     "@lowcode/schema": "workspace:^1.0.0",
     "@scena/guides": "^0.29.2",
     "events": "^3.3.0",
+    "lodash-es": "^4.17.21",
     "moveable": "^0.53.0"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.17.9",
     "vite": "^6.0.3",
     "vite-plugin-dts": "^4.3.0"
