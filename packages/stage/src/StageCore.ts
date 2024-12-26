@@ -25,7 +25,7 @@ class StageCore extends EventEmitter {
       this.emit('runtime-ready', runtime);
     });
     this.renderer.on('page-el-update', (el: HTMLElement) => {
-      console.log('page-el-update', el);
+      this.mask.observe(el);
     });
   }
 

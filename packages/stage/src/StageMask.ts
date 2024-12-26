@@ -3,7 +3,7 @@ import type { StageMaskConfig } from './types';
 import { throttle } from 'lodash-es';
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Ruler';
-import { createDiv } from './utils';
+import { createDiv, getScrollParent } from './utils';
 
 const throttleTime = 100;
 const wrapperClassName = 'designer-mask-wrapper';
@@ -57,13 +57,18 @@ export default class StageMask extends Rule {
   public pageScrollParent: HTMLElement | null = null;
   public scrollTop = 0;
   public scrollLeft = 0;
+  public width = 0;
+  public height = 0;
   public wrapper: HTMLDivElement;
   public wrapperHeight = 0;
   public wrapperWidth = 0;
   public maxScrollTop = 0;
   public maxScrollLeft = 0;
 
+  public intersectionObserver: IntersectionObserver | null = null;
   private mode: Mode = Mode.ABSOLUTE;
+  private pageResizeObserver: ResizeObserver | null = null;
+  private wrapperResizeObserver: ResizeObserver | null = null;
   constructor(config: StageMaskConfig) {
     const wrapper = createWrapper();
     super(wrapper);
@@ -78,6 +83,76 @@ export default class StageMask extends Rule {
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
   };
+
+  /**
+   * 监听页面大小变化
+   * @description 同步页面与mask的大小
+   * @param page 页面Dom节点
+   */
+  public observe(page: HTMLElement): void {
+    if (!page)
+      return;
+
+    this.page = page;
+    this.pageScrollParent = getScrollParent(page) || this.core.renderer.contentWindow?.document.documentElement || null;
+    this.pageResizeObserver?.disconnect();
+    this.wrapperResizeObserver?.disconnect();
+    this.intersectionObserver?.disconnect();
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const { target, intersectionRatio } = entry;
+            if (intersectionRatio <= 0) {
+              this.scrollIntoView(target);
+            }
+            this.intersectionObserver?.unobserve(target);
+          });
+        },
+        {
+          root: this.pageScrollParent,
+          rootMargin: '0px',
+          threshold: 1.0,
+        },
+      );
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this.pageResizeObserver = new ResizeObserver((entries) => {
+        const [entry] = entries;
+        const { clientHeight, clientWidth } = entry.target;
+        this.setHeight(clientHeight);
+        this.setWidth(clientWidth);
+
+        this.scroll();
+        // if (this.core.dr.moveable) {
+        //   this.core.dr.updateMoveable();
+        // }
+      });
+
+      this.pageResizeObserver.observe(page);
+
+      this.wrapperResizeObserver = new ResizeObserver((entries) => {
+        const [entry] = entries;
+        const { clientHeight, clientWidth } = entry.target;
+        this.wrapperHeight = clientHeight;
+        this.wrapperWidth = clientWidth;
+        this.setMaxScrollLeft();
+        this.setMaxScrollTop();
+      });
+      this.wrapperResizeObserver.observe(this.wrapper);
+    }
+  }
+
+  public scrollIntoView(el: Element): void {
+    el.scrollIntoView();
+    if (!this.pageScrollParent)
+      return;
+    this.scrollLeft = this.pageScrollParent.scrollLeft;
+    this.scrollTop = this.pageScrollParent.scrollTop;
+    this.scroll();
+  }
 
   private mouseWheelHandler = (event: WheelEvent) => {
     this.emit('clearHighlight');
@@ -140,8 +215,69 @@ export default class StageMask extends Rule {
     this.scrollTo(scrollLeft, scrollTop);
   }
 
+  public setMode(mode: Mode) {
+    this.mode = mode;
+    this.scroll();
+    if (mode === Mode.FIXED) {
+      this.content.style.width = `${this.wrapperWidth}px`;
+      this.content.style.height = `${this.wrapperHeight}px`;
+    }
+    else {
+      this.content.style.width = `${this.width}px`;
+      this.content.style.height = `${this.height}px`;
+    }
+  }
+
+  /**
+   * 销毁实例
+   */
+  public destroy(): void {
+    this.content?.remove();
+    this.page = null;
+    this.pageScrollParent = null;
+    this.pageResizeObserver?.disconnect();
+    this.wrapperResizeObserver?.disconnect();
+
+    this.content.removeEventListener('mouseleave', this.mouseLeaveHandler);
+    super.destroy();
+  }
+
   private scrollTo(scrollLeft: number, scrollTop: number): void {
     this.content.style.transform = `translate3d(${-scrollLeft}px, ${-scrollTop}px, 0)`;
+  }
+
+  /**
+   * 设置蒙层高度
+   * @param height 高度
+   */
+  private setHeight(height: number): void {
+    this.height = height;
+    this.setMaxScrollTop();
+    this.content.style.height = `${height}px`;
+  }
+
+  /**
+   * 设置蒙层宽度
+   * @param width 宽度
+   */
+  private setWidth(width: number): void {
+    this.width = width;
+    this.setMaxScrollLeft();
+    this.content.style.width = `${width}px`;
+  }
+
+  /**
+   * 计算并设置最大滚动宽度
+   */
+  private setMaxScrollLeft(): void {
+    this.maxScrollLeft = Math.max(this.width - this.wrapperWidth, 0);
+  }
+
+  /**
+   * 计算并设置最大滚动高度
+   */
+  private setMaxScrollTop(): void {
+    this.maxScrollTop = Math.max(this.height - this.wrapperHeight, 0);
   }
 
   private mouseDownHandler = (event: MouseEvent): void => {

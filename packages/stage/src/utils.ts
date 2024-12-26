@@ -1,3 +1,4 @@
+import type { Offset } from './types';
 import { Mode, SELECTED_CLASS } from './const';
 
 function getParents(el: Element, relative: Element) {
@@ -10,7 +11,42 @@ function getParents(el: Element, relative: Element) {
   return parents;
 }
 
+export function getOffset(el: HTMLElement): Offset {
+  const { offsetParent } = el;
+
+  const left = el.offsetLeft;
+  const top = el.offsetTop;
+
+  if (offsetParent) {
+    const parentOffset = getOffset(offsetParent as HTMLElement);
+    return {
+      left: left + parentOffset.left,
+      top: top + parentOffset.top,
+    };
+  }
+
+  return {
+    left,
+    top,
+  };
+}
+
+export function getAbsolutePosition(el: HTMLElement, { top, left }: Offset) {
+  const { offsetParent } = el;
+
+  if (offsetParent) {
+    const parentOffset = getOffset(offsetParent as HTMLElement);
+    return {
+      left: left - parentOffset.left,
+      top: top - parentOffset.top,
+    };
+  }
+
+  return { left, top };
+}
+
 export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];
+
 export function isSameDomain(targetUrl = '', source = globalThis.location.host) {
   const isHttpUrl = /^https?:\/\//.test(targetUrl);
 

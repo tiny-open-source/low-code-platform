@@ -1,9 +1,15 @@
 import type Core from '@lowcode/core';
+
 import type { Id, MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from 'moveable';
+
+import type { GuidesType } from './const';
 import type StageCore from './StageCore';
+import type StageDragResize from './StageDragResize';
+import type StageMask from './StageMask';
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
+
 export interface StageCoreConfig {
   /** 需要对齐的dom节点的CSS选择器字符串 */
   snapElementQuerySelector?: string;
@@ -17,22 +23,66 @@ export interface StageCoreConfig {
   autoScrollIntoView?: boolean;
   updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
 }
+
+export interface StageRenderConfig {
+  core: StageCore;
+}
+
 export interface StageMaskConfig {
   core: StageCore;
 }
+
+export interface StageDragResizeConfig {
+  core: StageCore;
+  container: HTMLElement;
+}
+
+export type Rect = {
+  width: number;
+  height: number;
+} & Offset;
+
+export interface Offset {
+  left: number;
+  top: number;
+}
+
+export interface GuidesEventData {
+  type: GuidesType;
+  guides: number[];
+}
+
+export interface UpdateEventData {
+  el: HTMLElement;
+  ghostEl: HTMLElement;
+  style: {
+    width?: number;
+    height?: number;
+    left?: number;
+    top?: number;
+    transform?: {
+      rotate?: string;
+      scale?: string;
+    };
+  };
+}
+
 export interface SortEventData {
   src: Id;
   dist: Id;
   root?: MApp;
 }
+
 export interface UpdateData {
   config: MNode;
   root: MApp;
 }
+
 export interface RemoveData {
   id: Id;
   root: MApp;
 }
+
 export interface Runtime {
   getApp?: () => Core;
   beforeSelect?: (el: HTMLElement) => Promise<boolean> | boolean;
@@ -55,4 +105,16 @@ export interface LowCode {
 
 export interface RuntimeWindow extends Window {
   lowcode: LowCode;
+}
+
+export interface StageHighlightConfig {
+  core: StageCore;
+  container: HTMLElement;
+}
+
+export interface TargetCalibrateConfig {
+  parent: HTMLElement;
+  mask: StageMask;
+  dr: StageDragResize;
+  core: StageCore;
 }
