@@ -3,7 +3,7 @@ import type { StageMaskConfig } from './types';
 import { throttle } from 'lodash-es';
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Ruler';
-import { createDiv, getScrollParent } from './utils';
+import { createDiv, getScrollParent, isFixedParent } from './utils';
 
 const throttleTime = 100;
 const wrapperClassName = 'designer-mask-wrapper';
@@ -126,9 +126,9 @@ export default class StageMask extends Rule {
         this.setWidth(clientWidth);
 
         this.scroll();
-        // if (this.core.dr.moveable) {
-        //   this.core.dr.updateMoveable();
-        // }
+        if (this.core.dr.moveable) {
+          this.core.dr.updateMoveable();
+        }
       });
 
       this.pageResizeObserver.observe(page);
@@ -213,6 +213,10 @@ export default class StageMask extends Rule {
 
     this.scrollRule(scrollTop);
     this.scrollTo(scrollLeft, scrollTop);
+  }
+
+  public setLayout(el: HTMLElement): void {
+    this.setMode(isFixedParent(el) ? Mode.FIXED : Mode.ABSOLUTE);
   }
 
   public setMode(mode: Mode) {

@@ -4,7 +4,7 @@ import type { Services } from './type';
 import designerService from '@designer/services/designer.service';
 import historyService from '@designer/services/history.service';
 import uiService from '@designer/services/ui.service';
-import { provide, toRaw, watch } from 'vue';
+import { provide, reactive, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 
@@ -25,6 +25,17 @@ watch(modelValue, (n) => {
 });
 
 provide<Services>('services', services);
+provide(
+  'stageOptions',
+  reactive({
+    runtimeUrl: 'http://localhost:10002/lowcode/runtime/vue3/playground',
+    autoScrollIntoView: true,
+    render: null,
+    moveableOptions: {},
+    canSelect: (el: HTMLElement) => Boolean(el.id),
+    updateDragEl: null,
+  }),
+);
 </script>
 
 <template>

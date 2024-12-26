@@ -60,6 +60,9 @@ importers:
       '@lowcode/stage':
         specifier: workspace:^1.0.0
         version: link:../stage
+      '@lowcode/utils':
+        specifier: workspace:^
+        version: link:../utils
       ant-design-vue:
         specifier: 4.x
         version: 4.2.6(vue@3.5.13(typescript@5.6.2))
@@ -181,6 +184,9 @@ importers:
       moveable:
         specifier: ^0.53.0
         version: 0.53.0
+      moveable-helper:
+        specifier: ^0.4.0
+        version: 0.4.0(scenejs@1.10.3)
     devDependencies:
       '@types/lodash-es':
         specifier: ^4.17.12
@@ -562,6 +568,9 @@ packages:
 
   '@cfcs/core@0.0.6':
     resolution: {integrity: sha512-FxfJMwoLB8MEMConeXUCqtMGqxdtePQxRBOiGip9ULcYYam3WfCgoY6xdnMaSkYvRvmosp5iuG+TiPofm65+Pw==}
+
+  '@cfcs/core@0.1.0':
+    resolution: {integrity: sha512-kvYX0RpL45XTHJ5sW7teNbKeAa7pK3nNqaJPoFfZDPTIBJOkTtRD3QhkBG+O3Hu69a8xeMoPvF6y/RtJ6JUOdA==}
 
   '@clack/core@0.3.5':
     resolution: {integrity: sha512-5cfhQNH+1VQ2xLQlmzXMqUoiaH0lRBq9/CLW9lTyMbuKLC3+xEK01tHVvyut++mLOn5urSHmkm6I0Lg9MaJSTQ==}
@@ -3225,6 +3234,11 @@ packages:
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
 
+  moveable-helper@0.4.0:
+    resolution: {integrity: sha512-t1FK9PO187Gn0N6GVZcrQgePjiHmuj8eUhmJjH38LvTMnVVxiHzWYRx6ARFZvSFIIW4yb6BEAv4C99Bsx84nFw==}
+    peerDependencies:
+      scenejs: '>=1.4.1'
+
   moveable@0.53.0:
     resolution: {integrity: sha512-71jS9zIoQzMhnNvduhg4tUEdm23+fO/40FN7muVMbZvVwbTku2MIxxLhnU4qFvxI4oVxn75l79SbtgjuA+s7Pw==}
 
@@ -3320,6 +3334,9 @@ packages:
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
+
+  order-map@0.3.1:
+    resolution: {integrity: sha512-RSuElIGwzPuBLzS9Io7G8fpcnQeudg0XswOyOiwRNLX7lkf+eQ/KUp+kcAP7z7nTOdkrfxhZycyXwzFW75iJ6A==}
 
   overlap-area@1.1.0:
     resolution: {integrity: sha512-3dlJgJCaVeXH0/eZjYVJvQiLVVrPO4U1ZGqlATtx6QGO3b5eNM6+JgUKa7oStBTdYuGTk7gVoABCW6Tp+dhRdw==}
@@ -3724,6 +3741,9 @@ packages:
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
+
+  scenejs@1.10.3:
+    resolution: {integrity: sha512-o1Xrz5sRMeVOD5R9MizY2tYVPYeRnQNttiNRD7vtfi4j4+su1nuP2R/1yv3jDNol1zFfFHwwh2G0jxyt0SIqUA==}
 
   scroll-into-view-if-needed@2.2.31:
     resolution: {integrity: sha512-dGCXy99wZQivjmjIqihaBQNjryrz5rueJY7eHfTdyWEiR4ttYpsajb14rn9s5d4DY4EcY6+4+U/maARBXJedkA==}
@@ -4747,6 +4767,10 @@ snapshots:
   '@bufbuild/protobuf@2.2.3': {}
 
   '@cfcs/core@0.0.6':
+    dependencies:
+      '@egjs/component': 3.0.5
+
+  '@cfcs/core@0.1.0':
     dependencies:
       '@egjs/component': 3.0.5
 
@@ -7668,6 +7692,11 @@ snapshots:
 
   moment@2.30.1: {}
 
+  moveable-helper@0.4.0(scenejs@1.10.3):
+    dependencies:
+      '@daybrush/utils': 1.13.0
+      scenejs: 1.10.3
+
   moveable@0.53.0:
     dependencies:
       '@daybrush/utils': 1.13.0
@@ -7769,6 +7798,8 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
       word-wrap: 1.2.5
+
+  order-map@0.3.1: {}
 
   overlap-area@1.1.0:
     dependencies:
@@ -8153,6 +8184,14 @@ snapshots:
   saxes@6.0.0:
     dependencies:
       xmlchars: 2.2.0
+
+  scenejs@1.10.3:
+    dependencies:
+      '@cfcs/core': 0.1.0
+      '@daybrush/utils': 1.13.0
+      '@scena/event-emitter': 1.0.5
+      css-styled: 1.0.8
+      order-map: 0.3.1
 
   scroll-into-view-if-needed@2.2.31:
     dependencies:

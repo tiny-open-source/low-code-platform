@@ -18,7 +18,7 @@ export const mockDSL = ({
         width: '375',
         height: '1728',
         backgroundImage: '',
-        backgroundColor: 'rgba(248, 218, 218, 1)',
+        backgroundColor: '#F4F4F4',
         backgroundRepeat: 'no-repeat',
         backgroundSize: '100% 100%',
         color: '',

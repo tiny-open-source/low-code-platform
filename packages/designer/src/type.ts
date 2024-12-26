@@ -2,6 +2,7 @@ import type { HistoryService } from '@designer/services/history.service';
 import type { UiService } from '@designer/services/ui.service';
 import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
+import type { MoveableOptions } from '@lowcode/stage';
 import type { DesignerService } from './services/designer.service';
 
 export interface InstallOptions {
@@ -12,6 +13,16 @@ export interface Services {
   historyService: HistoryService;
   designerService: DesignerService;
 }
+
+export interface StageOptions {
+  runtimeUrl: string;
+  autoScrollIntoView: boolean;
+  render: () => HTMLDivElement;
+  moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
+  canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
+  updateDragEl: (el: HTMLDivElement) => void;
+}
+
 export interface SetColumnWidth {
   left?: number;
   center?: number | 'auto';
