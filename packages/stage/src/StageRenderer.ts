@@ -100,7 +100,7 @@ export default class StageRenderer extends EventEmitter {
     this.emit('onload');
     this.contentWindow.postMessage(
       {
-        tmagicRuntimeReady: true,
+        lowcodeRuntimeReady: true,
       },
       '*',
     );

@@ -48,7 +48,7 @@ export const mockDSL = ({
             fontWeight: '',
           },
           name: '文本',
-          text: 'Tmagic editor 营销活动编辑器',
+          text: 'lowcode designer 模板编辑器',
           multiple: true,
           events: [],
           created: '',

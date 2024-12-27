@@ -35,89 +35,97 @@ watch(pageConfig, async () => {
 });
 
 onMounted(() => {
-  setTimeout(() => {
-    window.lowcode?.onRuntimeReady({
-      getApp() {
-        return app;
-      },
-      updateRootConfig(config: MApp) {
-        console.log('update config', config);
-        root.value = config;
-      },
-      updatePageId(id: Id) {
-        console.log('update page id', id);
-        curPageId.value = id;
-        app?.setPage(id);
-      },
-      getSnapElements() {
-        return Array.from(document.querySelectorAll<HTMLElement>('[class*=magic-ui][id]'));
-      },
-      select(id: Id) {
-        console.log('select config', id);
-        selectedId.value = id;
-        const el = document.getElementById(`${id}`);
-        if (el)
-          return el;
-        return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
-      },
-      add({ config }: UpdateData) {
-        console.log('add config', config);
-        if (!root.value)
-          throw new Error('error');
-        if (!selectedId.value)
-          throw new Error('error');
-        const path = getNodePath(selectedId.value, [root.value]);
-        const node = path.pop();
-        const parent = node?.items ? node : path.pop();
-        if (!parent)
-          throw new Error('未找到父节点');
+  window.lowcode?.onRuntimeReady({
+    getApp() {
+      return app;
+    },
+    updateRootConfig(config: MApp) {
+      console.log('update config', config);
+      root.value = config;
+    },
+    updatePageId(id: Id) {
+      console.log('update page id', id);
+      curPageId.value = id;
+      app?.setPage(id);
+    },
+    getSnapElements() {
+      return Array.from(document.querySelectorAll<HTMLElement>('[class*=magic-ui][id]'));
+    },
+    select(id: Id) {
+      console.log('select config', id);
+      selectedId.value = id;
+      const el = document.getElementById(`${id}`);
+      if (el)
+        return el;
+      return nextTick().then(() => document.getElementById(`${id}`) as HTMLElement);
+    },
+    add({ config }: UpdateData) {
+      console.log('add config', config);
+      if (!root.value)
+        throw new Error('error');
+      if (!selectedId.value)
+        throw new Error('error');
+      const path = getNodePath(selectedId.value, [root.value]);
+      const node = path.pop();
+      const parent = node?.items ? node : path.pop();
+      if (!parent)
+        throw new Error('未找到父节点');
         // 当前选中节点作为父节点
-        parent.items?.push(config);
-      },
-      update({ config }: UpdateData) {
-        console.log('update config', config);
-        if (!root.value)
-          throw new Error('error');
-        const path = getNodePath(config.id, [root.value]);
-        const node = path.pop();
-        const parent = path.pop();
-        if (!node)
-          throw new Error('未找到目标节点');
-        if (!parent)
-          throw new Error('未找到父节点');
-        const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
-        parent.items.splice(index, 1, reactive(config));
-      },
-      remove({ id }: RemoveData) {
-        if (!root.value)
-          throw new Error('error');
-        const path = getNodePath(id, [root.value]);
-        const node = path.pop();
-        if (!node)
-          throw new Error('未找到目标元素');
-        const parent = path.pop();
-        if (!parent)
-          throw new Error('未找到父元素');
-        const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
-        parent.items.splice(index, 1);
-      },
-    });
+      parent.items?.push(config);
+    },
+    update({ config }: UpdateData) {
+      console.log('update config', config);
+      if (!root.value)
+        throw new Error('error');
+      const path = getNodePath(config.id, [root.value]);
+      const node = path.pop();
+      const parent = path.pop();
+      if (!node)
+        throw new Error('未找到目标节点');
+      if (!parent)
+        throw new Error('未找到父节点');
+      const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
+      parent.items.splice(index, 1, reactive(config));
+    },
+    remove({ id }: RemoveData) {
+      if (!root.value)
+        throw new Error('error');
+      const path = getNodePath(id, [root.value]);
+      const node = path.pop();
+      if (!node)
+        throw new Error('未找到目标元素');
+      const parent = path.pop();
+      if (!parent)
+        throw new Error('未找到父元素');
+      const index = parent.items?.findIndex((child: MNode) => child.id === node.id);
+      parent.items.splice(index, 1);
+    },
   });
 });
 </script>
 
 <template>
-  <low-code-runtime-ui-page v-if="pageConfig" :config="pageConfig" />
+  <transition name="fade" appear>
+    <low-code-runtime-ui-page v-if="pageConfig" :config="pageConfig" />
+  </transition>
 </template>
 
-<style  lang="scss">
+<style lang="scss">
 html,
 body,
 #app {
   width: 100%;
   height: 100%;
 }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
 
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 #app {
   position: relative;
   overflow: auto;
