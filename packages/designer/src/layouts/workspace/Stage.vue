@@ -14,6 +14,7 @@ const stageOptions = inject<StageOptions>('stageOptions');
 const services = inject<Services>('services');
 
 let runtime: Runtime | null = null;
+
 const root = computed(() => services?.designerService.get<MApp>('root'));
 const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
 const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
@@ -21,8 +22,10 @@ const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMo
 const page = computed(() => services?.designerService.get<MPage>('page'));
 const node = computed(() => services?.designerService.get<MNode>('node'));
 const stageWrap = ref<InstanceType<typeof ScrollViewer> | null>(null);
+
 let stage: StageCore | null = null;
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
+
 watchEffect(() => {
   if (stage)
     return;
@@ -52,24 +55,27 @@ watchEffect(() => {
   services?.designerService.set('stage', markRaw(stage));
 
   stage.mount(stageContainer.value);
+
   stage.mask.setGuides([
     getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
     getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
   ]);
-  // stage?.on('select', (el: HTMLElement) => {
-  //   services?.designerService.select(el.id);
-  // });
-  // stage?.on('highlight', (el: HTMLElement) => {
-  //   services?.designerService.highlight(el.id);
-  // });
 
-  // stage?.on('update', (ev: UpdateEventData) => {
-  //   services?.designerService.update({ id: ev.el.id, style: ev.style });
-  // });
+  stage?.on('select', (el: HTMLElement) => {
+    services?.designerService.select(el.id);
+  });
 
-  // stage?.on('sort', (ev: SortEventData) => {
-  //   services?.designerService.sort(ev.src, ev.dist);
-  // });
+  stage?.on('highlight', (el: HTMLElement) => {
+    services?.designerService.highlight(el.id);
+  });
+
+  stage?.on('update', (ev: UpdateEventData) => {
+    services?.designerService.update({ id: ev.el.id, style: ev.style });
+  });
+
+  stage?.on('sort', (ev: SortEventData) => {
+    services?.designerService.sort(ev.src, ev.dist);
+  });
 
   stage?.on('changeGuides', (e) => {
     services?.uiService.set('showGuides', true);
@@ -133,5 +139,3 @@ onUnmounted(() => {
     <div ref="stageContainer" class="lc-d-stage-container" :style="`transform: scale(${zoom})`" />
   </ScrollViewer>
 </template>
-
-<style lang="scss" scoped></style>

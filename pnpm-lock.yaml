@@ -225,6 +225,12 @@ importers:
       '@lowcode/designer':
         specifier: workspace:^1.0.0
         version: link:../packages/designer
+      '@lowcode/schema':
+        specifier: workspace:^
+        version: link:../packages/schema
+      '@lowcode/stage':
+        specifier: workspace:^1.0.0
+        version: link:../packages/stage
       ant-design-vue:
         specifier: 4.x
         version: 4.2.6(vue@3.5.13(typescript@5.6.2))

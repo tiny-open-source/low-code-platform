@@ -62,7 +62,7 @@ class StageCore extends EventEmitter {
       })
       .on('clearHighlight', async () => {
         this.highlightLayer.clearHighlight();
-      }); ;
+      });
 
     // 要先触发select，在触发update
     this.dr

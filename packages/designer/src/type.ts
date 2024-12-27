@@ -22,7 +22,11 @@ export interface StageOptions {
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl: (el: HTMLDivElement) => void;
 }
-
+export interface DesignerNodeInfo {
+  node?: MNode;
+  parent?: MContainer;
+  page?: MPage;
+}
 export interface SetColumnWidth {
   left?: number;
   center?: number | 'auto';

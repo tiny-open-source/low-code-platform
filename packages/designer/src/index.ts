@@ -8,7 +8,10 @@ import './theme/index.scss';
 
 export { default as LowCodeDesigner } from './Designer.vue';
 
+export { default as designerService } from './services/designer.service';
+export { default as historyService } from './services/history.service';
 export { default as uiService } from './services/ui.service';
+export type { MoveableOptions } from '@lowcode/stage';
 const defaultInstallOpt: InstallOptions = {
   // @todo, 自定义图片上传方法等编辑器依赖的外部选项
 };
