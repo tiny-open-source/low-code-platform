@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from '@lowcode/stage';
+import type StageCore from '@lowcode/stage';
 import type { Services } from './type';
 import designerService from '@designer/services/designer.service';
 import historyService from '@designer/services/history.service';
@@ -14,7 +15,7 @@ defineOptions({
 });
 const props = defineProps<{
   defaultSelected?: number | string;
-  moveableOptions: MoveableOptions;
+  moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions) ;
 }>();
 
 const modelValue = defineModel<MApp>({ required: true });

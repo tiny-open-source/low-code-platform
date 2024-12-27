@@ -46,7 +46,6 @@ watchEffect(() => {
         document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
         return stop();
       }
-
       return elCanSelect;
     },
     moveableOptions: stageOptions.moveableOptions,
