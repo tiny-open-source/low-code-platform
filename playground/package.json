@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@lowcode/designer": "workspace:^1.0.0",
+    "@lowcode/form": "workspace:^1.0.0",
     "@lowcode/schema": "workspace:^1.0.0",
     "@lowcode/stage": "workspace:^1.0.0",
     "ant-design-vue": "4.x",

@@ -6,17 +6,23 @@ import type { Services } from './type';
 import designerService from '@designer/services/designer.service';
 import historyService from '@designer/services/history.service';
 import uiService from '@designer/services/ui.service';
-import { onUnmounted, provide, reactive, toRaw, watch } from 'vue';
+import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
+import PropsPanel from './layouts/PropsPanel.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 
 defineOptions({
   name: 'LowCodeDesigner',
 });
+
 const props = defineProps<{
   defaultSelected?: number | string;
   moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions) ;
 }>();
+
+defineEmits(['propsPanelMounted']);
+
+const propsPanel = ref<InstanceType<typeof PropsPanel> | null>(null);
 
 const modelValue = defineModel<MApp>({ required: true });
 
@@ -66,10 +72,14 @@ defineExpose({
       <div>sidebar</div>
     </template>
     <template #workspace>
-      <Workspace />
+      <slot name="workspace">
+        <Workspace />
+      </slot>
     </template>
     <template #propsPanel>
-      <div>propsPanel</div>
+      <slot name="propsPanel">
+        <PropsPanel ref="propsPanel" @mounted="(instance) => $emit('propsPanelMounted', instance)" />
+      </slot>
     </template>
   </Framework>
 </template>

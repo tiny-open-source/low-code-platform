@@ -57,6 +57,9 @@ importers:
 
   packages/designer:
     dependencies:
+      '@lowcode/form':
+        specifier: workspace:^
+        version: link:../form
       '@lowcode/stage':
         specifier: workspace:^1.0.0
         version: link:../stage
@@ -139,6 +142,37 @@ importers:
       vitest:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@20.17.9)(jsdom@25.0.1)(sass-embedded@1.83.0)(sass@1.83.0)
+
+  packages/form:
+    dependencies:
+      ant-design-vue:
+        specifier: 4.x
+        version: 4.2.6(vue@3.5.13(typescript@5.6.2))
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.6.2)
+    devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
+      '@types/node':
+        specifier: ^20.17.9
+        version: 20.17.9
+      '@vitejs/plugin-vue':
+        specifier: ^5.2.1
+        version: 5.2.1(vite@6.0.3(@types/node@20.17.9)(jiti@2.4.1)(sass-embedded@1.83.0)(sass@1.83.0)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.2))
+      '@vitejs/plugin-vue-jsx':
+        specifier: ^4.1.1
+        version: 4.1.1(vite@6.0.3(@types/node@20.17.9)(jiti@2.4.1)(sass-embedded@1.83.0)(sass@1.83.0)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.2))
+      vite:
+        specifier: ^6.0.3
+        version: 6.0.3(@types/node@20.17.9)(jiti@2.4.1)(sass-embedded@1.83.0)(sass@1.83.0)(tsx@4.19.2)(yaml@2.6.1)
+      vite-plugin-dts:
+        specifier: ^4.3.0
+        version: 4.3.0(@types/node@20.17.9)(rollup@4.28.1)(typescript@5.6.2)(vite@6.0.3(@types/node@20.17.9)(jiti@2.4.1)(sass-embedded@1.83.0)(sass@1.83.0)(tsx@4.19.2)(yaml@2.6.1))
 
   packages/runtime-ui:
     dependencies:
@@ -225,8 +259,11 @@ importers:
       '@lowcode/designer':
         specifier: workspace:^1.0.0
         version: link:../packages/designer
+      '@lowcode/form':
+        specifier: workspace:^1.0.0
+        version: link:../packages/form
       '@lowcode/schema':
-        specifier: workspace:^
+        specifier: workspace:^1.0.0
         version: link:../packages/schema
       '@lowcode/stage':
         specifier: workspace:^1.0.0

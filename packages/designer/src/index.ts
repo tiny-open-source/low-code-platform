@@ -12,12 +12,12 @@ export { default as designerService } from './services/designer.service';
 export { default as historyService } from './services/history.service';
 export { default as uiService } from './services/ui.service';
 export type { MoveableOptions } from '@lowcode/stage';
-const defaultInstallOpt: InstallOptions = {
+const defaultInstallOptions: InstallOptions = {
   // @todo, 自定义图片上传方法等编辑器依赖的外部选项
 };
 export default {
   install: (app: App, opt?: InstallOptions): void => {
-    const option = Object.assign(defaultInstallOpt, opt || {});
+    const option = Object.assign(defaultInstallOptions, opt || {});
 
     app.config.globalProperties.$LOWCODE_DESIGNER = option;
 

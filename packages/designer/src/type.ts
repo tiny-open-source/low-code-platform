@@ -1,5 +1,6 @@
 import type { HistoryService } from '@designer/services/history.service';
 import type { UiService } from '@designer/services/ui.service';
+import type { FormConfig } from '@lowcode/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
@@ -91,4 +92,8 @@ declare global {
   interface Window {
     global: any;
   }
+}
+export interface PropsState {
+  propsConfigMap: Record<string, FormConfig>;
+  propsValueMap: Record<string, MNode>;
 }
