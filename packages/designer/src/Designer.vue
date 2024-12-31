@@ -5,6 +5,7 @@ import type StageCore from '@lowcode/stage';
 import type { Services } from './type';
 import designerService from '@designer/services/designer.service';
 import historyService from '@designer/services/history.service';
+import propsService from '@designer/services/props.service';
 import uiService from '@designer/services/ui.service';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
@@ -36,6 +37,7 @@ const services: Services = {
   uiService,
   historyService,
   designerService,
+  propsService,
 };
 
 watch(modelValue, (n) => {

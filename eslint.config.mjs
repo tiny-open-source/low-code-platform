@@ -12,6 +12,7 @@ export default antfu({
     'eqeqeq': 'off',
     'vue/eqeqeq': 'off',
     'regexp/no-misleading-capturing-group': 'off',
+    'vue/component-definition-name-casing': 'off',
   },
   typescript: true,
   stylistic: {

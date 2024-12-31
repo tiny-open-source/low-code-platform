@@ -3,7 +3,7 @@ import { Input } from 'ant-design-vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({
-  name: 'LFieldsText',
+  name: 'l-fields-text',
 });
 defineProps(fieldProps);
 </script>
@@ -11,5 +11,3 @@ defineProps(fieldProps);
 <template>
   <Input v-model="model[name]" />
 </template>
-
-<style lang="scss" scoped></style>

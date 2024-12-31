@@ -1,0 +1,85 @@
+<script setup lang="ts">
+import type { FormState, TabConfig, TabPaneConfig } from '../schema';
+import { TabPane, Tabs } from 'ant-design-vue';
+import { computed, inject, ref } from 'vue';
+import { display as _display, filterFunction } from '../utils/form';
+
+defineOptions({
+  name: 'l-form-tab',
+});
+const props = defineProps<{
+  config: TabConfig;
+  model: any;
+  prop: string;
+}>();
+
+const emit = defineEmits(['change']);
+
+const lForm = inject<FormState | undefined>('lForm');
+function getActive(mForm: FormState | undefined, props: any, activeTabName: string) {
+  const { config, model, prop } = props;
+  const { active } = config;
+
+  if (typeof active === 'function')
+    return active(mForm, { model, formValue: mForm?.values, prop });
+  if (+activeTabName >= props.config.items.length)
+    return '0';
+  if (typeof active !== 'undefined')
+    return active;
+
+  return '0';
+}
+function tabClickHandler(mForm: FormState | undefined, tab: any, props: any) {
+  const { config, model, prop } = props;
+
+  if (typeof config.onTabClick === 'function') {
+    config.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
+  }
+
+  const tabConfig = config.items.find((item: TabPaneConfig) => tab.name === item.status);
+  if (tabConfig && typeof tabConfig.onTabClick === 'function') {
+    tabConfig.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
+  }
+}
+const activeTabName = ref(getActive(lForm, props, ''));
+
+const tabs = computed(() => {
+  if (props.config.dynamic) {
+    if (!props.config.name)
+      throw new Error('dynamic tab 必须配置name');
+    return props.model[props.config.name] || [];
+  }
+  return props.config.items;
+});
+function display(displayConfig: any) {
+  return _display(lForm, displayConfig, props);
+}
+function tabItems(tab: TabPaneConfig) {
+  return (props.config.dynamic ? props.config.items : tab.items);
+}
+function filter(config: any) {
+  return filterFunction(lForm, config, props);
+}
+function changeHandler() {
+  emit('change', props.model);
+  if (typeof props.config.onChange === 'function') {
+    props.config.onChange(lForm, { model: props.model, prop: props.prop, config: props.config });
+  }
+}
+</script>
+
+<template>
+  <Tabs v-model:active-key="activeTabName" @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
+    <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
+      <TabPane v-if="display(tab.display) && tabItems(tab).length" :key="filter(tab.status) || tabIndex.toString()" :tab="filter(tab.title)">
+        <l-form-container
+          v-for="item in tabItems(tab)" :key="item[lForm?.keyProp || '__key']"
+          :config="item"
+          :model="config.dynamic ? model[config.name || ''][tabIndex] : tab.name ? model[tab.name] : model"
+          :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
+          @change="changeHandler"
+        />
+      </TabPane>
+    </template>
+  </Tabs>
+</template>

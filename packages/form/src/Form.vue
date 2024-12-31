@@ -2,7 +2,8 @@
 import type { FormConfig, FormState, FormValue } from './schema';
 import { Form } from 'ant-design-vue';
 import { isEqual } from 'lodash-es';
-import { reactive, ref, toRaw, watch } from 'vue';
+import { provide, reactive, ref, toRaw, watch } from 'vue';
+import { initValue } from './utils/form';
 
 defineOptions({
   name: 'LForm',
@@ -62,25 +63,35 @@ const formState: FormState = reactive<FormState>({
     // TODO
   },
 });
-// watch(
-//   [() => props.config, () => props.initValues],
-//   ([config], [preConfig]) => {
-//     if (!isEqual(toRaw(config), toRaw(preConfig))) {
-//       initialized.value = false;
-//     }
+provide('lForm', formState);
+watch(
+  [() => props.config, () => props.initValues],
+  ([config], [preConfig]) => {
+    if (!isEqual(toRaw(config), toRaw(preConfig))) {
+      initialized.value = false;
+    }
 
-//     initValue(formState, {
-//       initValues: props.initValues,
-//       config: props.config,
-//     }).then((value) => {
-//       values.value = value;
-//       initialized.value = true;
-//     });
-//   },
-//   { immediate: true },
-// );
+    initValue(formState, {
+      initValues: props.initValues,
+      config: props.config,
+    }).then((value) => {
+      values.value = value;
+      initialized.value = true;
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <Form ref="lForm" class="l-form" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout" />
+  <Form ref="lForm" class="l-form" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
+    <template v-if="initialized && Array.isArray(config)">
+      <LFormContainer
+        v-for="(item, index) in config"
+        :key="item[keyProp] ?? index"
+        :config="item"
+        :model="values"
+      />
+    </template>
+  </Form>
 </template>

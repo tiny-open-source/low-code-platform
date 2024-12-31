@@ -5,6 +5,7 @@ import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
 import type { DesignerService } from './services/designer.service';
+import type { PropsService } from './services/props.service';
 
 export interface InstallOptions {
   [key: string]: any;
@@ -13,6 +14,7 @@ export interface Services {
   uiService: UiService;
   historyService: HistoryService;
   designerService: DesignerService;
+  propsService: PropsService;
 }
 
 export interface StageOptions {
