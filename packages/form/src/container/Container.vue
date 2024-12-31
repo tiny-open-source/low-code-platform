@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
 import { computed, inject, ref, resolveComponent } from 'vue';
-import { display as displayFunction } from '../utils/form';
+import { display as displayFunction, filterFunction } from '../utils/form';
 
 defineOptions({
   name: 'LFormContainer',
@@ -49,6 +49,7 @@ const type = computed((): string => {
     return '';
   return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
 });
+const disabled = computed(() => filterFunction(lForm, props.config.disabled, props));
 const tagName = computed(() => {
   const component = resolveComponent(`l-${items.value ? 'form' : 'fields'}-${type.value}`);
   if (typeof component !== 'string')
@@ -69,11 +70,24 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
 </script>
 
 <template>
-  <div>
-    {{ `l-${items ? 'form' : 'fields'}-${type}` }}
+  <div
+    v-if="config"
+    :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
+    :class="config.className"
+    class="l-form-container"
+  >
+    <l-fields-hidden
+      v-if="type === 'hidden'"
+      :model="model"
+      :config="config"
+      :name="config.name"
+      :disabled="disabled"
+      :prop="itemProp"
+    />
+
     <component
       :is="tagName"
-      v-if="items && !config.text && type && display"
+      v-else-if="items && !config.text && type && display"
       :key="key(config)"
       :size="size"
       :model="model"

@@ -6,6 +6,10 @@
   "author": "",
   "license": "ISC",
   "keywords": [],
+  "sideEffects": [
+    "dist/*",
+    "src/theme/*"
+  ],
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

@@ -84,7 +84,7 @@ watch(
 </script>
 
 <template>
-  <Form ref="lForm" class="l-form" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
+  <Form ref="lForm" class="lc-f" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
     <template v-if="initialized && Array.isArray(config)">
       <LFormContainer
         v-for="(item, index) in config"
