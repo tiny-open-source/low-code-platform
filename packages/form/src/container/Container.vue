@@ -56,6 +56,8 @@ const tooltip = computed(() => filterFunction(lForm, props.config.tooltip, props
 const extra = computed(() => filterFunction(lForm, props.config.extra, props));
 const expandHandler = () => (expand.value = !expand.value);
 const tagName = computed(() => {
+  console.log(type.value);
+
   const component = resolveComponent(`l-${items.value ? 'form' : 'fields'}-${type.value}`);
   if (typeof component !== 'string')
     return component;
@@ -147,7 +149,6 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
       :disabled="disabled"
       :prop="itemProp"
     />
-
     <component
       :is="tagName"
       v-else-if="items && !config.text && type && display"
@@ -168,6 +169,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
         :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
         :name="itemProp"
         :label-col="itemLabelWidth"
+        :colon="false"
       >
         <template #label>
           <span v-html="type === 'checkbox' ? '' : config.text" />

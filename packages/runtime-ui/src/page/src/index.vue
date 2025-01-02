@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MPage } from '@lowcode/schema';
+import { computed } from 'vue';
 import LowCodeRuntimeUiComponent from '../../Component.vue';
 import { useApp } from '../../use-app';
 
@@ -12,7 +13,7 @@ const props = defineProps<{
 
 const app = useApp(props);
 
-const style = app?.transformStyle(props.config.style || {});
+const style = computed(() => app?.transformStyle(props.config.style || {}));
 </script>
 
 <template>

@@ -24,6 +24,6 @@ const display = computed(() => {
 
 <template>
   <component
-    :is="tagName" v-if="display" :id="config.id" :style="style" :class="`magic-ui-component${config.className ?? ''}`" :config="config"
+    :is="tagName" v-if="display" :id="config.id" :style="style" :class="`lowcode-ui-component${config.className ?? ''}`" :config="config"
   />
 </template>

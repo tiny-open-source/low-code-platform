@@ -35,11 +35,14 @@
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "vue": "^3.5.13"
+    "tinycolor2": "^1.6.0",
+    "vue": "^3.5.13",
+    "vue3-colorpicker": "^2.3.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.17.9",
+    "@types/tinycolor2": "^1.4.6",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "vite": "^6.0.3",
