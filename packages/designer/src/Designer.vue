@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
@@ -16,10 +17,15 @@ defineOptions({
   name: 'LowCodeDesigner',
 });
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   defaultSelected?: number | string;
   moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions) ;
-}>();
+  propsConfigs: Record<string, FormConfig>;
+}>(), {
+  defaultSelected: '',
+  moveableOptions: () => ({}),
+  propsConfigs: () => ({}),
+});
 
 defineEmits(['propsPanelMounted']);
 
@@ -45,7 +51,13 @@ watch(modelValue, (n) => {
 }, {
   immediate: true,
 });
-
+watch(
+  () => props.propsConfigs,
+  configs => propsService.setPropsConfigs(configs),
+  {
+    immediate: true,
+  },
+);
 provide<Services>('services', services);
 provide(
   'stageOptions',

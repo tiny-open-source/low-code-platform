@@ -16,12 +16,12 @@ const props = defineProps<{
 const emit = defineEmits(['change']);
 
 const lForm = inject<FormState | undefined>('lForm');
-function getActive(mForm: FormState | undefined, props: any, activeTabName: string) {
+function getActive(lForm: FormState | undefined, props: any, activeTabName: string) {
   const { config, model, prop } = props;
   const { active } = config;
 
   if (typeof active === 'function')
-    return active(mForm, { model, formValue: mForm?.values, prop });
+    return active(lForm, { model, formValue: lForm?.values, prop });
   if (+activeTabName >= props.config.items.length)
     return '0';
   if (typeof active !== 'undefined')
@@ -29,16 +29,16 @@ function getActive(mForm: FormState | undefined, props: any, activeTabName: stri
 
   return '0';
 }
-function tabClickHandler(mForm: FormState | undefined, tab: any, props: any) {
+function tabClickHandler(lForm: FormState | undefined, tab: any, props: any) {
   const { config, model, prop } = props;
 
   if (typeof config.onTabClick === 'function') {
-    config.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
+    config.onTabClick(lForm, tab, { model, formValue: lForm?.values, prop, config });
   }
 
   const tabConfig = config.items.find((item: TabPaneConfig) => tab.name === item.status);
   if (tabConfig && typeof tabConfig.onTabClick === 'function') {
-    tabConfig.onTabClick(mForm, tab, { model, formValue: mForm?.values, prop, config });
+    tabConfig.onTabClick(lForm, tab, { model, formValue: lForm?.values, prop, config });
   }
 }
 const activeTabName = ref(getActive(lForm, props, ''));

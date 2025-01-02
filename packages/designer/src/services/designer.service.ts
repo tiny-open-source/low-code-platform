@@ -2,7 +2,6 @@ import type StageCore from '@lowcode/stage';
 import { type DesignerNodeInfo, Layout, type StoreState } from '@designer/type';
 import { change2Fixed, Fixed2Other, getNodeIndex, isFixed, setLayout } from '@designer/utils/editor';
 
-import { log } from '@designer/utils/logger';
 import { type Id, type MApp, type MComponent, type MContainer, type MNode, type MPage, NodeType } from '@lowcode/schema';
 import { getNodePath, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
@@ -62,7 +61,7 @@ class Designer extends BaseService {
    */
   public set<T = MNode>(name: keyof StoreState, value: T) {
     this.state[name] = value as any;
-    log('store set ', name, ' ', value);
+    // log('store set ', name, ' ', value);
 
     if (name === 'root') {
       this.state.pageLength = (value as unknown as MApp)?.items?.length || 0;

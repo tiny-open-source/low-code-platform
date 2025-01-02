@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
+import { Button, FormItem, Tooltip } from 'ant-design-vue';
 import { computed, inject, ref, resolveComponent } from 'vue';
 import { display as displayFunction, filterFunction } from '../utils/form';
 
@@ -11,14 +12,15 @@ const props = withDefaults(defineProps<{
   model: FormValue;
   size?: 'small' | 'default' | 'large';
   prop?: string;
-  labelWidth?: string;
+  labelCol?: Record<string, any>;
   expandMore?: boolean;
   stepActive?: number | string;
 
 }>(), {
-  size: 'small',
+  size: 'default',
   prop: '',
 });
+const emit = defineEmits(['change']);
 const lForm = inject<FormState | undefined>('lForm');
 const expand = ref(false);
 const name = computed(() => props.config.name || '');
@@ -37,7 +39,7 @@ const itemProp = computed(() => {
   return `${props.prop}${props.prop ? '.' : ''}${n}`;
 });
 const items = computed(() => (props.config as ContainerCommonConfig).items);
-const itemLabelWidth = computed(() => props.config.labelWidth || props.labelWidth);
+const itemLabelWidth = computed(() => props.config.labelCol || props.labelCol);
 const type = computed((): string => {
   let { type } = props.config;
   if (typeof type === 'function') {
@@ -50,6 +52,9 @@ const type = computed((): string => {
   return type?.replace(/([A-Z])/g, '-$1').toLowerCase() || (items.value ? '' : 'text');
 });
 const disabled = computed(() => filterFunction(lForm, props.config.disabled, props));
+const tooltip = computed(() => filterFunction(lForm, props.config.tooltip, props));
+const extra = computed(() => filterFunction(lForm, props.config.extra, props));
+const expandHandler = () => (expand.value = !expand.value);
 const tagName = computed(() => {
   const component = resolveComponent(`l-${items.value ? 'form' : 'fields'}-${type.value}`);
   if (typeof component !== 'string')
@@ -64,8 +69,66 @@ const display = computed((): boolean => {
   return displayFunction(lForm, props.config.display, props);
 });
 const key = (config: any) => config[lForm?.keyProps];
+function filterHandler(filter: any, value: FormValue | number | string) {
+  if (typeof filter === 'function') {
+    return filter(lForm, value, {
+      model: props.model,
+      values: lForm?.initValues,
+      formValue: lForm?.values,
+      prop: itemProp.value,
+      config: props.config,
+    });
+  }
+
+  if (filter === 'number') {
+    return +value;
+  }
+
+  return value;
+}
+
+function changeHandler(onChange: any, value: FormValue | number | string) {
+  if (typeof onChange === 'function') {
+    return onChange(lForm, value, {
+      model: props.model,
+      values: lForm?.initValues,
+      formValue: lForm?.values,
+      prop: itemProp.value,
+      config: props.config,
+    });
+  }
+}
+
+function trimHandler(trim: any, value: FormValue | number | string) {
+  if (typeof value === 'string' && trim) {
+    return value.replace(/^\s*/, '').replace(/\s*$/, '');
+  }
+}
+
 const onChangeHandler = async function (v: FormValue, key?: string) {
-  console.log('onChangeHandler', v, key);
+  const { filter, onChange, trim, name, dynamicKey } = props.config as any;
+  let value: FormValue | number | string = v;
+
+  try {
+    value = filterHandler(filter, v);
+    value = (await changeHandler(onChange, value)) ?? value;
+    value = trimHandler(trim, value) ?? value;
+  }
+  catch (e) {
+    console.error(e);
+  }
+
+  // field内容下包含field-link时，model===value, 这里避免循环引用
+  if ((name || name === 0) && props.model !== value && (v !== value || props.model[name] !== value)) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.model[name] = value;
+  }
+  // 动态表单类型，根据value和key参数，直接修改model
+  if (key !== undefined && dynamicKey) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.model[key] = value;
+  }
+  emit('change', props.model);
 };
 </script>
 
@@ -99,5 +162,76 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
       :label-width="itemLabelWidth"
       @change="onChangeHandler"
     />
+    <template v-else-if="type && display">
+      <FormItem
+        :style="config.tip ? 'flex: 1' : ''"
+        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+        :name="itemProp"
+        :label-col="itemLabelWidth"
+      >
+        <template #label>
+          <span v-html="type === 'checkbox' ? '' : config.text" />
+        </template>
+        <Tooltip v-if="tooltip">
+          <component
+            :is="tagName"
+            :key="key(config)"
+            :size="size"
+            :model="model"
+            :config="config"
+            :name="name"
+            :disabled="disabled"
+            :prop="itemProp"
+            @change="onChangeHandler"
+          />
+          <template #title>
+            <div v-html="tooltip" />
+          </template>
+        </Tooltip>
+
+        <component
+          :is="tagName"
+          v-else
+          :key="key(config)"
+          :size="size"
+          :model="model"
+          :config="config"
+          :name="name"
+          :disabled="disabled"
+          :prop="itemProp"
+          @change="onChangeHandler"
+        />
+
+        <div v-if="extra" class="l-form-tip" v-html="extra" />
+      </FormItem>
+
+      <Tooltip v-if="config.tip" placement="left">
+        <template #title>
+          <div v-html="config.tip" />
+        </template>
+      </Tooltip>
+    </template>
+    <template v-else-if="items && display">
+      <template v-if="name || name === 0 ? model[name] : model">
+        <l-form-container
+          v-for="item in items"
+          :key="key(item)"
+          :model="name || name === 0 ? model[name] : model"
+          :config="item"
+          :size="size"
+          :step-active="stepActive"
+          :expand-more="expand"
+          :label-width="itemLabelWidth"
+          :prop="itemProp"
+          @change="onChangeHandler"
+        />
+      </template>
+    </template>
+
+    <div v-if="config.expand && type !== 'fieldset'" style="text-align: center">
+      <Button text @click="expandHandler">
+        {{ expand ? '收起配置' : '展开更多配置' }}
+      </Button>
+    </div>
   </div>
 </template>

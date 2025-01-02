@@ -1,10 +1,14 @@
 <script setup lang="ts" name="LForm">
 import type { FormConfig, FormState, FormValue } from './schema';
 import { Form } from 'ant-design-vue';
-import { isEqual } from 'lodash-es';
+import { cloneDeep, isEqual } from 'lodash-es';
 import { provide, reactive, ref, toRaw, watch } from 'vue';
 import { initValue } from './utils/form';
 
+export interface ValidateError {
+  message: string;
+  field: string;
+}
 defineOptions({
   name: 'LForm',
 });
@@ -29,8 +33,8 @@ const props = withDefaults(defineProps<{
   initValues: () => ({}),
   parentValues: () => ({}),
   config: () => [],
-  labelCol: () => ({ span: 8 }),
-  wrapperCol: () => ({ span: 16 }),
+  labelCol: () => ({ span: 2 }),
+  wrapperCol: () => ({ span: 6 }),
   disabled: false,
   height: 'auto',
   stepActive: 1,
@@ -42,7 +46,7 @@ const props = withDefaults(defineProps<{
   popperClass: '',
 });
 const emit = defineEmits(['change', 'field-input', 'field-change']);
-const lForm = ref<InstanceType<typeof Form>>();
+const formRef = ref();
 
 const initialized = ref(false);
 const values = ref<FormValue>({});
@@ -63,6 +67,9 @@ const formState: FormState = reactive<FormState>({
     // TODO
   },
 });
+function changeHandler() {
+  emit('change', values.value);
+}
 provide('lForm', formState);
 watch(
   [() => props.config, () => props.initValues],
@@ -81,16 +88,41 @@ watch(
   },
   { immediate: true },
 );
+defineExpose({
+  submitForm: async (native?: boolean): Promise<any> => {
+    try {
+      await formRef.value?.validate();
+      return native ? values.value : cloneDeep(toRaw(values.value));
+    }
+    catch (invalidFields: any) {
+      const error: string[] = [];
+
+      Object.entries(invalidFields).forEach(([, ValidateError]) => {
+        (ValidateError as ValidateError[]).forEach(({ field, message }) => {
+          if (field && message)
+            error.push(`${field} -> ${message}`);
+          if (field && !message)
+            error.push(`${field} -> 出现错误`);
+          if (!field && message)
+            error.push(`${message}`);
+        });
+      });
+      throw new Error(error.join('<br>') || '表单校验失败');
+    }
+  },
+});
 </script>
 
 <template>
-  <Form ref="lForm" class="lc-f" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
+  <Form ref="formRef" class="lc-f" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
     <template v-if="initialized && Array.isArray(config)">
       <LFormContainer
         v-for="(item, index) in config"
         :key="item[keyProp] ?? index"
         :config="item"
         :model="values"
+        :size
+        @change="changeHandler"
       />
     </template>
   </Form>

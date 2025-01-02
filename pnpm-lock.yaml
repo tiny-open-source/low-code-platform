@@ -58,13 +58,13 @@ importers:
   packages/designer:
     dependencies:
       '@lowcode/form':
-        specifier: workspace:^
+        specifier: workspace:^1.0.0
         version: link:../form
       '@lowcode/stage':
         specifier: workspace:^1.0.0
         version: link:../stage
       '@lowcode/utils':
-        specifier: workspace:^
+        specifier: workspace:^1.0.0
         version: link:../utils
       ant-design-vue:
         specifier: 4.x
@@ -268,6 +268,9 @@ importers:
       '@lowcode/stage':
         specifier: workspace:^1.0.0
         version: link:../packages/stage
+      '@lowcode/utils':
+        specifier: workspace:^
+        version: link:../packages/utils
       ant-design-vue:
         specifier: 4.x
         version: 4.2.6(vue@3.5.13(typescript@5.6.2))

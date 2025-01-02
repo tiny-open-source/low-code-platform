@@ -20,8 +20,8 @@ const node = computed(() => services?.designerService.get<MNode | null>('node'))
 
 async function submit() {
   try {
-    // const values = await configForm.value?.submitForm();
-    // services?.editorService.update(values);
+    const values = await configForm.value?.submitForm();
+    services?.designerService.update(values);
   }
   catch (e: any) {
     console.error(e);

@@ -8,23 +8,23 @@ interface DefaultItem {
   filter: string;
   multiple: boolean;
 }
-export function filterFunction(mForm: FormState | undefined, config: any, props: any) {
+export function filterFunction(lForm: FormState | undefined, config: any, props: any) {
   if (typeof config !== 'function') {
     return config;
   }
 
-  return config(mForm, {
-    values: mForm?.initValues || {},
+  return config(lForm, {
+    values: lForm?.initValues || {},
     model: props.model,
-    parent: mForm?.parentValues || {},
-    formValue: mForm?.values || props.model,
+    parent: lForm?.parentValues || {},
+    formValue: lForm?.values || props.model,
     prop: props.prop,
     config: props.config,
   });
 }
-export const display = function (mForm: FormState | undefined, config: any, props: any) {
+export const display = function (lForm: FormState | undefined, config: any, props: any) {
   if (typeof config === 'function') {
-    return filterFunction(mForm, config, props);
+    return filterFunction(lForm, config, props);
   }
 
   if (config === false) {
@@ -51,7 +51,7 @@ const init = function (
   return value;
 };
 function initValueItem(
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   item: ChildConfig | TabPaneConfig,
   initValue: FormValue,
   value: FormValue,
@@ -87,10 +87,10 @@ function initValueItem(
 
   if (!name) {
     // 没有配置name，直接跳过
-    return init(mForm, items, initValue, value);
+    return init(lForm, items, initValue, value);
   }
 
-  setValue(mForm, value, initValue, item);
+  setValue(lForm, value, initValue, item);
 
   return value;
 };
@@ -107,21 +107,21 @@ function isMultipleValue(type?: string | TypeFunction) {
       'dynamicTab',
     ].includes(type);
 }
-function initItemsValue(mForm: FormState | undefined, value: FormValue, initValue: FormValue, { items, name, extensible }: any) {
+function initItemsValue(lForm: FormState | undefined, value: FormValue, initValue: FormValue, { items, name, extensible }: any) {
   if (Array.isArray(initValue[name])) {
-    value[name] = initValue[name].map((v: any) => init(mForm, items, v));
+    value[name] = initValue[name].map((v: any) => init(lForm, items, v));
   }
   else {
-    value[name] = init(mForm, items, initValue[name], value[name]);
+    value[name] = init(lForm, items, initValue[name], value[name]);
     if (extensible) {
       value[name] = Object.assign({}, initValue[name], value[name]);
     }
   }
 }
 
-const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, type, filter, multiple }: DefaultItem) {
+const getDefaultValue = function (lForm: FormState | undefined, { defaultValue, type, filter, multiple }: DefaultItem) {
   if (typeof defaultValue === 'function') {
-    return defaultValue(mForm);
+    return defaultValue(lForm);
   }
 
   // 如果直接设置为undefined，在解析成js对象时会丢失这个配置，所以用'undefined'代替
@@ -147,7 +147,7 @@ const getDefaultValue = function (mForm: FormState | undefined, { defaultValue, 
 
   return '';
 };
-function setValue(mForm: FormState | undefined, value: FormValue, initValue: FormValue, item: any) {
+function setValue(lForm: FormState | undefined, value: FormValue, initValue: FormValue, item: any) {
   const { items, name, type, checkbox } = item;
   // 值是数组， 有可能也有items配置，所以不能放到getDefaultValue里赋值
   if (isMultipleValue(type)) {
@@ -156,10 +156,10 @@ function setValue(mForm: FormState | undefined, value: FormValue, initValue: For
 
   // 有子项继续递归，没有的话有初始值用初始值，没有初始值用默认值
   if (items) {
-    initItemsValue(mForm, value, initValue, item);
+    initItemsValue(lForm, value, initValue, item);
   }
   else {
-    value[name] = getDefaultValue(mForm, item as DefaultItem);
+    value[name] = getDefaultValue(lForm, item as DefaultItem);
   }
 
   // 如果fieldset配置checkbox，checkbox的值保存在value中

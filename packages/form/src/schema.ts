@@ -1,3 +1,5 @@
+import type { RuleObject } from 'ant-design-vue/es/form';
+
 /**
  * 整个表单的数据，会注入到各个组件中去
  */
@@ -28,7 +30,7 @@ export interface FormItem {
   /** vnode的key值，默认是遍历数组时的index */
   __key?: string | number;
   /** 表单域标签的的宽度，例如 '50px'。支持 auto。 */
-  labelWidth?: string;
+  labelCol?: Record<string, any>;
   className?: string;
   /** 表单组件类型 */
   type?: string | TypeFunction;
@@ -57,7 +59,7 @@ export interface FormItem {
   /** 默认值 */
   defaultValue?: any | DefaultValueFunction;
   /** 表单验证规则 */
-  rules?: Rule[];
+  rules?: RuleObject[];
   extensible?: boolean;
   dynamicKey?: string;
   /** 是否需要显示`展开更多配置` */
@@ -67,7 +69,7 @@ export interface FormItem {
 export interface ContainerCommonConfig {
   items: FormConfig;
   onInitValue?: (
-    mForm: FormState | undefined,
+    lForm: FormState | undefined,
     data: {
       formValue: FormValue;
       initValue: FormValue;
@@ -104,7 +106,7 @@ export interface Rule {
       prop: string;
       config: any;
     },
-    mForm: FormState | undefined,
+    lForm: FormState | undefined,
   ) => void;
 }
 
@@ -114,14 +116,14 @@ export interface Input {
 }
 
 export type TypeFunction = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   data: {
     model: Record<any, any>;
   },
 ) => string;
 
 type FilterFunction = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   data: {
     model: Record<any, any>;
     values: Record<any, any>;
@@ -133,7 +135,7 @@ type FilterFunction = (
 ) => boolean;
 
 type OnChangeHandler = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   value: any,
   data: {
     model: Record<any, any>;
@@ -144,7 +146,7 @@ type OnChangeHandler = (
   },
 ) => any;
 
-type DefaultValueFunction = (mForm: FormState | undefined) => any;
+type DefaultValueFunction = (lForm: FormState | undefined) => any;
 
 /**
  * 下拉选择器选项配置
@@ -170,7 +172,7 @@ export interface SelectGroupOption {
 }
 
 type SelectOptionFunction = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   data: {
     model: any;
     prop?: string;
@@ -181,7 +183,7 @@ type SelectOptionFunction = (
 ) => SelectOption[] | SelectGroupOption[];
 
 type RemoteSelectOptionBodyFunction = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   data: {
     model: any;
     formValue: any;
@@ -191,7 +193,7 @@ type RemoteSelectOptionBodyFunction = (
 ) => Record<string, any>;
 
 type RemoteSelectOptionRequestFunction = (
-  mForm: FormState | undefined,
+  lForm: FormState | undefined,
   res: any,
   data: {
     model: any;
@@ -251,7 +253,7 @@ export interface TextConfig extends FormItem, Input {
       text: string;
       type: 'button';
       handler: (
-        mForm: FormState | undefined,
+        lForm: FormState | undefined,
         data: {
           model: any;
           values: any;
@@ -373,7 +375,7 @@ export interface SelectConfig extends FormItem, Input {
   remote: true;
   option: {
     url: string;
-    initUrl?: string | ((mForm: FormState | undefined, data: { model: any; formValue: any }) => string);
+    initUrl?: string | ((lForm: FormState | undefined, data: { model: any; formValue: any }) => string);
     method?: 'jsonp' | string;
     cache?: boolean;
     timeout?: number;
@@ -385,7 +387,7 @@ export interface SelectConfig extends FormItem, Input {
     body?: Record<string, any> | RemoteSelectOptionBodyFunction;
     jsonpCallback?: 'callback' | string;
     afterRequest?: RemoteSelectOptionRequestFunction;
-    beforeRequest?: (mForm: FormState | undefined, postOptions: Record<string, any>, data: any) => Record<string, any>;
+    beforeRequest?: (lForm: FormState | undefined, postOptions: Record<string, any>, data: any) => Record<string, any>;
     root: string;
     item?: RemoteSelectOptionItemFunction;
     value: string | SelectOptionValueFunction;
@@ -409,7 +411,7 @@ export interface LinkConfig extends FormItem {
   formWidth?: number | string;
   displayText?:
     | ((
-      mForm: FormState | undefined,
+      lForm: FormState | undefined,
       data: {
         model: Record<any, any>;
       },
@@ -418,7 +420,7 @@ export interface LinkConfig extends FormItem {
   form:
     | FormConfig
     | ((
-      mForm: FormState | undefined,
+      lForm: FormState | undefined,
       data: {
         model: Record<any, any>;
         values: Record<any, any>;
@@ -436,7 +438,7 @@ export interface CascaderConfig extends FormItem, Input {
   multiple?: boolean;
   options?:
     | ((
-      mForm: FormState | undefined,
+      lForm: FormState | undefined,
       data: {
         model: Record<any, any>;
         formValues: Record<any, any>;
@@ -499,10 +501,10 @@ export interface TabConfig extends FormItem, ContainerCommonConfig {
   dynamic?: boolean;
   tabPosition?: 'top' | 'right' | 'bottom' | 'left';
   items: TabPaneConfig[];
-  onChange?: (mForm: FormState | undefined, data: any) => void;
-  onTabAdd?: (mForm: FormState | undefined, data: any) => void;
-  onTabRemove?: (mForm: FormState | undefined, tabName: string, data: any) => void;
-  activeChange?: (mForm: FormState | undefined, tabName: string, data: any) => void;
+  onChange?: (lForm: FormState | undefined, data: any) => void;
+  onTabAdd?: (lForm: FormState | undefined, data: any) => void;
+  onTabRemove?: (lForm: FormState | undefined, tabName: string, data: any) => void;
+  activeChange?: (lForm: FormState | undefined, tabName: string, data: any) => void;
 }
 
 /**
@@ -547,12 +549,12 @@ export interface TableConfig extends FormItem {
   maxHeight?: number | string;
   border?: boolean;
   enum?: any[];
-  addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  addable?: (lForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
   delete?: (model: any, index: number, values: any) => boolean | boolean;
-  importable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
-  selection?: (mForm: FormState | undefined, data: any) => boolean | boolean | 'single';
-  defaultAdd?: (mForm: FormState | undefined, data: any) => any;
-  onSelect?: (mForm: FormState | undefined, data: any) => any;
+  importable?: (lForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  selection?: (lForm: FormState | undefined, data: any) => boolean | boolean | 'single';
+  defaultAdd?: (lForm: FormState | undefined, data: any) => any;
+  onSelect?: (lForm: FormState | undefined, data: any) => any;
   defautSort?: SortProp;
   dropSort?: boolean;
   enableFullscreen?: boolean;
@@ -569,11 +571,11 @@ export interface GroupListConfig extends FormItem {
   tableItems?: FormConfig;
   titleKey?: string;
   itemExtra?: string | FilterFunction;
-  addable?: (mForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
-  defaultAdd?: (mForm: FormState | undefined, data: any) => any;
+  addable?: (lForm: FormState | undefined, data: any) => boolean | 'undefined' | boolean;
+  defaultAdd?: (lForm: FormState | undefined, data: any) => any;
   delete?: (model: any, index: number | string | symbol, values: any) => boolean | boolean;
   movable?: (
-    mForm: FormState | undefined,
+    lForm: FormState | undefined,
     index: number | string | symbol,
     model: any,
     groupModel: any,

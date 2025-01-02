@@ -1,13 +1,19 @@
 import type { App } from 'vue';
 import LFormContainer from './container/Container.vue';
 import LFormTabs from './container/Tabs.vue';
+import LFieldsDisplay from './fields/Display.vue';
 import LFieldsHidden from './fields/Hidden.vue';
+import LFieldsSelect from './fields/Select.vue';
+import LFieldsSwitch from './fields/Switch.vue';
 import LFieldsText from './fields/Text.vue';
 import './theme/index.scss';
 
 export { default as LFormContainer } from './container/Container.vue';
 export { default as LFormTabs } from './container/Tabs.vue';
+export { default as LFieldsDisplay } from './fields/Display.vue';
 export { default as LFieldsHidden } from './fields/Hidden.vue';
+export { default as LFieldsSelect } from './fields/Select.vue';
+export { default as LFieldsSwitch } from './fields/Switch.vue';
 export { default as LFieldsText } from './fields/Text.vue';
 export { default as LForm } from './Form.vue';
 export * from './schema';
@@ -24,6 +30,9 @@ function install(app: App, options: any) {
   app.component(LFormContainer.name!, LFormContainer);
   app.component(LFormTabs.name!, LFormTabs);
   app.component(LFieldsHidden.name!, LFieldsHidden);
+  app.component(LFieldsDisplay.name!, LFieldsDisplay);
+  app.component(LFieldsSelect.name!, LFieldsSelect);
+  app.component(LFieldsSwitch.name!, LFieldsSwitch);
 }
 
 export default {

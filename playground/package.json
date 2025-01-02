@@ -17,6 +17,7 @@
     "@lowcode/form": "workspace:^1.0.0",
     "@lowcode/schema": "workspace:^1.0.0",
     "@lowcode/stage": "workspace:^1.0.0",
+    "@lowcode/utils": "workspace:^",
     "ant-design-vue": "4.x",
     "events": "^3.3.0",
     "gesto": "^1.19.4",

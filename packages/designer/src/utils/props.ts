@@ -12,7 +12,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
       items: [
         {
           title: '属性',
-          labelWidth: '80px',
+          labelCol: '2',
           items: [
           // 组件类型，必须要有
             {
@@ -22,9 +22,9 @@ export function fillConfig(config: FormConfig = []): FormConfig {
             },
             // 组件id，必须要有
             {
+              text: 'id',
               name: 'id',
               type: 'display',
-              text: 'id',
             },
             {
               name: 'name',
@@ -35,7 +35,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
         },
         {
           title: '样式',
-          labelWidth: '80px',
+          labelCol: '2',
           items: [
             {
               name: 'style',
@@ -170,7 +170,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   name: 'name',
                   label: '事件名',
                   type: 'select',
-                  // options: (mForm: FormState, { formValue }: any) =>
+                  // options: (lForm: FormState, { formValue }: any) =>
                   //   eventsService.getEvent(formValue.type).map(option => ({
                   //     text: option.label,
                   //     value: option.value,
@@ -185,7 +185,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   name: 'method',
                   label: '动作',
                   type: 'select',
-                  // options: (mForm: FormState, { model }: any) => {
+                  // options: (lForm: FormState, { model }: any) => {
                   //   const node = editorService.getNodeById(model.to);
                   //   if (!node?.type)
                   //     return [];
@@ -202,7 +202,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
         },
         {
           title: '高级',
-          labelWidth: '80px',
+          labelCol: '2',
           items: [
             {
               type: 'code-link',
