@@ -6,7 +6,6 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-import vueDevTools from 'vite-plugin-vue-devtools';
 import pkg from './package.json';
 // https://vite.dev/config/
 const alias = [{ find: /@designer/, replacement: path.join(__dirname, './src') }];
@@ -23,7 +22,7 @@ export default defineConfig({
     include: ['src/**/*'],
     staticImport: true,
     insertTypesEntry: true,
-  }), vue(), vueJsx(), vueDevTools(), Components({
+  }), vue(), vueJsx(), Components({
     resolvers: [AntDesignVueResolver()],
   })],
   resolve: {

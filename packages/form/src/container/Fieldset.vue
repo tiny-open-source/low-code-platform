@@ -7,7 +7,7 @@ defineOptions({
   name: 'l-form-fieldset',
 });
 const props = defineProps({
-  labelCol: String,
+  labelWidth: String,
   model: {
     type: Object,
     default: () => ({}),
@@ -34,11 +34,11 @@ const show = computed(() => {
   }
   return true;
 });
-const lCol = computed(() => {
+const lWidth = computed(() => {
   if (props.config.items) {
-    return props.config.labelCol || props.labelCol;
+    return props.config.labelWidth || props.labelWidth;
   }
-  return props.config.labelCol || props.labelCol || (props.config.text ? null : '0');
+  return props.config.labelWidth || props.labelWidth || (props.config.text ? null : '0');
 });
 const key = (item: any, index: number) => item[lForm?.keyProp || '__key'] ?? index;
 function change() {
@@ -85,7 +85,7 @@ function change() {
           :model="name ? model[name] : model"
           :config="item"
           :prop="prop"
-          :label-col="lCol"
+          :label-width="lWidth"
           :size="size"
           @change="change"
         />
@@ -101,7 +101,7 @@ function change() {
         :model="name ? model[name] : model"
         :config="item"
         :prop="prop"
-        :label-col="lCol"
+        :label-width="lWidth"
         :size="size"
         @change="change"
       />

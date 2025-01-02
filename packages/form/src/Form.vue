@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
   parentValues?: Record<string, any>;
   config?: FormConfig;
 
-  labelCol?: Record<string, any>;
+  labelWidth?: string;
   wrapperCol?: Record<string, any>;
   disabled?: boolean;
 
@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<{
   initValues: () => ({}),
   parentValues: () => ({}),
   config: () => [],
-  labelCol: () => ({ span: 2 }),
+  labelWidth: '200px',
   wrapperCol: () => ({ span: 6 }),
   disabled: false,
   height: 'auto',
@@ -114,7 +114,11 @@ defineExpose({
 </script>
 
 <template>
-  <Form ref="formRef" class="lc-f" :model="values" :label-col="labelCol" :wrapper-col="wrapperCol" :label-align="labelPosition" :disabled="disabled" :layout="layout">
+  <Form
+    ref="formRef" class="lc-f" :model="values" :label-col="{
+      style: { width: labelWidth },
+    }" :label-align="labelPosition" :disabled="disabled" :layout="layout"
+  >
     <template v-if="initialized && Array.isArray(config)">
       <LFormContainer
         v-for="(item, index) in config"

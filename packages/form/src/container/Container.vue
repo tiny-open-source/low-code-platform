@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<{
   model: FormValue;
   size?: 'small' | 'default' | 'large';
   prop?: string;
-  labelCol?: Record<string, any>;
+  labelWidth?: string;
   expandMore?: boolean;
   stepActive?: number | string;
 
@@ -39,7 +39,7 @@ const itemProp = computed(() => {
   return `${props.prop}${props.prop ? '.' : ''}${n}`;
 });
 const items = computed(() => (props.config as ContainerCommonConfig).items);
-const itemLabelWidth = computed(() => props.config.labelCol || props.labelCol);
+const itemLabelWidth = computed(() => props.config.labelWidth || props.labelWidth);
 const type = computed((): string => {
   let { type } = props.config;
   if (typeof type === 'function') {
@@ -56,8 +56,6 @@ const tooltip = computed(() => filterFunction(lForm, props.config.tooltip, props
 const extra = computed(() => filterFunction(lForm, props.config.extra, props));
 const expandHandler = () => (expand.value = !expand.value);
 const tagName = computed(() => {
-  console.log(type.value);
-
   const component = resolveComponent(`l-${items.value ? 'form' : 'fields'}-${type.value}`);
   if (typeof component !== 'string')
     return component;
@@ -168,7 +166,9 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
         :style="config.tip ? 'flex: 1' : ''"
         :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
         :name="itemProp"
-        :label-col="itemLabelWidth"
+        :label-col="{
+          style: { width: itemLabelWidth },
+        }"
         :colon="false"
       >
         <template #label>

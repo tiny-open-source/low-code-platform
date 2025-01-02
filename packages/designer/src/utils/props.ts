@@ -12,7 +12,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
       items: [
         {
           title: '属性',
-          labelCol: '2',
+          labelWidth: '80px',
           items: [
           // 组件类型，必须要有
             {
@@ -35,7 +35,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
         },
         {
           title: '样式',
-          labelCol: '2',
+          labelWidth: '80px',
           items: [
             {
               name: 'style',
@@ -202,7 +202,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
         },
         {
           title: '高级',
-          labelCol: '2',
+          labelWidth: '80px',
           items: [
             {
               type: 'code-link',

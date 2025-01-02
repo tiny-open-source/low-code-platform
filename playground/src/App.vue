@@ -41,7 +41,6 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 </script>
 
 <template>
-  {{ value }}
   <LowCodeDesigner ref="designer" v-model="value" :default-selected="value.items[0].id" :moveable-options="moveableOptions" :props-configs="propsConfigs" />
 </template>
 

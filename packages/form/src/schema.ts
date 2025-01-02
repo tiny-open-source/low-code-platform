@@ -30,7 +30,7 @@ export interface FormItem {
   /** vnode的key值，默认是遍历数组时的index */
   __key?: string | number;
   /** 表单域标签的的宽度，例如 '50px'。支持 auto。 */
-  labelCol?: Record<string, any>;
+  labelWidth?: string;
   className?: string;
   /** 表单组件类型 */
   type?: string | TypeFunction;
