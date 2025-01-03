@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormState, TabConfig, TabPaneConfig } from '../schema';
-import { TabPane, Tabs } from 'ant-design-vue';
+import { NTabPane, NTabs } from 'naive-ui';
 import { computed, inject, ref } from 'vue';
 import { display as _display, filterFunction } from '../utils/form';
 
@@ -69,17 +69,20 @@ function changeHandler() {
 </script>
 
 <template>
-  <Tabs v-model:active-key="activeTabName" @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
-    <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
-      <TabPane v-if="display(tab.display) && tabItems(tab).length" :key="filter(tab.status) || tabIndex.toString()" :tab="filter(tab.title)">
-        <l-form-container
-          v-for="item in tabItems(tab)" :key="item[lForm?.keyProp || '__key']"
-          :config="item"
-          :model="config.dynamic ? model[config.name || ''][tabIndex] : tab.name ? model[tab.name] : model"
-          :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
-          @change="changeHandler"
-        />
-      </TabPane>
-    </template>
-  </Tabs>
+  <div>
+    <NTabs v-model:value="activeTabName" type="line" animated @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
+      <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
+        <NTabPane v-if="display(tab.display) && tabItems(tab).length" :tab="filter(tab.title)" :name="filter(tab.status) || tabIndex.toString()">
+          <l-form-container
+            v-for="item in tabItems(tab)"
+            :key="item[lForm?.keyProp || '__key']"
+            :config="item"
+            :model="config.dynamic ? model[config.name || ''][tabIndex] : tab.name ? model[tab.name] : model"
+            :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
+            @change="changeHandler"
+          />
+        </NTabPane>
+      </template>
+    </NTabs>
+  </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts" name="LForm">
 import type { FormConfig, FormState, FormValue } from './schema';
-import { Form } from 'ant-design-vue';
 import { cloneDeep, isEqual } from 'lodash-es';
+import { NConfigProvider, NForm } from 'naive-ui';
 import { provide, reactive, ref, toRaw, watch } from 'vue';
 import { initValue } from './utils/form';
 
@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<{
   config?: FormConfig;
 
   labelWidth?: string;
-  wrapperCol?: Record<string, any>;
   disabled?: boolean;
 
   height?: string;
@@ -33,8 +32,7 @@ const props = withDefaults(defineProps<{
   initValues: () => ({}),
   parentValues: () => ({}),
   config: () => [],
-  labelWidth: '200px',
-  wrapperCol: () => ({ span: 6 }),
+  labelWidth: '100',
   disabled: false,
   height: 'auto',
   stepActive: 1,
@@ -114,20 +112,20 @@ defineExpose({
 </script>
 
 <template>
-  <Form
-    ref="formRef" class="lc-f" :model="values" :label-col="{
-      style: { width: labelWidth },
-    }" :label-align="labelPosition" :disabled="disabled" :layout="layout"
-  >
-    <template v-if="initialized && Array.isArray(config)">
-      <LFormContainer
-        v-for="(item, index) in config"
-        :key="item[keyProp] ?? index"
-        :config="item"
-        :model="values"
-        :size
-        @change="changeHandler"
-      />
-    </template>
-  </Form>
+  <NConfigProvider>
+    <NForm
+      ref="formRef" class="lc-f" :model="values" :label-width="labelWidth" :label-align="labelPosition" label-placement="left" :disabled="disabled" :layout="layout"
+    >
+      <template v-if="initialized && Array.isArray(config)">
+        <LFormContainer
+          v-for="(item, index) in config"
+          :key="item[keyProp] ?? index"
+          :config="item"
+          :model="values"
+          :size
+          @change="changeHandler"
+        />
+      </template>
+    </NForm>
+  </NConfigProvider>
 </template>

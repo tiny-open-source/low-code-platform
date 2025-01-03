@@ -83,7 +83,7 @@ defineExpose({
       <div>header</div>
     </template>
     <template #sidebar>
-      <div>sidebar</div>
+      <div>{{ modelValue }}</div>
     </template>
     <template #workspace>
       <slot name="workspace">

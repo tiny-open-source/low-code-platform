@@ -38,7 +38,7 @@ export default defineConfig({
       external(id: string) {
         return (
           id.startsWith('vue')
-          || id.startsWith('ant-design-vue')
+          || id.startsWith('naive-ui')
           || /^@lowcode\//.test(id)
           || Object.keys(pkg.dependencies).some(k => new RegExp(`^${k}`).test(id))
         );
@@ -48,7 +48,7 @@ export default defineConfig({
         // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
         globals: {
           'vue': 'Vue',
-          'ant-design-vue': 'AntDesignVue',
+          'naive-ui': 'NaiveUi',
         },
       },
     },

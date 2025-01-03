@@ -30,13 +30,13 @@
     "build:watch": "vite build --watch"
   },
   "peerDependencies": {
-    "ant-design-vue": "4.x",
+    "naive-ui": "^2.40.4",
     "vue": "^3.5.13"
   },
   "dependencies": {
+    "@vicons/ionicons5": "^0.13.0",
     "lodash-es": "^4.17.21",
     "tinycolor2": "^1.6.0",
-    "vue": "^3.5.13",
     "vue3-colorpicker": "^2.3.0"
   },
   "devDependencies": {

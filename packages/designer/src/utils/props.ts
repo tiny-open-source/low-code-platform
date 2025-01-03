@@ -55,19 +55,23 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                     {
                       name: 'left',
                       text: 'left',
+                      type: 'number',
                     },
                     {
                       name: 'top',
                       text: 'top',
+                      type: 'number',
                       disabled: (vm: FormState, { model }: any) =>
                         model.position === 'fixed' && model._magic_position === 'fixedBottom',
                     },
                     {
                       name: 'right',
+                      type: 'number',
                       text: 'right',
                     },
                     {
                       name: 'bottom',
+                      type: 'number',
                       text: 'bottom',
                       disabled: (vm: FormState, { model }: any) =>
                         model.position === 'fixed' && model._magic_position === 'fixedTop',
@@ -80,10 +84,12 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   items: [
                     {
                       name: 'width',
+                      type: 'number',
                       text: '宽度',
                     },
                     {
                       name: 'height',
+                      type: 'number',
                       text: '高度',
                     },
                   ],

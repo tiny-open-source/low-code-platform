@@ -1,5 +1,3 @@
-import type { RuleObject } from 'ant-design-vue/es/form';
-
 /**
  * 整个表单的数据，会注入到各个组件中去
  */
@@ -59,7 +57,7 @@ export interface FormItem {
   /** 默认值 */
   defaultValue?: any | DefaultValueFunction;
   /** 表单验证规则 */
-  rules?: RuleObject[];
+  rules?: Rule[];
   extensible?: boolean;
   dynamicKey?: string;
   /** 是否需要显示`展开更多配置` */

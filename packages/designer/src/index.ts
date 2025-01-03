@@ -1,6 +1,7 @@
 import type { App } from 'vue';
 import type { InstallOptions } from './type';
 import Editor from './Designer.vue';
+import UISelect from './fields/UISelect.vue';
 
 import '@unocss/reset/tailwind-compat.css';
 import './utils/polyfills';
@@ -22,5 +23,6 @@ export default {
     app.config.globalProperties.$LOWCODE_DESIGNER = option;
 
     app.component(Editor.name!, Editor);
+    app.component(UISelect.name!, UISelect);
   },
 };

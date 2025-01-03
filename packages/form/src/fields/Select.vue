@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 import type { FormState, SelectConfig, SelectGroupOption, SelectOption } from '../schema';
-import { SelectOption as Option, Select } from 'ant-design-vue';
+import { NSelect } from 'naive-ui';
 import { computed, inject, onBeforeMount, ref, watch } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
@@ -72,16 +72,15 @@ function changeHandler(value: any) {
 </script>
 
 <template>
-  <Select
+  <NSelect
     v-if="model"
     v-model:value="model[modelName]"
-    class="l-select" allow-clear :size="size" :placeholder="config.placeholder" @change="changeHandler"
-  >
-    <template v-if="config.group" />
-    <template v-else>
-      <Option v-for="item in options" :key="item.value" :value="item.value">
-        {{ item.text }}
-      </Option>
-    </template>
-  </Select>
+    :options="options"
+    label-field="text"
+    value-field="value"
+    class="l-select"
+    allow-clear
+    :placeholder="config.placeholder"
+    @update:value="changeHandler"
+  />
 </template>

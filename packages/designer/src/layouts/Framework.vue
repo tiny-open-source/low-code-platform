@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GetColumnWidth, Services } from '@designer/type';
+import { NScrollbar } from 'naive-ui';
 import { computed, inject } from 'vue';
 import Resizer from './Resizer.vue';
 
@@ -14,7 +15,9 @@ const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'))
     </div>
     <div class="lc-d-framework__content">
       <div class="lc-d-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
-        <slot name="sidebar" />
+        <NScrollbar>
+          <slot name="sidebar" />
+        </NScrollbar>
       </div>
       <Resizer type="left" />
       <div class="lc-d-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
@@ -22,7 +25,9 @@ const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'))
       </div>
       <Resizer type="right" />
       <div class="lc-d-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
-        <slot name="propsPanel" />
+        <NScrollbar>
+          <slot name="propsPanel" />
+        </NScrollbar>
       </div>
     </div>
   </div>

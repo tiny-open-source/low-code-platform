@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 import type { CheckboxConfig } from '../schema';
-import { Checkbox } from 'ant-design-vue';
+import { NCheckbox } from 'naive-ui';
 import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
@@ -41,13 +41,19 @@ const inactiveValue = computed(() => {
 
   return false;
 });
-function changeHandler(e: any) {
-  emit('change', e.target.value);
+function changeHandler(value: any) {
+  emit('change', value);
 };
 </script>
 
 <template>
-  <Checkbox v-model:checked="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @change="changeHandler">
+  <NCheckbox
+    v-model:checked="model[modelName]"
+    :checked-value="activeValue"
+    :unchecked-value="inactiveValue"
+    :disabled="disabled"
+    @update:checked="changeHandler"
+  >
     {{ config.text }}
-  </Checkbox>
+  </NCheckbox>
 </template>

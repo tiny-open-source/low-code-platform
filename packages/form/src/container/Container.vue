@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
-import { Button, FormItem, Tooltip } from 'ant-design-vue';
+import { NButton, NFormItem, NTooltip } from 'naive-ui';
 import { computed, inject, ref, resolveComponent } from 'vue';
 import { display as displayFunction, filterFunction } from '../utils/form';
 
@@ -137,7 +137,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
     v-if="config"
     :style="config.tip ? 'display: flex;align-items: baseline;' : ''"
     :class="config.className"
-    class="l-form-container"
+    class="lc-f-container"
   >
     <l-fields-hidden
       v-if="type === 'hidden'"
@@ -162,19 +162,17 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
       @change="onChangeHandler"
     />
     <template v-else-if="type && display">
-      <FormItem
+      <NFormItem
         :style="config.tip ? 'flex: 1' : ''"
-        :class="{ hidden: `${itemLabelWidth}` === '0' || !config.text }"
+
         :name="itemProp"
-        :label-col="{
-          style: { width: itemLabelWidth },
-        }"
+        :label-width="itemLabelWidth"
         :colon="false"
       >
         <template #label>
-          <span v-html="type === 'checkbox' ? '' : config.text" />
+          <span v-show="!(itemLabelWidth === '0' || !config.text)" v-html="type === 'checkbox' ? '' : config.text" />
         </template>
-        <Tooltip v-if="tooltip">
+        <NTooltip v-if="tooltip">
           <component
             :is="tagName"
             :key="key(config)"
@@ -189,7 +187,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
           <template #title>
             <div v-html="tooltip" />
           </template>
-        </Tooltip>
+        </NTooltip>
 
         <component
           :is="tagName"
@@ -205,13 +203,13 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
         />
 
         <div v-if="extra" class="l-form-tip" v-html="extra" />
-      </FormItem>
+      </NFormItem>
 
-      <Tooltip v-if="config.tip" placement="left">
+      <NTooltip v-if="config.tip" placement="left">
         <template #title>
           <div v-html="config.tip" />
         </template>
-      </Tooltip>
+      </NTooltip>
     </template>
     <template v-else-if="items && display">
       <template v-if="name || name === 0 ? model[name] : model">
@@ -231,9 +229,15 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
     </template>
 
     <div v-if="config.expand && type !== 'fieldset'" style="text-align: center">
-      <Button text @click="expandHandler">
+      <NButton text @click="expandHandler">
         {{ expand ? '收起配置' : '展开更多配置' }}
-      </Button>
+      </NButton>
     </div>
   </div>
 </template>
+
+<style scoped>
+.lc-f-container ::v-deep(.n-form-item-blank){
+  flex-wrap: wrap !important;
+}
+</style>

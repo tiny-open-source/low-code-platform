@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FieldsetConfig, FormState } from '../schema';
-import { Checkbox } from 'ant-design-vue';
+import { NCheckbox } from 'naive-ui';
 import { computed, inject, type PropType } from 'vue';
 
 defineOptions({
@@ -47,8 +47,11 @@ function change() {
 </script>
 
 <template>
-  <fieldset v-if="name ? model[name] : model" class="l-fieldset">
-    <Checkbox
+  <fieldset
+    v-if="name ? model[name] : model" class="l-fieldset"
+    :style="show ? 'padding: 15px 15px 0 5px;' : 'border: 0'"
+  >
+    <NCheckbox
       v-if="!show && name"
       v-model:checked="
         //eslint-disable-next-line vue/no-mutating-props
@@ -59,9 +62,9 @@ function change() {
       @change="change"
     >
       <span v-html="config.legend" /><span v-if="config.extra" class="l-form-tip" v-html="config.extra" />
-    </Checkbox>
+    </NCheckbox>
     <legend v-else-if="config.checkbox && name">
-      <Checkbox
+      <NCheckbox
         v-model:checked="
           //eslint-disable-next-line vue/no-mutating-props
           model[name].value"
@@ -71,7 +74,7 @@ function change() {
         @change="change"
       >
         <span v-html="config.legend" /><span v-if="config.extra" class="l-form-tip" v-html="config.extra" />
-      </Checkbox>
+      </NCheckbox>
     </legend>
     <legend v-else>
       <span v-html="config.legend" />

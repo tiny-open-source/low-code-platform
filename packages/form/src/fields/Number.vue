@@ -1,32 +1,39 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { FormState, TextConfig } from '../schema';
-import { NInput } from 'naive-ui';
+import type { FormState, NumberConfig } from '../schema';
+import { NInputNumber } from 'naive-ui';
 import { computed, inject } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({
-  name: 'l-fields-text',
+  name: 'l-fields-number',
 });
 const props = defineProps({
   ...fieldProps,
   config: {
-    type: Object as PropType<TextConfig>,
+    type: Object as PropType<NumberConfig>,
     required: true,
   },
 });
 const emit = defineEmits(['change', 'input']);
 const lForm = inject<FormState | undefined>('lForm');
 const modelName = computed(() => props.name || props.config.name || '');
-function changeHandler(value: string | [string, string]) {
+function changeHandler(value: number | null) {
   emit('change', value);
 }
-function inputHandler(value: string | [string, string]) {
+function inputHandler(value: number | null) {
   emit('input', modelName, value);
   lForm?.$emit('fieldInput', props.prop, value);
 }
 </script>
 
 <template>
-  <NInput v-model:value="model[modelName]" type="text" clearable :placeholder="config.placeholder" @change="changeHandler" @input="inputHandler" />
+  <NInputNumber
+    v-model:value="model[modelName]" clearable :disabled="disabled" @update:value="changeHandler"
+    @input="inputHandler"
+  >
+    <template #suffix>
+      px
+    </template>
+  </NInputNumber>
 </template>

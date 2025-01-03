@@ -14,7 +14,7 @@ export default {
     type: Boolean,
     default: false,
   },
-  size: String as PropType<'small' | 'middle' | 'large' | undefined>,
+  size: String as PropType<'tiny' | 'small' | 'medium' | 'large'>,
   prop: String,
   initValues: Object,
   values: Object,

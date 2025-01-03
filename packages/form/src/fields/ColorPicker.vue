@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ColorInputWithoutInstance } from 'tinycolor2';
 import type { HiddenConfig } from '../schema';
+import { NColorPicker } from 'naive-ui';
 import { computed, type PropType, ref } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
@@ -17,11 +17,10 @@ const props = defineProps({
 const emit = defineEmits(['change']);
 const name = computed(() => props.name || props.config.name || '');
 function handleColor(value: string) {
-  console.log('🚀 ~ handleColor ~ value:', value);
   emit('change', value);
 }
 </script>
 
 <template>
-  <color-picker v-if="model" v-model:pure-color="model[name]" format="hex" @pure-color-change="handleColor" />
+  <NColorPicker v-if="model" v-model:value="model[name]" @update:value="handleColor" />
 </template>

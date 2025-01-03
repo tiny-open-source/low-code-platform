@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 import type { SwitchConfig } from '../schema';
-import { Switch } from 'ant-design-vue';
+import { NSwitch } from 'naive-ui';
 import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
@@ -47,5 +47,5 @@ function changeHandler(v: boolean | number | string) {
 </script>
 
 <template>
-  <Switch v-model:checked="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @change="changeHandler" />
+  <NSwitch v-model:value="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @change="changeHandler" />
 </template>
