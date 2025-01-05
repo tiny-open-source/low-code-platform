@@ -9,14 +9,23 @@ const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const value = ref(mockDSL);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
-asyncLoadJs(`http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`).then(() => {
+const eventMethodList = ref<Record<string, any>>({});
+
+asyncLoadJs(
+  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`,
+).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
-asyncLoadJs(`http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`).then(() => {
+asyncLoadJs(
+  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`,
+).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
-asyncLoadJs(`http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`).then(() => {
-  // eventMethodList.value = (globalThis as any).magicPresetEvents;
+asyncLoadJs(
+  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/event.js`,
+).then(() => {
+  eventMethodList.value = (globalThis as any).lowcodePresetEvents;
+  console.log();
 });
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
@@ -41,7 +50,14 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 </script>
 
 <template>
-  <LowCodeDesigner ref="designer" v-model="value" :default-selected="value.items[0].id" :moveable-options="moveableOptions" :props-configs="propsConfigs" />
+  <LowCodeDesigner
+    ref="designer"
+    v-model="value"
+    :default-selected="value.items[0].id"
+    :moveable-options="moveableOptions"
+    :props-configs="propsConfigs"
+    :event-method-list="eventMethodList"
+  />
 </template>
 
 <style>

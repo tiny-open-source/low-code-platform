@@ -1,4 +1,6 @@
 import type { FormConfig, FormState } from '@lowcode/form';
+import designerService from '@designer/services/designer.service';
+import eventsService from '@designer/services/events.service';
 
 /**
  * 统一为组件属性表单加上事件、高级、样式配置
@@ -176,11 +178,11 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   name: 'name',
                   label: '事件名',
                   type: 'select',
-                  // options: (lForm: FormState, { formValue }: any) =>
-                  //   eventsService.getEvent(formValue.type).map(option => ({
-                  //     text: option.label,
-                  //     value: option.value,
-                  //   })),
+                  options: (lForm: FormState, { formValue }: any) =>
+                    eventsService.getEvent(formValue.type).map(option => ({
+                      text: option.label,
+                      value: option.value,
+                    })),
                 },
                 {
                   name: 'to',
@@ -191,16 +193,16 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   name: 'method',
                   label: '动作',
                   type: 'select',
-                  // options: (lForm: FormState, { model }: any) => {
-                  //   const node = editorService.getNodeById(model.to);
-                  //   if (!node?.type)
-                  //     return [];
+                  options: (lForm: FormState, { model }: any) => {
+                    const node = designerService.getNodeById(model.to);
+                    if (!node?.type)
+                      return [];
 
-                  //   return eventsService.getMethod(node.type).map(option => ({
-                  //     text: option.label,
-                  //     value: option.value,
-                  //   }));
-                  // },
+                    return eventsService.getMethod(node.type).map(option => ({
+                      text: option.label,
+                      value: option.value,
+                    }));
+                  },
                 },
               ],
             },

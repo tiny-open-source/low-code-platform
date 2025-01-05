@@ -79,8 +79,9 @@ function changeHandler(value: any) {
     label-field="text"
     value-field="value"
     class="l-select"
-    allow-clear
-    :placeholder="config.placeholder"
+    clearable
+    placeholder="请选择"
+    size="tiny"
     @update:value="changeHandler"
   />
 </template>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { DataTableColumns } from 'naive-ui';
-import type { ColumnConfig, TableConfig } from '../schema';
+import type { ColumnConfig, FormState, TableConfig } from '../schema';
 import { GridOutline, ScanOutline, TrashOutline } from '@vicons/ionicons5';
 import { cloneDeep } from 'lodash-es';
 import { NButton, NDataTable, NIcon, NTag } from 'naive-ui';
-import { computed, h, ref } from 'vue';
+import { computed, h, inject, ref } from 'vue';
 import { LFormContainer } from '..';
+import { initValue } from '../utils/form';
 
 defineOptions({
   name: 'l-form-table',
@@ -16,10 +17,14 @@ const props = withDefaults(defineProps<{
   model: Record<string, any>;
   name: string;
   prop: string;
+  sortKey?: string;
 }>(), {
   model: () => ({}),
+  sortKey: '',
 });
 const emit = defineEmits(['change']);
+const lForm = inject<FormState | undefined>('lForm');
+
 const modelName = computed(() => props.name || props.config.name || '');
 function getProp(index: number) {
   return `${props.prop}${props.prop ? '.' : ''}${index + 1}`;
@@ -34,9 +39,9 @@ const columns = computed(() => props.config.items.map(
     ({
       title: item.label,
       key: item.name,
-      ellipsis: {
-        tooltip: true,
-      },
+      // ellipsis: {
+      //   tooltip: true,
+      // },
       render(row: any, index: number) {
         return h(LFormContainer, {
           labelWidth: '0',
@@ -58,6 +63,7 @@ const mergedColumns = computed(() => {
     {
       title: '操作',
       key: 'action',
+      width: 40,
       render(row) {
         return h(
           NButton,
@@ -76,6 +82,7 @@ const mergedColumns = computed(() => {
     {
       title: '序号',
       key: 'tags',
+      width: 50,
       render: (_, index) => {
         return `${index + 1}`;
       },
@@ -83,12 +90,69 @@ const mergedColumns = computed(() => {
   ];
   return [...extraColumns, ..._columns];
 });
+async function newHandler(row?: any) {
+  if (props.config.max && props.model[modelName.value].length >= props.config.max) {
+    console.error(`最多新增配置不能超过${props.config.max}条`);
+    return;
+  }
 
-const data = [
-  { name: '张三', age: 18, tags: [h(NTag, null, { default: () => 'tag1' })] },
-  { name: '李四', age: 19, tags: [h(NTag, null, { default: () => 'tag2' })] },
-  { name: '王五', age: 20, tags: [h(NTag, null, { default: () => 'tag3' })] },
-];
+  const columns = props.config.items;
+  const enumValues = props.config.enum || [];
+  let enumV = [];
+  const { length } = props.model[modelName.value];
+  const key = props.config.key || 'id';
+  let inputs: any = {};
+
+  if (enumValues.length) {
+    if (length >= enumValues.length) {
+      return;
+    }
+    enumV = enumValues.filter((item) => {
+      let i = 0;
+      for (; i < length; i++) {
+        if (item[key] === props.model[modelName.value][i][key]) {
+          break;
+        }
+      }
+      return i === length;
+    });
+
+    if (enumV.length > 0) {
+      inputs = enumV[0];
+    }
+  }
+  else if (Array.isArray(row)) {
+    columns.forEach((column, index) => {
+      column.name && (inputs[column.name] = row[index]);
+    });
+  }
+  else {
+    if (typeof props.config.defaultAdd === 'function') {
+      inputs = await props.config.defaultAdd(lForm, {
+        model: props.model[modelName.value],
+        formValue: lForm?.values,
+      });
+    }
+    else if (props.config.defaultAdd) {
+      inputs = props.config.defaultAdd;
+    }
+
+    inputs = await initValue(lForm, {
+      config: columns,
+      initValues: inputs,
+    });
+  }
+
+  if (props.sortKey && length) {
+    inputs[props.sortKey] = props.model[modelName.value][length - 1][props.sortKey] - 1;
+  }
+  console.log(inputs);
+
+  // eslint-disable-next-line vue/no-mutating-props
+  props.model[modelName.value].push(inputs);
+
+  emit('change', props.model[modelName.value]);
+}
 const lTable = ref<HTMLElement | null>(null);
 </script>
 
@@ -102,10 +166,11 @@ const lTable = ref<HTMLElement | null>(null);
         :max-height="config.maxHeight"
         :single-line="false"
         :columns="mergedColumns"
-        :data="data"
+        :data="model[modelName]"
+        size="small"
       />
       <slot />
-      <NButton type="primary" size="small">
+      <NButton type="primary" size="small" @click="newHandler">
         添加
       </NButton> &nbsp;
       <NButton type="primary" size="small">
@@ -127,5 +192,3 @@ const lTable = ref<HTMLElement | null>(null);
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped></style>
