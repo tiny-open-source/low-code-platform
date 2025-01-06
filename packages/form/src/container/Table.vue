@@ -39,19 +39,17 @@ const columns = computed(() => props.config.items.map(
     ({
       title: item.label,
       key: item.name,
-      // ellipsis: {
-      //   tooltip: true,
-      // },
+      align: 'center',
+      width: '120',
       render(row: any, index: number) {
         return h(LFormContainer, {
           labelWidth: '0',
           prop: getProp(index),
           config: makeConfig(item),
           model: row,
-          on: {
-            change() {
-              emit('change', props.model[modelName.value]);
-            },
+          onChange: (value: any) => {
+            console.log('change', value);
+            emit('change', props.model[modelName.value]);
           },
         });
       },
@@ -59,11 +57,13 @@ const columns = computed(() => props.config.items.map(
 ));
 const mergedColumns = computed(() => {
   const _columns = cloneDeep(columns.value);
-  const extraColumns: DataTableColumns = [
+  const commonColumns: DataTableColumns = [
     {
       title: '操作',
       key: 'action',
-      width: 40,
+      align: 'center',
+      width: 50,
+      fixed: 'left',
       render(row) {
         return h(
           NButton,
@@ -82,13 +82,15 @@ const mergedColumns = computed(() => {
     {
       title: '序号',
       key: 'tags',
+      align: 'center',
       width: 50,
+      fixed: 'left',
       render: (_, index) => {
         return `${index + 1}`;
       },
     },
   ];
-  return [...extraColumns, ..._columns];
+  return [...commonColumns, ..._columns];
 });
 async function newHandler(row?: any) {
   if (props.config.max && props.model[modelName.value].length >= props.config.max) {
@@ -136,7 +138,6 @@ async function newHandler(row?: any) {
     else if (props.config.defaultAdd) {
       inputs = props.config.defaultAdd;
     }
-
     inputs = await initValue(lForm, {
       config: columns,
       initValues: inputs,
@@ -146,8 +147,6 @@ async function newHandler(row?: any) {
   if (props.sortKey && length) {
     inputs[props.sortKey] = props.model[modelName.value][length - 1][props.sortKey] - 1;
   }
-  console.log(inputs);
-
   // eslint-disable-next-line vue/no-mutating-props
   props.model[modelName.value].push(inputs);
 
@@ -170,7 +169,7 @@ const lTable = ref<HTMLElement | null>(null);
         size="small"
       />
       <slot />
-      <NButton type="primary" size="small" @click="newHandler">
+      <NButton type="primary" size="small" @click="newHandler()">
         添加
       </NButton> &nbsp;
       <NButton type="primary" size="small">
@@ -180,7 +179,7 @@ const lTable = ref<HTMLElement | null>(null);
           </NIcon>
         </template>
         展开配置
-      </NButton>&nbsp;
+      </NButton> &nbsp;
       <NButton type="primary" size="small">
         <template #icon>
           <NIcon>

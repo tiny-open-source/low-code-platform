@@ -10,14 +10,13 @@ defineOptions({
 const props = withDefaults(defineProps<{
   config: ChildConfig;
   model: FormValue;
-  size?: 'small' | 'default' | 'large';
+  size?: 'tiny' | 'small' | 'default' | 'large';
   prop?: string;
   labelWidth?: string;
   expandMore?: boolean;
   stepActive?: number | string;
 
 }>(), {
-  size: 'default',
   prop: '',
 });
 const emit = defineEmits(['change']);

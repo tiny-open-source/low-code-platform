@@ -74,14 +74,15 @@ function changeHandler(value: any) {
 <template>
   <NSelect
     v-if="model"
-    v-model:value="model[modelName]"
+    v-model="model[modelName]"
     :options="options"
     label-field="text"
     value-field="value"
     class="l-select"
     clearable
     placeholder="请选择"
-    size="tiny"
+    :size="size"
+    :show-arrow="false"
     @update:value="changeHandler"
   />
 </template>
