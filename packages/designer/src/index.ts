@@ -1,11 +1,13 @@
 import type { App } from 'vue';
 import type { InstallOptions } from './type';
 import Editor from './Designer.vue';
+
+import CodeLink from './fields/CodeLink.vue';
+
 import UISelect from './fields/UISelect.vue';
+import './theme/index.scss';
 
 import '@unocss/reset/tailwind-compat.css';
-import './utils/polyfills';
-import './theme/index.scss';
 
 export { default as LowCodeDesigner } from './Designer.vue';
 
@@ -24,5 +26,6 @@ export default {
 
     app.component(Editor.name!, Editor);
     app.component(UISelect.name!, UISelect);
+    app.component(CodeLink.name!, CodeLink);
   },
 };

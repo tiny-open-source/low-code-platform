@@ -35,6 +35,14 @@ export default defineConfig({
       { find: /@designer/, replacement: path.join(__dirname, '../packages/designer/src') },
     ],
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 10001,

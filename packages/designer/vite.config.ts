@@ -33,6 +33,14 @@ export default defineConfig({
           { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../$1/src') },
         ],
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
   build: {
     cssCodeSplit: false,
     sourcemap: true,
