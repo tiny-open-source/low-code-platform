@@ -127,6 +127,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
     // eslint-disable-next-line vue/no-mutating-props
     props.model[key] = value;
   }
+
   emit('change', props.model);
 };
 </script>

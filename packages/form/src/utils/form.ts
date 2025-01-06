@@ -43,8 +43,8 @@ const init = function (
   value: FormValue = {},
 ) {
   if (Array.isArray(config)) {
-    config.forEach((item: ChildConfig | TabPaneConfig) => {
-      initValueItem(lForm, item, initValue, value);
+    config.forEach((configItem: ChildConfig | TabPaneConfig) => {
+      initValueItem(lForm, configItem, initValue, value);
     });
   }
 
@@ -52,20 +52,19 @@ const init = function (
 };
 function initValueItem(
   lForm: FormState | undefined,
-  item: ChildConfig | TabPaneConfig,
+  configItem: ChildConfig | TabPaneConfig,
   initValue: FormValue,
   value: FormValue,
 ) {
-  const { items } = item as ContainerCommonConfig;
-  const { names } = item as DaterangeConfig;
-  const { type, name } = item as ChildConfig;
-
+  const { items } = configItem as ContainerCommonConfig;
+  const { names } = configItem as DaterangeConfig;
+  const { type, name } = configItem as ChildConfig;
   if (isTableSelect(type) && name) {
     value[name] = initValue[name] || '';
     return value;
   }
 
-  asyncLoadConfig(value, initValue, item as HtmlField);
+  asyncLoadConfig(value, initValue, configItem as HtmlField);
 
   // 这种情况比较多，提前结束
   if (name && !items && typeof initValue[name] !== 'undefined') {
@@ -77,7 +76,10 @@ function initValueItem(
         value[name] = typeof initValue[name] === 'object' ? cloneDeep(initValue[name]) : initValue[name];
       }
     }
-
+    // Patch: table的key不能丢
+    if (initValue.key) {
+      value.key = initValue.key;
+    }
     return value;
   }
 
@@ -90,7 +92,7 @@ function initValueItem(
     return init(lForm, items, initValue, value);
   }
 
-  setValue(lForm, value, initValue, item);
+  setValue(lForm, value, initValue, configItem);
 
   return value;
 };
@@ -147,19 +149,18 @@ const getDefaultValue = function (lForm: FormState | undefined, { defaultValue, 
 
   return '';
 };
-function setValue(lForm: FormState | undefined, value: FormValue, initValue: FormValue, item: any) {
-  const { items, name, type, checkbox } = item;
+function setValue(lForm: FormState | undefined, value: FormValue, initValue: FormValue, configItem: any) {
+  const { items, name, type, checkbox } = configItem;
   // 值是数组， 有可能也有items配置，所以不能放到getDefaultValue里赋值
   if (isMultipleValue(type)) {
     value[name] = initValue[name] || [];
   }
-
   // 有子项继续递归，没有的话有初始值用初始值，没有初始值用默认值
   if (items) {
-    initItemsValue(lForm, value, initValue, item);
+    initItemsValue(lForm, value, initValue, configItem);
   }
   else {
-    value[name] = getDefaultValue(lForm, item as DefaultItem);
+    value[name] = getDefaultValue(lForm, configItem as DefaultItem);
   }
 
   // 如果fieldset配置checkbox，checkbox的值保存在value中

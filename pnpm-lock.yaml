@@ -66,6 +66,9 @@ importers:
       '@lowcode/utils':
         specifier: workspace:^1.0.0
         version: link:../utils
+      '@vicons/ionicons5':
+        specifier: ^0.13.0
+        version: 0.13.0
       events:
         specifier: ^3.3.0
         version: 3.3.0

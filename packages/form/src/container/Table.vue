@@ -3,7 +3,7 @@ import type { DataTableColumns } from 'naive-ui';
 import type { ColumnConfig, FormState, TableConfig } from '../schema';
 import { GridOutline, ScanOutline, TrashOutline } from '@vicons/ionicons5';
 import { cloneDeep } from 'lodash-es';
-import { NButton, NDataTable, NIcon, NTag } from 'naive-ui';
+import { NButton, NDataTable, NIcon } from 'naive-ui';
 import { computed, h, inject, ref } from 'vue';
 import { LFormContainer } from '..';
 import { initValue } from '../utils/form';
@@ -64,7 +64,7 @@ const mergedColumns = computed(() => {
       align: 'center',
       width: 50,
       fixed: 'left',
-      render(row) {
+      render(row, index) {
         return h(
           NButton,
           {
@@ -72,6 +72,11 @@ const mergedColumns = computed(() => {
             size: 'medium',
             type: 'error',
             quaternary: true,
+            onClick: () => {
+              // eslint-disable-next-line vue/no-mutating-props
+              props.model[modelName.value].splice(index, 1);
+              emit('change', props.model[modelName.value]);
+            },
           },
           { icon: () => {
             return h(NIcon, { }, { default: () => h(TrashOutline) });
@@ -90,7 +95,7 @@ const mergedColumns = computed(() => {
       },
     },
   ];
-  return [...commonColumns, ..._columns];
+  return [...commonColumns, ..._columns] as DataTableColumns;
 });
 async function newHandler(row?: any) {
   if (props.config.max && props.model[modelName.value].length >= props.config.max) {
@@ -147,6 +152,8 @@ async function newHandler(row?: any) {
   if (props.sortKey && length) {
     inputs[props.sortKey] = props.model[modelName.value][length - 1][props.sortKey] - 1;
   }
+  inputs.key = Date.now();
+
   // eslint-disable-next-line vue/no-mutating-props
   props.model[modelName.value].push(inputs);
 
