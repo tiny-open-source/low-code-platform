@@ -30,6 +30,6 @@ export default defineComponent({
   <img v-else-if="typeof icon === 'string' && icon.startsWith('http')" :src="icon">
   <i v-else-if="typeof icon === 'string'" :class="icon" />
   <NIcon v-else>
-    <component :is="toRaw(icon)" />
+    <Accessibility />
   </NIcon>
 </template>

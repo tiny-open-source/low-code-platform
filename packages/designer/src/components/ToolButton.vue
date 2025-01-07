@@ -85,7 +85,7 @@ export default defineComponent({
           return {
             type: 'button',
             icon: markRaw(Accessibility),
-            tooltip: '縮小',
+            tooltip: '缩小',
             handler: zoomOutHandler,
           };
         case 'rule':
@@ -211,10 +211,13 @@ export default defineComponent({
     </template>
 
     <template v-else-if="item.type === 'button'">
-      <NTooltip v-if="item.tooltip" effect="dark" placement="bottom-start" :content="item.tooltip">
-        <NButton size="small" text :disabled="disabled">
-          <MIcon v-if="item.icon" :icon="item.icon" /><span>{{ item.text }}</span>
-        </NButton>
+      <NTooltip v-if="item.tooltip" effect="dark" placement="bottom" trigger="hover">
+        <template #trigger>
+          <NButton size="small" text :disabled="disabled">
+            <MIcon v-if="item.icon" :icon="item.icon" /><span>{{ item.text }}</span>
+          </NButton>
+        </template>
+        {{ item.tooltip }}
       </NTooltip>
       <NButton v-else size="small" text :disabled="disabled">
         <MIcon v-if="item.icon" :icon="item.icon" /><span>{{ item.text }}</span>

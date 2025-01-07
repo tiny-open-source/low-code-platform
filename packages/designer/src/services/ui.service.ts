@@ -1,6 +1,8 @@
 import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@designer/type';
+import type StageCore from '@lowcode/stage';
 import BaseService from '@designer/services/base.service';
 import { reactive, toRaw } from 'vue';
+import designerService from './designer.service';
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const MIN_LEFT_COLUMN_WIDTH = 45;
@@ -56,20 +58,20 @@ class Ui extends BaseService {
   }
 
   public set<T>(name: keyof typeof state, value: T) {
-    // const mask = designerService.get<StageCore>('stage')?.mask;
+    const mask = designerService.get<StageCore>('stage')?.mask;
     if (name === 'columnWidth') {
       this.setColumnWidth(value as unknown as SetColumnWidth);
     }
     if (name === 'stageRect') {
       this.setStageRect(value as unknown as StageRect);
     }
-    // if (name === 'showGuides') {
-    //   mask?.showGuides(value as unknown as boolean);
-    // }
+    if (name === 'showGuides') {
+      mask?.showGuides(value as unknown as boolean);
+    }
 
-    // if (name === 'showRule') {
-    //   mask?.showRule(value as unknown as boolean);
-    // }
+    if (name === 'showRule') {
+      mask?.showRule(value as unknown as boolean);
+    }
 
     (state as any)[name] = value;
 

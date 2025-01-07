@@ -20,7 +20,7 @@ export class UndoRedo<T = any> {
   }
 
   public canUndo(): boolean {
-    return this.stackCursor > 1;
+    return this.stackCursor > 0;
   }
 
   public undo(): T | null {
@@ -32,7 +32,7 @@ export class UndoRedo<T = any> {
   }
 
   public canRedo(): boolean {
-    return this.stackCursor < this.stack.length;
+    return this.stackCursor < this.stack.length - 1;
   }
 
   public redo(): T | null {
@@ -44,7 +44,7 @@ export class UndoRedo<T = any> {
   }
 
   public getCurrent(): T | null {
-    if (this.stackCursor < 1) {
+    if (this.stackCursor < 0) {
       return null;
     }
     return cloneDeep(this.stack[this.stackCursor]);

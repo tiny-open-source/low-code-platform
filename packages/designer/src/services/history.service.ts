@@ -68,6 +68,7 @@ class History extends BaseService {
     const undoRedo = this.getUndoRedo();
     if (!undoRedo)
       return null;
+    console.log('undo');
 
     const state = undoRedo.undo();
     this.emit('change', state);
@@ -78,6 +79,7 @@ class History extends BaseService {
     const undoRedo = this.getUndoRedo();
     if (!undoRedo)
       return null;
+    console.log('redo');
 
     const state = undoRedo.redo();
     this.emit('change', state);

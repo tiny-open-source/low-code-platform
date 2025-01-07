@@ -66,11 +66,12 @@ const menu: MenuBarData = {
   left: [
     {
       type: 'text',
-      text: '魔方',
+      text: '医疗设备模板编辑器',
     },
   ],
-  center: [],
+  center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
   right: [
+    '/',
     {
       type: 'button',
       text: '预览',
@@ -87,8 +88,22 @@ const menu: MenuBarData = {
         previewVisible.value = true;
       },
     },
+    {
+      type: 'button',
+      text: '保存',
+      icon: PlayOutline,
+      handler: () => {
+        save();
+      },
+    },
+    '/',
+    {
+      type: 'button',
+      icon: Document,
+      tooltip: '源码',
+      handler: service => service?.uiService.set('showSrc', !service?.uiService.get('showSrc')),
+    },
   ],
-
 };
 </script>
 
