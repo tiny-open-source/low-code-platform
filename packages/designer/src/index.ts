@@ -2,9 +2,11 @@ import type { App } from 'vue';
 import type { InstallOptions } from './type';
 import Editor from './Designer.vue';
 
+import Code from './fields/Code.vue';
 import CodeLink from './fields/CodeLink.vue';
-
 import UISelect from './fields/UISelect.vue';
+
+import CodeEditor from './layouts/CodeEditor.vue';
 import './theme/index.scss';
 
 import '@unocss/reset/tailwind-compat.css';
@@ -27,5 +29,7 @@ export default {
     app.component(Editor.name!, Editor);
     app.component(UISelect.name!, UISelect);
     app.component(CodeLink.name!, CodeLink);
+    app.component(Code.name!, Code);
+    app.component(CodeEditor.name!, CodeEditor);
   },
 };

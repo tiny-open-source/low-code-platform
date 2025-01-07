@@ -1,7 +1,7 @@
 <script setup lang="ts" name="LForm">
 import type { FormConfig, FormState, FormValue } from './schema';
 import { cloneDeep, isEqual } from 'lodash-es';
-import { NConfigProvider, NForm } from 'naive-ui';
+import { NConfigProvider, NDialogProvider, NForm, NMessageProvider } from 'naive-ui';
 import { provide, reactive, ref, toRaw, watch } from 'vue';
 import { initValue } from './utils/form';
 
@@ -13,7 +13,7 @@ defineOptions({
   name: 'LForm',
 });
 const props = withDefaults(defineProps<{
-  initValues: Record<string, any>;
+  initValues?: Record<string, any>;
   parentValues?: Record<string, any>;
   config?: FormConfig;
 
@@ -90,6 +90,7 @@ defineExpose({
   submitForm: async (native?: boolean): Promise<any> => {
     try {
       await formRef.value?.validate();
+
       return native ? values.value : cloneDeep(toRaw(values.value));
     }
     catch (invalidFields: any) {
@@ -113,19 +114,22 @@ defineExpose({
 
 <template>
   <NConfigProvider>
-    <NForm
-      ref="formRef" class="lc-f" :model="values" :label-width="labelWidth" :label-align="labelPosition" label-placement="left" :disabled="disabled" :layout="layout"
-    >
-      <template v-if="initialized && Array.isArray(config)">
-        <LFormContainer
-          v-for="(item, index) in config"
-          :key="item[keyProp] ?? index"
-          :config="item"
-          :model="values"
-          :size
-          @change="changeHandler"
-        />
-      </template>
-    </NForm>
+    <NDialogProvider>
+      <NForm
+        ref="formRef" class="lc-f" :model="values" :label-width="labelWidth" :label-align="labelPosition" label-placement="left" :disabled="disabled" :layout="layout"
+      >
+        <template v-if="initialized && Array.isArray(config)">
+          <LFormContainer
+            v-for="(item, index) in config"
+            :key="item[keyProp] ?? index"
+            :label-width="labelWidth"
+            :config="item"
+            :model="values"
+            :size
+            @change="changeHandler"
+          />
+        </template>
+      </NForm>
+    </NDialogProvider>
   </NConfigProvider>
 </template>

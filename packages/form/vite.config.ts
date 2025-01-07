@@ -1,6 +1,7 @@
 import path from 'node:path';
 import process from 'node:process';
 import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import pkg from './package.json';
@@ -14,6 +15,7 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
     vue(),
+    vueJsx(),
   ],
   resolve: {
     alias:

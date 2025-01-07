@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import serialize from 'serialize-javascript';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 
 interface CodeLinkConfig {
   type: 'code-link';
@@ -21,8 +21,19 @@ const props = withDefaults(defineProps<{
   name: '',
   prop: '',
 });
+const emit = defineEmits(['change']);
 // const emit = defineEmits(['change']);
-
+const formConfig = computed(() => ({
+  ...props.config,
+  text: '',
+  type: 'link',
+  form: [
+    {
+      name: props.name,
+      type: 'vs-code',
+    },
+  ],
+}));
 const dslModelValue = ref<{ form: Record<string, any> }>({
   form: {},
 });
@@ -35,10 +46,22 @@ watchEffect(() => {
     space: 2,
     unsafe: true,
   }).replace(/"(\w+)":\s/g, '$1: ');
-  console.log('🚀 ~ watchEffect ~ dslModelValue:', dslModelValue);
 });
+function changeHandler(v: Record<string, any>) {
+  if (!props.name || !props.model)
+    return;
+
+  try {
+    // eslint-disable-next-line vue/no-mutating-props, no-eval
+    props.model[props.name] = eval(`${v[props.name]}`);
+    emit('change', props.model[props.name]);
+  }
+  catch (e) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
-  <div />
+  <l-fields-link :config="formConfig" :model="dslModelValue" name="form" label-width="0" @change="changeHandler" />
 </template>

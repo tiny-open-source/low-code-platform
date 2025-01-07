@@ -81,6 +81,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      monaco-editor:
+        specifier: ^0.52.2
+        version: 0.52.2
       naive-ui:
         specifier: ^2.40.4
         version: 2.40.4(vue@3.5.13(typescript@5.6.2))
@@ -3312,6 +3315,9 @@ packages:
 
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
+  monaco-editor@0.52.2:
+    resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
   moveable-helper@0.4.0:
     resolution: {integrity: sha512-t1FK9PO187Gn0N6GVZcrQgePjiHmuj8eUhmJjH38LvTMnVVxiHzWYRx6ARFZvSFIIW4yb6BEAv4C99Bsx84nFw==}
@@ -7778,6 +7784,8 @@ snapshots:
       ufo: 1.5.4
 
   moment@2.30.1: {}
+
+  monaco-editor@0.52.2: {}
 
   moveable-helper@0.4.0(scenejs@1.10.3):
     dependencies:

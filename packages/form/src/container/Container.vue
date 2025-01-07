@@ -164,7 +164,6 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
     <template v-else-if="type && display">
       <NFormItem
         :style="config.tip ? 'flex: 1' : ''"
-
         :name="itemProp"
         :label-width="itemLabelWidth"
         :colon="false"

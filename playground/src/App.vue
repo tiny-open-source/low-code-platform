@@ -25,7 +25,6 @@ asyncLoadJs(
   `http://localhost:10002/lowcode/runtime/vue3/dist/assets/event.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
-  console.log();
 });
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};

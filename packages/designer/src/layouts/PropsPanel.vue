@@ -53,6 +53,9 @@ onMounted(() => {
 <template>
   <LForm
     ref="configForm"
-    :class="`lc-d-props-panel ${propsPanelSize}`" :config="curFormConfig" :init-values="values" @change="submit"
+    :class="`lc-d-props-panel ${propsPanelSize}`"
+    :config="curFormConfig"
+    :init-values="values"
+    @change="submit"
   />
 </template>

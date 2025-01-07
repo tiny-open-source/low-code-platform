@@ -10,6 +10,7 @@ import eventsService from '@designer/services/events.service';
 import historyService from '@designer/services/history.service';
 import propsService from '@designer/services/props.service';
 import uiService from '@designer/services/ui.service';
+import serialize from 'serialize-javascript';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
@@ -67,8 +68,6 @@ watch(
 watch(
   () => props.eventMethodList,
   (eventMethodList) => {
-    console.log('eventMethodList', eventMethodList);
-
     const eventsList: Record<string, EventOption[]> = {};
     const methodsList: Record<string, EventOption[]> = {};
 
@@ -117,7 +116,12 @@ defineExpose({
       <div>header</div>
     </template>
     <template #sidebar>
-      <div>{{ modelValue }}</div>
+      <div>
+        {{ serialize(modelValue, {
+          space: 2,
+          unsafe: true,
+        }) }}
+      </div>
     </template>
     <template #workspace>
       <slot name="workspace">

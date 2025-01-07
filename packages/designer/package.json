@@ -22,6 +22,7 @@
     "build:watch": "vite build --watch"
   },
   "peerDependencies": {
+    "monaco-editor": "^0.52.2",
     "naive-ui": "^2.40.4",
     "vue": "^3.5.13"
   },
@@ -34,6 +35,7 @@
     "events": "^3.3.0",
     "gesto": "^1.19.4",
     "lodash-es": "^4.17.21",
+    "monaco-editor": "^0.52.2",
     "naive-ui": "^2.40.4",
     "serialize-javascript": "^6.0.2"
   },
