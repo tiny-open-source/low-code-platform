@@ -4,6 +4,7 @@ import type { FormConfig } from '@lowcode/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
+import type { Component } from 'vue';
 import type { DesignerService } from './services/designer.service';
 import type { PropsService } from './services/props.service';
 
@@ -98,4 +99,78 @@ declare global {
 export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, MNode>;
+}
+/**
+ * 菜单按钮
+ */
+export interface MenuButton {
+  /**
+   * 按钮类型
+   * button: 只有文字不带边框的按钮
+   * text: 纯文本
+   * dropdown: 下拉菜单
+   * divider: 分隔线
+   * zoom: 放大缩小
+   */
+  type: 'button' | 'dropdown' | 'text' | 'divider' | 'zoom';
+  /** 当type为divider时有效，分割线方向, 默认vertical */
+  direction?: 'horizontal' | 'vertical';
+  /** 展示的文案 */
+  text?: string;
+  /** 鼠标悬浮是显示的气泡中的文案 */
+  tooltip?: string;
+  /** element-plus icon class */
+  icon?: string | Component<object, object, any>;
+  /** 是否置灰，默认为false */
+  disabled?: boolean | ((data?: Services) => boolean);
+  /** 是否显示，默认为true */
+  display?: boolean | ((data?: Services) => boolean);
+  /** type为button/dropdown时点击运行的方法 */
+  handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
+  /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
+  items?: MenuButton[];
+}
+
+export interface MenuComponent {
+  type: 'component';
+  /** Vue3组件 */
+  component: any;
+  /** 传入组件的props对象 */
+  props?: Record<string, any>;
+  /** 组件监听的事件对象，如：{ click: () => { console.log('click'); } } */
+  listeners?: Record<string, (...args: any[]) => any>;
+  slots?: Record<string, any>;
+  /** 是否显示，默认为true */
+  display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
+}
+
+/**
+ * '/': 分隔符
+ * 'delete': 删除按钮
+ * 'undo': 撤销按钮
+ * 'redo': 恢复按钮
+ * 'zoom-in': 放大按钮
+ * 'zoom-out': 缩小按钮
+ */
+export type MenuItem =
+  | '/'
+  | 'delete'
+  | 'undo'
+  | 'redo'
+  | 'zoom'
+  | 'zoom-in'
+  | 'zoom-out'
+  | 'guides'
+  | 'rule'
+  | MenuButton
+  | MenuComponent;
+
+/** 工具栏 */
+export interface MenuBarData {
+  /** 顶部工具栏左边项 */
+  left?: MenuItem[];
+  /** 顶部工具栏中间项 */
+  center?: MenuItem[];
+  /** 顶部工具栏右边项 */
+  right?: MenuItem[];
 }

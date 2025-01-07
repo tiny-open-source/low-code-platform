@@ -4,7 +4,7 @@ import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
-import type { Services } from './type';
+import type { MenuBarData, Services } from './type';
 import designerService from '@designer/services/designer.service';
 import eventsService from '@designer/services/events.service';
 import historyService from '@designer/services/history.service';
@@ -13,6 +13,7 @@ import uiService from '@designer/services/ui.service';
 import serialize from 'serialize-javascript';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
+import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 
@@ -26,12 +27,14 @@ const props = withDefaults(
     moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
     propsConfigs: Record<string, FormConfig>;
     eventMethodList: Record<string, { events: EventOption[]; methods: EventOption[] }>;
+    menu: MenuBarData;
   }>(),
   {
     defaultSelected: '',
     moveableOptions: () => ({}),
     propsConfigs: () => ({}),
     eventMethodList: () => ({}),
+    menu: () => ({ left: [], right: [] }),
   },
 );
 
@@ -95,7 +98,7 @@ provide<Services>('services', services);
 provide(
   'stageOptions',
   reactive({
-    runtimeUrl: 'http://localhost:10002/lowcode/runtime/vue3/playground',
+    runtimeUrl: '/lowcode/runtime/vue3/playground',
     autoScrollIntoView: true,
     render: null,
     moveableOptions: props.moveableOptions,
@@ -113,7 +116,9 @@ defineExpose({
 <template>
   <Framework>
     <template #header>
-      <div>header</div>
+      <slot name="header">
+        <NavMenu :data="menu" />
+      </slot>
     </template>
     <template #sidebar>
       <div>

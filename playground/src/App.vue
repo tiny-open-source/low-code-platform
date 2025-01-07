@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import type { LowCodeDesigner, MoveableOptions } from '@lowcode/designer';
+import type { LowCodeDesigner, MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type StageCore from '@lowcode/stage';
-import { NodeType } from '@lowcode/schema';
+import { type Id, NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
+import { PlayOutline } from '@vicons/ionicons5';
+import { NDrawer, NDrawerContent } from 'naive-ui';
+import serialize from 'serialize-javascript';
 import { mockDSL } from './config/dsl';
 
+const previewVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const value = ref(mockDSL);
 const propsValues = ref<Record<string, any>>({});
@@ -46,6 +50,46 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 
   return options;
 }
+
+function save() {
+  localStorage.setItem(
+    'lowcodeUiConfig',
+    serialize(toRaw(value.value), {
+      space: 2,
+      unsafe: true,
+    }).replace(/"(\w+)":\s/g, '$1: '),
+  );
+  designer.value?.designerService.resetModifiedNodeId();
+}
+
+const menu: MenuBarData = {
+  left: [
+    {
+      type: 'text',
+      text: '魔方',
+    },
+  ],
+  center: [],
+  right: [
+    {
+      type: 'button',
+      text: '预览',
+      icon: PlayOutline,
+      handler: async (services) => {
+        if (services?.designerService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+          try {
+            save();
+          }
+          catch (e) {
+            console.error(e);
+          }
+        }
+        previewVisible.value = true;
+      },
+    },
+  ],
+
+};
 </script>
 
 <template>
@@ -56,7 +100,18 @@ function moveableOptions(core?: StageCore): MoveableOptions {
     :moveable-options="moveableOptions"
     :props-configs="propsConfigs"
     :event-method-list="eventMethodList"
+    :menu="menu"
   />
+  <NDrawer v-model:show="previewVisible" :width="502" placement="right">
+    <NDrawerContent title="预览">
+      <iframe
+        v-if="previewVisible"
+        width="100%"
+        height="817"
+        :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`"
+      />
+    </NDrawerContent>
+  </NDrawer>
 </template>
 
 <style>

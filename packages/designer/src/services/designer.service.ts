@@ -1,7 +1,8 @@
 import type StageCore from '@lowcode/stage';
+import type { StepValue } from './history.service';
 import { type DesignerNodeInfo, Layout, type StoreState } from '@designer/type';
-import { change2Fixed, Fixed2Other, getNodeIndex, isFixed, setLayout } from '@designer/utils/editor';
 
+import { change2Fixed, Fixed2Other, getNodeIndex, isFixed, setLayout } from '@designer/utils/editor';
 import { type Id, type MApp, type MComponent, type MContainer, type MNode, type MPage, NodeType } from '@lowcode/schema';
 import { getNodePath, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
@@ -166,6 +167,68 @@ class Designer extends BaseService {
   }
 
   /**
+   * 删除组件
+   * @param {object} node
+   * @return {object} 删除的组件配置
+   */
+  public async remove(node: MNode): Promise<MNode | void> {
+    if (!node?.id)
+      return;
+
+    const root = this.get<MApp | null>('root');
+
+    if (!root)
+      throw new Error('没有root');
+
+    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
+
+    if (!parent || !curNode)
+      throw new Error('找不要删除的节点');
+
+    const index = getNodeIndex(curNode, parent);
+
+    if (typeof index !== 'number' || index === -1)
+      throw new Error('找不要删除的节点');
+
+    parent.items?.splice(index, 1);
+    const stage = this.get<StageCore | null>('stage');
+    stage?.remove({ id: node.id, root: this.get('root') });
+
+    if (node.type === NodeType.PAGE) {
+      this.state.pageLength -= 1;
+
+      if (root.items[0]) {
+        await this.select(root.items[0]);
+        stage?.select(root.items[0].id);
+      }
+      else {
+        this.set('node', null);
+        this.set('parent', null);
+        this.set('page', null);
+        this.set('stage', null);
+        this.set('highlightNode', null);
+        this.resetModifiedNodeId();
+        historyService.reset();
+
+        this.emit('remove', node);
+
+        return node;
+      }
+    }
+    else {
+      await this.select(parent);
+      stage?.select(parent.id);
+    }
+
+    this.addModifiedNodeId(parent.id);
+    this.pushHistoryState();
+
+    this.emit('remove', node);
+
+    return node;
+  }
+
+  /**
    * 更新节点
    * @param config 新的节点配置，配置中需要有id信息
    * @returns 更新后的节点配置
@@ -247,6 +310,45 @@ class Designer extends BaseService {
     if (!this.isHistoryStateChange) {
       this.get<Map<Id, Id>>('modifiedNodeIds').set(id, id);
     }
+  }
+
+  public resetModifiedNodeId() {
+    this.get<Map<Id, Id>>('modifiedNodeIds').clear();
+  }
+
+  /**
+   * 撤销当前操作
+   * @returns 上一次数据
+   */
+  public async undo(): Promise<StepValue | null> {
+    const value = historyService.undo();
+    await this.changeHistoryState(value);
+    return value;
+  }
+
+  /**
+   * 恢复到下一步
+   * @returns 下一步数据
+   */
+  public async redo(): Promise<StepValue | null> {
+    const value = historyService.redo();
+    await this.changeHistoryState(value);
+    return value;
+  }
+
+  private async changeHistoryState(value: StepValue | null) {
+    if (!value)
+      return;
+
+    this.isHistoryStateChange = true;
+    await this.update(value.data);
+    this.set('modifiedNodeIds', value.modifiedNodeIds);
+    setTimeout(async () => {
+      if (!value.nodeId)
+        return;
+      await this.select(value.nodeId);
+      this.get<StageCore | null>('stage')?.select(value.nodeId);
+    }, 0);
   }
 
   private async toggleFixedPosition(dist: MNode, src: MNode, root: MApp) {

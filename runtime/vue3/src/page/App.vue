@@ -7,7 +7,7 @@ const pageConfig = reactive(app?.page?.data || {});
 </script>
 
 <template>
-  <div>{{ pageConfig }}</div>
+  <low-code-runtime-ui-page :config="pageConfig" />
 </template>
 
 <style>

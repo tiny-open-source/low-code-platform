@@ -1,5 +1,5 @@
 import type { Id } from '@lowcode/schema';
-import type { CanSelect, GuidesEventData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
+import type { CanSelect, GuidesEventData, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import { EventEmitter } from 'events';
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
@@ -72,6 +72,14 @@ class StageCore extends EventEmitter {
       .on('sort', (data: UpdateEventData) => {
         setTimeout(() => this.emit('sort', data));
       });
+  }
+
+  public add(data: UpdateData): Promise<void> {
+    return this.renderer?.getRuntime().then(runtime => runtime?.add?.(data));
+  }
+
+  public remove(data: RemoveData): Promise<void> {
+    return this.renderer?.getRuntime().then(runtime => runtime?.remove?.(data));
   }
 
   public async setElementFromPoint(event: MouseEvent) {
