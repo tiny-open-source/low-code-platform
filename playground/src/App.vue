@@ -3,11 +3,13 @@ import type { LowCodeDesigner, MenuBarData, MoveableOptions } from '@lowcode/des
 import type StageCore from '@lowcode/stage';
 import { type Id, NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
-import { PlayOutline } from '@vicons/ionicons5';
-import { NDrawer, NDrawerContent } from 'naive-ui';
+import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
+import { NConfigProvider, NDialogProvider, NDrawer, NDrawerContent } from 'naive-ui';
 import serialize from 'serialize-javascript';
+import { ThemeColorConfig } from '../theme.config';
 import { mockDSL } from './config/dsl';
 
+const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const value = ref(mockDSL);
@@ -61,12 +63,12 @@ function save() {
   );
   designer.value?.designerService.resetModifiedNodeId();
 }
-
+save();
 const menu: MenuBarData = {
   left: [
     {
       type: 'text',
-      text: '医疗设备模板编辑器',
+      text: '模板编辑器',
     },
   ],
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
@@ -75,7 +77,7 @@ const menu: MenuBarData = {
     {
       type: 'button',
       text: '预览',
-      icon: PlayOutline,
+      icon: PlayCircleOutlined,
       handler: async (services) => {
         if (services?.designerService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
           try {
@@ -85,13 +87,14 @@ const menu: MenuBarData = {
             console.error(e);
           }
         }
+
         previewVisible.value = true;
       },
     },
     {
       type: 'button',
       text: '保存',
-      icon: PlayOutline,
+      icon: SaveOutlined,
       handler: () => {
         save();
       },
@@ -99,7 +102,7 @@ const menu: MenuBarData = {
     '/',
     {
       type: 'button',
-      icon: Document,
+      icon: CodeOutlined,
       tooltip: '源码',
       handler: service => service?.uiService.set('showSrc', !service?.uiService.get('showSrc')),
     },
@@ -108,25 +111,37 @@ const menu: MenuBarData = {
 </script>
 
 <template>
-  <LowCodeDesigner
-    ref="designer"
-    v-model="value"
-    :default-selected="value.items[0].id"
-    :moveable-options="moveableOptions"
-    :props-configs="propsConfigs"
-    :event-method-list="eventMethodList"
-    :menu="menu"
-  />
-  <NDrawer v-model:show="previewVisible" :width="502" placement="right">
-    <NDrawerContent title="预览">
-      <iframe
-        v-if="previewVisible"
-        width="100%"
-        height="817"
-        :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`"
-      />
-    </NDrawerContent>
-  </NDrawer>
+  <NConfigProvider
+    abstract :theme-overrides="{
+      common: colorRef,
+    }"
+  >
+    <NDialogProvider>
+      <LowCodeDesigner
+        ref="designer"
+        v-model="value"
+        :default-selected="value.items[0].id"
+        :moveable-options="moveableOptions"
+        :props-configs="propsConfigs"
+        :event-method-list="eventMethodList"
+        :menu="menu"
+      >
+        <template #workspace-content>
+          123
+        </template>
+      </LowCodeDesigner>
+      <NDrawer v-model:show="previewVisible" :width="1072" placement="right">
+        <NDrawerContent title="预览">
+          <iframe
+            v-if="previewVisible"
+            width="100%"
+            height="600"
+            :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`"
+          />
+        </NDrawerContent>
+      </NDrawer>
+    </NDialogProvider>
+  </NConfigProvider>
 </template>
 
 <style>

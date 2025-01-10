@@ -9,7 +9,7 @@ import { fillBackgroundImage, style2Obj } from './utils';
 interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
-  platform?: 'designer' | 'mobile' | 'tv' | 'pc';
+  platform?: 'designer' | 'device';
   jsEngine?: 'browser';
   curPage?: Id;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
@@ -20,8 +20,14 @@ class App extends EventEmitter {
   pages = new Map<Id, Page>();
   page: Page | undefined;
 
-  platform = 'mobile';
+  platform = 'device';
   jsEngine = 'browser';
+
+  rootFontSize = document.documentElement.style.fontSize;
+  zoomRatio = {
+    x: 1,
+    y: 1,
+  };
 
   components = new Map();
 
@@ -33,12 +39,12 @@ class App extends EventEmitter {
     options.jsEngine && (this.jsEngine = options.jsEngine);
 
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.platform === 'mobile' || this.platform === 'designer') {
+    if (this.platform === 'device' || this.platform === 'designer') {
       const calcFontsize = () => {
         let { width } = document.documentElement.getBoundingClientRect();
-        width = Math.min(800, width);
-        const fontSize = width / 3.75;
-        document.documentElement.style.fontSize = `${fontSize}px`;
+        width = Math.max(600, width);
+        const fontSize = width / 10.24;
+        this.rootFontSize = document.documentElement.style.fontSize = `${fontSize}px`;
       };
 
       calcFontsize();
@@ -94,7 +100,14 @@ class App extends EventEmitter {
           .join(' ');
       }
       else if (!whiteList.includes(key) && value && /^-?\d*(?:\.\d*)?$/.test(value)) {
-        results[key] = `${value / 100}rem`;
+        let radio = 1;
+        if (key === 'height' || key === 'top') {
+          radio = this.zoomRatio.y;
+        }
+        else {
+          radio = this.zoomRatio.x;
+        }
+        results[key] = `${value * radio}px`;
       }
       else {
         results[key] = value;
@@ -139,6 +152,25 @@ class App extends EventEmitter {
     if (this.platform !== 'magic') {
       this.bindEvents();
     }
+    this.calcZoomRatio(page);
+  }
+
+  calcZoomRatio(page?: Page) {
+    if (!page)
+      return;
+    if (this.platform !== 'device')
+      return;
+
+    const templateWidth = Number(page.data.style!.width);
+    const templateHeight = Number(page.data.style!.height);
+    if (!templateWidth || !templateHeight)
+      throw new Error('模板页面宽高不明确');
+    const { width: screenWidth, height: screenHeight } = document.documentElement.getBoundingClientRect(); ;
+
+    this.zoomRatio = {
+      x: screenWidth / templateWidth,
+      y: screenHeight / templateHeight,
+    };
   }
 
   registerComponent(type: string, Component: any) {

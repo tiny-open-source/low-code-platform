@@ -52,7 +52,9 @@ export class ScrollViewer {
     this.target.addEventListener('mouseenter', this.targetMouseEnterHandler);
     this.target.addEventListener('mouseleave', this.targetMouseLeaveHandler);
 
-    this.container.addEventListener('wheel', this.wheelHandler);
+    this.container.addEventListener('wheel', this.wheelHandler, {
+      passive: true,
+    });
 
     this.resizeObserver.observe(this.container);
   }

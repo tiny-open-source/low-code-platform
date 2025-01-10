@@ -95,5 +95,8 @@ export default defineComponent({
       cancel,
     };
   },
+  render() {
+    return null;
+  },
 });
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DataTableColumns } from 'naive-ui';
 import type { ColumnConfig, FormState, TableConfig } from '../schema';
-import { GridOutline, ScanOutline, TrashOutline } from '@vicons/ionicons5';
+import { DeleteOutlined, ExpandAltOutlined, FullscreenOutlined } from '@vicons/antd';
 import { cloneDeep } from 'lodash-es';
 import { NButton, NDataTable, NIcon } from 'naive-ui';
 import { computed, h, inject, ref } from 'vue';
@@ -79,7 +79,7 @@ const mergedColumns = computed(() => {
             },
           },
           { icon: () => {
-            return h(NIcon, { }, { default: () => h(TrashOutline) });
+            return h(NIcon, { }, { default: () => h(DeleteOutlined) });
           } },
         );
       },
@@ -182,7 +182,7 @@ const lTable = ref<HTMLElement | null>(null);
       <NButton type="primary" size="small">
         <template #icon>
           <NIcon>
-            <GridOutline />
+            <ExpandAltOutlined />
           </NIcon>
         </template>
         展开配置
@@ -190,7 +190,7 @@ const lTable = ref<HTMLElement | null>(null);
       <NButton type="primary" size="small">
         <template #icon>
           <NIcon>
-            <ScanOutline />
+            <FullscreenOutlined />
           </NIcon>
         </template>
         全屏编辑

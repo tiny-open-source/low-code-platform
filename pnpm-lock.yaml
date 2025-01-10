@@ -66,7 +66,7 @@ importers:
       '@lowcode/utils':
         specifier: workspace:^1.0.0
         version: link:../utils
-      '@vicons/ionicons5':
+      '@vicons/antd':
         specifier: ^0.13.0
         version: 0.13.0
       buffer:
@@ -157,7 +157,7 @@ importers:
 
   packages/form:
     dependencies:
-      '@vicons/ionicons5':
+      '@vicons/antd':
         specifier: ^0.13.0
         version: 0.13.0
       lodash-es:
@@ -293,9 +293,9 @@ importers:
         specifier: workspace:^1.0.0
         version: link:../packages/stage
       '@lowcode/utils':
-        specifier: workspace:^
+        specifier: workspace:^1.0.0
         version: link:../packages/utils
-      '@vicons/ionicons5':
+      '@vicons/antd':
         specifier: ^0.13.0
         version: 0.13.0
       events:
@@ -1733,8 +1733,8 @@ packages:
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0
 
-  '@vicons/ionicons5@0.13.0':
-    resolution: {integrity: sha512-zvZKBPjEXKN7AXNo2Na2uy+nvuv6SP4KAMQxpKL2vfHMj0fSvuw7JZcOPCjQC3e7ayssKnaoFVAhbYcW6v41qQ==}
+  '@vicons/antd@0.13.0':
+    resolution: {integrity: sha512-yrUGoUSz2BbGupk9ghQOahc04n5H3MwUDM9pVPsLh9U1uqB47oRWZvYRiZaT1JKPqgTgSE6BXcVw4i9MOF4M+g==}
 
   '@vitejs/plugin-vue-jsx@4.1.1':
     resolution: {integrity: sha512-uMJqv/7u1zz/9NbWAD3XdjaY20tKTf17XVfQ9zq4wY1BjsB/PjpJPMe2xiG39QpP4ZdhYNhm4Hvo66uJrykNLA==}
@@ -5841,7 +5841,7 @@ snapshots:
       - supports-color
       - vue
 
-  '@vicons/ionicons5@0.13.0': {}
+  '@vicons/antd@0.13.0': {}
 
   '@vitejs/plugin-vue-jsx@4.1.1(vite@6.0.3(@types/node@20.17.9)(jiti@2.4.1)(sass-embedded@1.83.0)(sass@1.83.0)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.2))':
     dependencies:

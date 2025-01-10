@@ -4,17 +4,17 @@ import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
-import type { MenuBarData, Services } from './type';
+import type { MenuBarData, Services, SideBarData, StageRect } from './type';
 import designerService from '@designer/services/designer.service';
 import eventsService from '@designer/services/events.service';
 import historyService from '@designer/services/history.service';
 import propsService from '@designer/services/props.service';
 import uiService from '@designer/services/ui.service';
-import serialize from 'serialize-javascript';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
+import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
 
 defineOptions({
@@ -28,6 +28,9 @@ const props = withDefaults(
     propsConfigs: Record<string, FormConfig>;
     eventMethodList: Record<string, { events: EventOption[]; methods: EventOption[] }>;
     menu: MenuBarData;
+    /** 左侧面板配置 */
+    sidebar?: SideBarData;
+    stageRect?: StageRect;
   }>(),
   {
     defaultSelected: '',
@@ -94,6 +97,15 @@ watch(
     immediate: true,
   },
 );
+
+watch(
+  () => props.stageRect,
+  stageRect => stageRect && uiService.set('stageRect', stageRect),
+  {
+    immediate: true,
+  },
+);
+
 provide<Services>('services', services);
 provide(
   'stageOptions',
@@ -121,16 +133,15 @@ defineExpose({
       </slot>
     </template>
     <template #sidebar>
-      <div>
-        {{ serialize(modelValue, {
-          space: 2,
-          unsafe: true,
-        }) }}
-      </div>
+      <!-- <Sidebar /> -->
     </template>
     <template #workspace>
       <slot name="workspace">
-        <Workspace />
+        <Workspace>
+          <template #workspace-content>
+            <slot name="workspace-content" :designer-service="designerService" />
+          </template>
+        </Workspace>
       </slot>
     </template>
     <template #propsPanel>

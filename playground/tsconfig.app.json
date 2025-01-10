@@ -14,7 +14,8 @@
     "auto-imports.d.ts",
     "components.d.ts",
     "src/**/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "./theme.config.ts"
   ],
   "exclude": ["src/**/__tests__/*"]
 }

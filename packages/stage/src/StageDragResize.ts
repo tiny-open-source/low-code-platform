@@ -227,9 +227,7 @@ class StageDragResize extends EventEmitter {
         }
 
         this.moveableHelper?.onDrag(e);
-
-        this.target.style.left = `${frame.left + e.beforeTranslate[0]}px`;
-        this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
+        this.updatePosition(frame.left + e.beforeTranslate[0], frame.top + e.beforeTranslate[1]);
       })
       .on('dragEnd', () => {
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
@@ -246,6 +244,14 @@ class StageDragResize extends EventEmitter {
         this.dragStatus = ActionStatus.END;
         this.destroyGhostEl();
       });
+  }
+
+  // 使用 requestAnimationFrame 优化拖拽动画
+  private updatePosition(x: number, y: number) {
+    requestAnimationFrame(() => {
+      this.target!.style.left = `${x}px`;
+      this.target!.style.top = `${y}px`;
+    });
   }
 
   private bindResizeEvent(): void {
@@ -337,13 +343,13 @@ class StageDragResize extends EventEmitter {
   }
 
   private calcValueByFontsize(value: number) {
-    const { contentWindow } = this.core.renderer;
-    const fontSize = contentWindow?.document.documentElement.style.fontSize;
+    // const { contentWindow } = this.core.renderer;
+    // const fontSize = contentWindow?.document.documentElement.style.fontSize;
 
-    if (fontSize) {
-      const times = Number.parseFloat(fontSize) / 100;
-      return (value / times).toFixed(2);
-    }
+    // if (fontSize) {
+    //   const times = Number.parseFloat(fontSize) / 32;
+    //   return (value / times).toFixed(2);
+    // }
 
     return value;
   }
@@ -367,6 +373,21 @@ class StageDragResize extends EventEmitter {
     if (typeof this.core.config.updateDragEl === 'function') {
       this.core.config.updateDragEl(this.dragEl, el);
     }
+  }
+
+  /**
+   * 销毁实例
+   */
+  public destroy(): void {
+    this.moveable?.destroy();
+    this.destroyGhostEl();
+    this.destroyDragEl();
+    this.dragStatus = ActionStatus.END;
+    this.removeAllListeners();
+  }
+
+  private destroyDragEl(): void {
+    this.dragEl?.remove();
   }
 
   private init(el: HTMLElement): void {

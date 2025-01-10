@@ -47,5 +47,5 @@ function changeHandler(v: boolean | number | string) {
 </script>
 
 <template>
-  <NSwitch v-model:value="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @change="changeHandler" />
+  <NSwitch v-model:value="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @update:value="changeHandler" />
 </template>

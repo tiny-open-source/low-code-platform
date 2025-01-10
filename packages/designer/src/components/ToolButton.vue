@@ -3,7 +3,7 @@ import type { MenuButton, MenuComponent, MenuItem, Services } from '@designer/ty
 import type { PropType } from 'vue';
 import MIcon from '@designer/components/Icon.vue';
 import { NodeType } from '@lowcode/schema';
-import { Accessibility } from '@vicons/ionicons5';
+import { ArrowLeftOutlined, ArrowRightOutlined, BorderInnerOutlined, BorderOuterOutlined, DeleteOutlined, TableOutlined, ZoomInOutlined, ZoomOutOutlined } from '@vicons/antd';
 import { NButton, NDivider, NTooltip } from 'naive-ui';
 import { computed, defineComponent, inject, markRaw } from 'vue';
 
@@ -53,7 +53,7 @@ export default defineComponent({
         case 'delete':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: DeleteOutlined,
             tooltip: '刪除',
             disabled: () => services?.designerService.get('node')?.type === NodeType.PAGE,
             handler: () => services?.designerService.remove(services?.designerService.get('node')),
@@ -61,7 +61,7 @@ export default defineComponent({
         case 'undo':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: ArrowLeftOutlined,
             tooltip: '后退',
             disabled: () => !services?.historyService.state.canUndo,
             handler: () => services?.designerService.undo(),
@@ -69,7 +69,7 @@ export default defineComponent({
         case 'redo':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: ArrowRightOutlined,
             tooltip: '前进',
             disabled: () => !services?.historyService.state.canRedo,
             handler: () => services?.designerService.redo(),
@@ -77,28 +77,28 @@ export default defineComponent({
         case 'zoom-in':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: ZoomOutOutlined,
             tooltip: '放大',
             handler: zoomInHandler,
           };
         case 'zoom-out':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: ZoomInOutlined,
             tooltip: '缩小',
             handler: zoomOutHandler,
           };
         case 'rule':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: BorderInnerOutlined,
             tooltip: showRule.value ? '隐藏标尺' : '显示标尺',
             handler: () => uiService?.set('showRule', !showRule.value),
           };
         case 'guides':
           return {
             type: 'button',
-            icon: markRaw(Accessibility),
+            icon: TableOutlined,
             tooltip: showGuides.value ? '隐藏参考线' : '显示参考线',
             handler: () => uiService?.set('showGuides', !showGuides.value),
           };
@@ -130,8 +130,8 @@ export default defineComponent({
     };
 
     return {
-      ZoomIn: markRaw(Accessibility),
-      ZoomOut: markRaw(Accessibility),
+      ZoomIn: markRaw(ZoomInOutlined),
+      ZoomOut: markRaw(ZoomOutOutlined),
 
       item,
       zoom,
@@ -193,7 +193,7 @@ export default defineComponent({
     @mousedown="mousedownHandler(item, $event)"
     @mouseup="mouseupHandler(item, $event)"
   >
-    <NDivider v-if="item.type === 'divider'" :vertical="item.direction === 'vertical'" />
+    <NDivider v-if="item.type === 'divider'" :vertical="!item.direction || item.direction === 'vertical'" />
     <div v-else-if="item.type === 'text'" class="menu-item-text">
       {{ item.text }}
     </div>
@@ -213,31 +213,22 @@ export default defineComponent({
     <template v-else-if="item.type === 'button'">
       <NTooltip v-if="item.tooltip" effect="dark" placement="bottom" trigger="hover">
         <template #trigger>
-          <NButton size="small" text :disabled="disabled">
-            <MIcon v-if="item.icon" :icon="item.icon" /><span>{{ item.text }}</span>
+          <NButton size="small" quaternary circle :disabled="disabled">
+            <template v-if="item.icon" #icon>
+              <MIcon :icon="item.icon" /><span>{{ item.text }}</span>
+            </template>
           </NButton>
         </template>
         {{ item.tooltip }}
       </NTooltip>
-      <NButton v-else size="small" text :disabled="disabled">
-        <MIcon v-if="item.icon" :icon="item.icon" /><span>{{ item.text }}</span>
+      <NButton v-else size="small" quaternary :disabled="disabled">
+        <template v-if="item.icon" #icon>
+          <MIcon :icon="item.icon" />
+        </template><span>{{ item.text }}</span>
       </NButton>
     </template>
 
-    <!-- <el-dropdown v-else-if="item.type === 'dropdown'" trigger="click" :disabled="disabled" @command="dropdownHandler">
-      <span class="el-dropdown-link menubar-menu-button">
-        {{ item.text }}<el-icon class="el-icon--right"><ArrowDown /></el-icon>
-      </span>
-      <template #dropdown>
-        <el-dropdown-menu v-if="item.items && item.items.length">
-          <el-dropdown-item v-for="(subItem, index) in item.items" :key="index" :command="{ item, subItem }">
-            {{
-              subItem.text
-            }}
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown> -->
+    <!-- <NDropdown v-else-if="item.type === 'dropdown'" trigger="click" :disabled="disabled" :options="[]" @select="dropdownHandler" /> -->
 
     <component v-bind="item.props || {}" :is="item.component" v-else-if="item.type === 'component'" />
   </div>

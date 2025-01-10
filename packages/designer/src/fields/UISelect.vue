@@ -1,7 +1,7 @@
 <script setup lang="ts" name="UISelect">
 import type { Services } from '@designer/type';
 import type { FormState } from '@lowcode/form';
-import { TrashOutline } from '@vicons/ionicons5';
+import { DeleteOutlined } from '@vicons/antd';
 
 import { NButton, NIcon, NTooltip } from 'naive-ui';
 import { computed, inject, ref } from 'vue';
@@ -73,7 +73,7 @@ const toName = computed(() => {
     <NButton type="error" text style="padding: 0">
       <template #icon>
         <NIcon>
-          <TrashOutline />
+          <DeleteOutlined />
         </NIcon>
       </template>
       取消
@@ -84,7 +84,7 @@ const toName = computed(() => {
       <template #trigger>
         <NButton text type="primary" @click.stop="deleteHandler">
           <NIcon>
-            <TrashOutline />
+            <DeleteOutlined />
           </NIcon>
         </NButton>
       </template>

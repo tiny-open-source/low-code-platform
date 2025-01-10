@@ -113,23 +113,21 @@ defineExpose({
 </script>
 
 <template>
-  <NConfigProvider>
-    <NDialogProvider>
-      <NForm
-        ref="formRef" class="lc-f" :model="values" :label-width="labelWidth" :label-align="labelPosition" label-placement="left" :disabled="disabled" :layout="layout"
-      >
-        <template v-if="initialized && Array.isArray(config)">
-          <LFormContainer
-            v-for="(item, index) in config"
-            :key="item[keyProp] ?? index"
-            :label-width="labelWidth"
-            :config="item"
-            :model="values"
-            :size
-            @change="changeHandler"
-          />
-        </template>
-      </NForm>
-    </NDialogProvider>
-  </NConfigProvider>
+  <div>
+    <NForm
+      ref="formRef" class="lc-f" :model="values" :label-width="labelWidth" :label-align="labelPosition" label-placement="left" :disabled="disabled" :layout="layout"
+    >
+      <template v-if="initialized && Array.isArray(config)">
+        <LFormContainer
+          v-for="(item, index) in config"
+          :key="item[keyProp] ?? index"
+          :label-width="labelWidth"
+          :config="item"
+          :model="values"
+          :size
+          @change="changeHandler"
+        />
+      </template>
+    </NForm>
+  </div>
 </template>

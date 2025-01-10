@@ -1,13 +1,12 @@
 <script lang="ts">
 import type { Component, PropType } from 'vue';
-import { Accessibility } from '@vicons/ionicons5';
 import { NIcon } from 'naive-ui';
 import { defineComponent, toRaw } from 'vue';
 
 export default defineComponent({
   name: 'm-icon',
 
-  components: { Accessibility, NIcon },
+  components: { NIcon },
 
   props: {
     icon: {
@@ -25,11 +24,11 @@ export default defineComponent({
 
 <template>
   <NIcon v-if="!icon">
-    <Accessibility />
+    haha
   </NIcon>
   <img v-else-if="typeof icon === 'string' && icon.startsWith('http')" :src="icon">
   <i v-else-if="typeof icon === 'string'" :class="icon" />
-  <NIcon v-else>
-    <Accessibility />
+  <NIcon v-else size="16">
+    <component :is="icon" />
   </NIcon>
 </template>

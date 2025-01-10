@@ -24,9 +24,8 @@ onMounted(() => {
 });
 const style = computed(() => (`
         width: ${props.width}px;
-        height: ${(props.height || 0) - 40}px;
+        height: ${props.height}px;
         position: absolute;
-        margin-top: 30px;
       `));
 watch(
   () => props.zoom,

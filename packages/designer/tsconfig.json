@@ -3,6 +3,7 @@
   "compilerOptions": {
     "target": "esnext",
     "jsx": "preserve",
+    "jsxImportSource": "vue",
     "lib": [
       "esnext",
       "dom",
@@ -28,7 +29,7 @@
   },
   "include": [
     "vite.config.*",
-    "env.d.ts",
+    "./env.d.ts",
     "auto-imports.d.ts",
     "components.d.ts",
     "src/**/*",

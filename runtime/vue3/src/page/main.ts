@@ -19,6 +19,7 @@ Object.values(entry.plugins).forEach((plugin: any) => {
 const app = new Core({
   config: ((getUrlParam('localPreview') ? getLocalConfig() : window.lowcodeDSL) || [])[0] || {},
   curPage: getUrlParam('page'),
+  platform: 'device',
 });
 
 vm.config.globalProperties.app = app;

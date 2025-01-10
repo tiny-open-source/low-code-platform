@@ -12,5 +12,6 @@ const workspace = ref<HTMLElement | null>(null);
 <template>
   <div ref="workspace" class="lc-d-workspace" tabindex="1">
     <LowCodeStage />
+    <slot name="workspace-content" />
   </div>
 </template>

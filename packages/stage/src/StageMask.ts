@@ -79,7 +79,7 @@ export default class StageMask extends Rule {
     this.content.addEventListener('mousedown', this.mouseDownHandler);
     this.wrapper.appendChild(this.content);
 
-    this.content.addEventListener('wheel', this.mouseWheelHandler);
+    this.content.addEventListener('wheel', this.mouseWheelHandler, { passive: true });
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
   };

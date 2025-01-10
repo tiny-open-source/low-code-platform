@@ -100,6 +100,29 @@ export interface PropsState {
   propsConfigMap: Record<string, FormConfig>;
   propsValueMap: Record<string, MNode>;
 }
+
+export interface SideComponent extends MenuComponent {
+  /** 显示文案 */
+  text: string;
+  /** element-plus icon class */
+  icon: Component<object, object, any>;
+}
+/**
+ * component-list: 组件列表
+ * layer: 已选组件树
+ */
+export type SideItem = 'component-list' | 'layer' | SideComponent;
+
+/** 工具栏 */
+export interface SideBarData {
+  /** 容器类型 */
+  type: 'tabs';
+  /** 默认激活的内容 */
+  status: string;
+  /** panel列表 */
+  items: SideItem[];
+}
+
 /**
  * 菜单按钮
  */
@@ -173,4 +196,10 @@ export interface MenuBarData {
   center?: MenuItem[];
   /** 顶部工具栏右边项 */
   right?: MenuItem[];
+}
+
+export interface AddMNode {
+  type: string;
+  name?: string;
+  [key: string]: any;
 }

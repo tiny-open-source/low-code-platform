@@ -1,14 +1,16 @@
+import type { AddMNode, DesignerNodeInfo, StoreState } from '@designer/type';
 import type StageCore from '@lowcode/stage';
 import type { StepValue } from './history.service';
-import { type DesignerNodeInfo, Layout, type StoreState } from '@designer/type';
+import { Layout } from '@designer/type';
 
-import { change2Fixed, Fixed2Other, getNodeIndex, isFixed, setLayout } from '@designer/utils/editor';
+import { change2Fixed, Fixed2Other, getNodeIndex, initPosition, isFixed, setLayout } from '@designer/utils/editor';
 import { type Id, type MApp, type MComponent, type MContainer, type MNode, type MPage, NodeType } from '@lowcode/schema';
 import { getNodePath, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { reactive, toRaw } from 'vue';
 import BaseService from './base.service';
 import historyService from './history.service';
+import propsService from './props.service';
 
 class Designer extends BaseService {
   private isHistoryStateChange = false;
@@ -164,6 +166,85 @@ class Designer extends BaseService {
 
     this.addModifiedNodeId(parent.id);
     this.pushHistoryState();
+  }
+
+  /**
+   * 根据ID获取指点节点的父节点配置
+   * @param id 组件ID
+   * @param {boolean} raw 是否使用toRaw
+   * @returns 指点组件的父节点配置
+   */
+  public getParentById(id: Id, raw = true): MContainer | undefined {
+    if (!this.get<MApp | null>('root'))
+      return;
+    const { parent } = this.getNodeInfo(id, raw);
+    return parent;
+  }
+
+  /**
+   * 向指点容器添加组件节点
+   * @param addConfig 将要添加的组件节点配置
+   * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
+   * @returns 添加后的节点
+   */
+  public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
+    const { type, ...config } = addNode;
+    const curNode = this.get<MContainer>('node');
+
+    let parentNode: MNode | undefined;
+    const isPage = type === NodeType.PAGE;
+
+    if (isPage) {
+      parentNode = this.get<MApp>('root');
+      // 由于支持中间件扩展，在parent参数为undefined时，parent会变成next函数
+    }
+    else if (parent && typeof parent !== 'function') {
+      parentNode = parent;
+    }
+    else if (curNode.items) {
+      parentNode = curNode;
+    }
+    else {
+      parentNode = this.getParentById(curNode.id, false);
+    }
+
+    if (!parentNode)
+      throw new Error('未找到父元素');
+
+    const layout = await this.getLayout(toRaw(parentNode), addNode as MNode);
+    const newNode = initPosition(
+      { ...toRaw(await propsService.getPropsValue(type, config)) },
+      layout,
+      parentNode,
+      this.get<StageCore>('stage'),
+    );
+
+    if ((parentNode?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && newNode.type !== NodeType.PAGE) {
+      throw new Error('app下不能添加组件');
+    }
+
+    parentNode?.items?.push(newNode);
+
+    const stage = this.get<StageCore | null>('stage');
+
+    await stage?.add({ config: cloneDeep(newNode), root: cloneDeep(this.get('root')) });
+
+    await this.select(newNode);
+
+    this.addModifiedNodeId(newNode.id);
+    if (!isPage) {
+      this.pushHistoryState();
+    }
+
+    stage?.select(newNode.id);
+
+    if (isPage) {
+      this.state.pageLength += 1;
+    }
+
+    this.emit('add', newNode);
+
+    return newNode;
   }
 
   /**

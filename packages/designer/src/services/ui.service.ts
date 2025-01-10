@@ -25,8 +25,8 @@ const state = reactive<UiState>({
     height: 0,
   },
   stageRect: {
-    width: 375,
-    height: 750,
+    width: 1024,
+    height: 600,
   },
   columnWidth: defaultColumnWidth,
   showGuides: true,
@@ -61,9 +61,11 @@ class Ui extends BaseService {
     const mask = designerService.get<StageCore>('stage')?.mask;
     if (name === 'columnWidth') {
       this.setColumnWidth(value as unknown as SetColumnWidth);
+      return;
     }
     if (name === 'stageRect') {
       this.setStageRect(value as unknown as StageRect);
+      return;
     }
     if (name === 'showGuides') {
       mask?.showGuides(value as unknown as boolean);

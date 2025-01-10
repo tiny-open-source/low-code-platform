@@ -1,0 +1,10 @@
+@use "./common/variables";
+
+.#{variables.$namespace}-sidebar {
+  height: 100%;
+
+  &-tab-panel-title {
+    font-size: 12px;
+    white-space: normal;
+  }
+}

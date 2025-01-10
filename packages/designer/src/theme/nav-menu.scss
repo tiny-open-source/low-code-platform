@@ -2,16 +2,13 @@
 .#{variables.$namespace}-nav-menu {
   display: flex;
   z-index: 5;
-  -webkit-box-pack: justify;
   justify-content: space-between;
-  -webkit-box-align: center;
   align-items: center;
   background-color: variables.$nav-background-color;
   font-size: 19.2px;
   color: variables.$nav-color;
   font-weight: 400;
   box-sizing: border-box;
-  margin: 0px;
   flex: 0 0 variables.$nav-height;
   border-bottom: 1px solid #d8dee8;
 
@@ -44,7 +41,6 @@
     display: flex !important;
     transition: all 0.3s ease 0s;
     border-bottom: 2px solid transparent;
-    margin: 0;
 
     .is-disabled {
       opacity: 0.5;
