@@ -1,5 +1,5 @@
-import page from 'C:/Users/16045/Desktop/code/my-project/github/tmagic-editor/packages/ui/src/page/src/initValue';
-import text from 'C:/Users/16045/Desktop/code/my-project/github/tmagic-editor/packages/ui/src/text/src/initValue';
+import page from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/page/src/init-value';
+import text from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/text/src/init-value';
 
 (function () {
   const values = {

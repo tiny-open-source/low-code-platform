@@ -19,17 +19,17 @@ const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
 
 asyncLoadJs(
-  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`,
+  `/lowcode/runtime/vue3/dist/assets/config.js`,
 ).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
 asyncLoadJs(
-  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/config.js`,
+  `/lowcode/runtime/vue3/dist/assets/value.js`,
 ).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
 asyncLoadJs(
-  `http://localhost:10002/lowcode/runtime/vue3/dist/assets/event.js`,
+  `/lowcode/runtime/vue3/dist/assets/event.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
@@ -124,6 +124,7 @@ const menu: MenuBarData = {
         :default-selected="value.items[0].id"
         :moveable-options="moveableOptions"
         :props-configs="propsConfigs"
+        :props-values="propsValues"
         :event-method-list="eventMethodList"
         :component-group-list="componentGroupList"
         :menu="menu"

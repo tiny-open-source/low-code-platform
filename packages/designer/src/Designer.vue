@@ -33,6 +33,7 @@ const props = withDefaults(
     sidebar?: SideBarData;
     stageRect?: StageRect;
     componentGroupList?: ComponentGroup[];
+    propsValues?: Record<string, MNode>;
   }>(),
   {
     defaultSelected: '',
@@ -41,6 +42,7 @@ const props = withDefaults(
     eventMethodList: () => ({}),
     menu: () => ({ left: [], right: [] }),
     componentGroupList: () => [],
+    propsValues: () => ({}),
   },
 );
 
@@ -70,6 +72,13 @@ watch(
   (n) => {
     designerService.set('root', toRaw(n));
   },
+  {
+    immediate: true,
+  },
+);
+watch(
+  () => props.propsValues,
+  values => propsService.setPropsValues(values),
   {
     immediate: true,
   },

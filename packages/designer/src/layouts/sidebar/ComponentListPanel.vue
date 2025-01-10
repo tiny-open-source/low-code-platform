@@ -2,6 +2,7 @@
 import type { ComponentGroup, ComponentItem, Services } from '@designer/type';
 import MIcon from '@designer/components/Icon.vue';
 import { NCollapse, NCollapseItem, NInput, NScrollbar } from 'naive-ui';
+import serialize from 'serialize-javascript';
 import { computed, inject, ref } from 'vue';
 
 defineOptions({
@@ -20,6 +21,27 @@ const collapseValue = computed(() =>
     .fill(1)
     .map((x, i) => i),
 );
+function appendComponent({ text, type, data = {} }: ComponentItem): void {
+  services?.designerService.add({
+    name: text,
+    type,
+    ...data,
+  });
+}
+
+function dragstartHandler({ text, type, data = {} }: ComponentItem, event: DragEvent): void {
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData(
+      'data',
+      serialize({
+        name: text,
+        type,
+        ...data,
+      }).replace(/"(\w+)":\s/g, '$1: '),
+    );
+  }
+}
 </script>
 
 <template>
@@ -45,6 +67,8 @@ const collapseValue = computed(() =>
             :key="item.type"
             class="component-item"
             draggable="true"
+            @click="appendComponent(item)"
+            @dragstart="dragstartHandler(item, $event)"
           >
             <MIcon :icon="item.icon" />
             <span>{{ item.text }}</span>

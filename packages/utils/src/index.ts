@@ -57,7 +57,7 @@ export const asyncLoadJs = (() => {
 
     const load = new Promise<void>((resolve, reject) => {
       const script = document.createElement('script');
-      script.type = 'text/javascript';
+      script.type = 'module';
       if (crossOrigin) {
         script.crossOrigin = crossOrigin;
       }
