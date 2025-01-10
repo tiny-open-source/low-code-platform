@@ -1,3 +1,4 @@
+import type { ComponentListService } from '@designer/services/component-list.service';
 import type { HistoryService } from '@designer/services/history.service';
 import type { UiService } from '@designer/services/ui.service';
 import type { FormConfig } from '@lowcode/form';
@@ -16,6 +17,7 @@ export interface Services {
   historyService: HistoryService;
   designerService: DesignerService;
   propsService: PropsService;
+  componentListService: ComponentListService;
 }
 
 export interface StageOptions {
@@ -202,4 +204,26 @@ export interface AddMNode {
   type: string;
   name?: string;
   [key: string]: any;
+}
+
+export interface ComponentItem {
+  /** 显示文案 */
+  text: string;
+  /** 组件类型 */
+  type: string;
+  /** element-plus icon class */
+  icon?: string | Component;
+  data?: {
+    [key: string]: any;
+  };
+}
+
+export interface ComponentGroup {
+  /** 显示文案 */
+  title: string;
+  /** 组内列表 */
+  items: ComponentItem[];
+}
+export interface ComponentGroupState {
+  list: ComponentGroup[];
 }

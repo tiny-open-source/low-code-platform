@@ -4,7 +4,8 @@ import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
-import type { MenuBarData, Services, SideBarData, StageRect } from './type';
+import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from './type';
+import componentListService from '@designer/services/component-list.service';
 import designerService from '@designer/services/designer.service';
 import eventsService from '@designer/services/events.service';
 import historyService from '@designer/services/history.service';
@@ -31,6 +32,7 @@ const props = withDefaults(
     /** 左侧面板配置 */
     sidebar?: SideBarData;
     stageRect?: StageRect;
+    componentGroupList?: ComponentGroup[];
   }>(),
   {
     defaultSelected: '',
@@ -38,6 +40,7 @@ const props = withDefaults(
     propsConfigs: () => ({}),
     eventMethodList: () => ({}),
     menu: () => ({ left: [], right: [] }),
+    componentGroupList: () => [],
   },
 );
 
@@ -59,6 +62,7 @@ const services: Services = {
   historyService,
   designerService,
   propsService,
+  componentListService,
 };
 
 watch(
@@ -70,7 +74,13 @@ watch(
     immediate: true,
   },
 );
-
+watch(
+  () => props.componentGroupList,
+  componentGroupList => componentListService.setList(componentGroupList),
+  {
+    immediate: true,
+  },
+);
 watch(
   () => props.eventMethodList,
   (eventMethodList) => {
@@ -133,7 +143,7 @@ defineExpose({
       </slot>
     </template>
     <template #sidebar>
-      <!-- <Sidebar /> -->
+      <Sidebar />
     </template>
     <template #workspace>
       <slot name="workspace">

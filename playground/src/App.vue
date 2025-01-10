@@ -7,7 +7,8 @@ import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { NConfigProvider, NDialogProvider, NDrawer, NDrawerContent } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
-import { mockDSL } from './config/dsl';
+import componentGroupList from './configs/componentGroupList';
+import { mockDSL } from './configs/dsl';
 
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
@@ -124,6 +125,7 @@ const menu: MenuBarData = {
         :moveable-options="moveableOptions"
         :props-configs="propsConfigs"
         :event-method-list="eventMethodList"
+        :component-group-list="componentGroupList"
         :menu="menu"
       >
         <template #workspace-content>

@@ -15,9 +15,7 @@ const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'))
     </div>
     <div class="lc-d-framework__content">
       <div class="lc-d-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
-        <NScrollbar>
-          <slot name="sidebar" />
-        </NScrollbar>
+        <slot name="sidebar" />
       </div>
       <Resizer type="left" />
       <div class="lc-d-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
