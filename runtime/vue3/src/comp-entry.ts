@@ -1,9 +1,13 @@
-import page from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/page/src/index.vue';
-import text from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/text/src/index.vue';
+import button from '/Users/vanweiping/Desktop/code/personal/low-code-platform/packages/runtime-ui/src/button/src/index.vue';
+import container from '/Users/vanweiping/Desktop/code/personal/low-code-platform/packages/runtime-ui/src/container/src/Container.vue';
+import page from '/Users/vanweiping/Desktop/code/personal/low-code-platform/packages/runtime-ui/src/page/src/index.vue';
+import text from '/Users/vanweiping/Desktop/code/personal/low-code-platform/packages/runtime-ui/src/text/src/index.vue';
 
 const components = {
   page,
   text,
+  container,
+  button,
 };
 const plugins = {};
 const entry = {

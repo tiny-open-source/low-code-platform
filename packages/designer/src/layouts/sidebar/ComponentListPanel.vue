@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ComponentGroup, ComponentItem, Services } from '@designer/type';
 import MIcon from '@designer/components/Icon.vue';
-import { NCollapse, NCollapseItem, NInput, NScrollbar } from 'naive-ui';
+import { SearchOutlined } from '@vicons/antd';
+import { NCollapse, NCollapseItem, NIcon, NInput, NScrollbar } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { computed, inject, ref } from 'vue';
 
@@ -51,11 +52,15 @@ function dragstartHandler({ text, type, data = {} }: ComponentItem, event: DragE
         class="search-input"
       >
         <NInput
-          v-model="searchText"
+          v-model:value="searchText"
           placeholder="输入关键字进行过滤"
           size="tiny"
           clearable
-        />
+        >
+          <template #prefix>
+            <NIcon :component="SearchOutlined" />
+          </template>
+        </NInput>
       </div>
       <template v-for="(group, index) in list">
         <NCollapseItem v-if="group.items && group.items.length" :key="index" :name="group.title" :title="group.title">

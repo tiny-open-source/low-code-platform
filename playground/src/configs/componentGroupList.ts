@@ -1,4 +1,4 @@
-import { CopyOutlined } from '@vicons/antd';
+import { BorderOuterOutlined, FileImageOutlined, FileTextOutlined, GroupOutlined, PoweroffOutlined, QrcodeOutlined } from '@vicons/antd';
 import { markRaw } from 'vue';
 
 export default [
@@ -6,12 +6,12 @@ export default [
     title: '示例容器',
     items: [
       {
-        icon: markRaw(CopyOutlined),
-        text: '组',
+        icon: markRaw(GroupOutlined),
+        text: '普通容器',
         type: 'container',
       },
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(BorderOuterOutlined),
         text: '蒙层',
         type: 'overlay',
       },
@@ -21,22 +21,22 @@ export default [
     title: '示例组件',
     items: [
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(FileTextOutlined),
         text: '文本',
         type: 'text',
       },
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(PoweroffOutlined),
         text: '按钮',
         type: 'button',
       },
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(FileImageOutlined),
         text: '图片',
         type: 'img',
       },
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(QrcodeOutlined),
         text: '二维码',
         type: 'qrcode',
       },
@@ -46,7 +46,7 @@ export default [
     title: '组合',
     items: [
       {
-        icon: markRaw(CopyOutlined),
+        icon: markRaw(FileTextOutlined),
         text: '弹窗',
         data: {
           type: 'overlay',
