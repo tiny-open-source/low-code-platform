@@ -1,8 +1,10 @@
-import page from '/Users/vanweiping/Desktop/code/personal/low-code-platform/packages/runtime-ui/src/page/src/event';
+import overlay from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/overlay/src/event';
+import page from 'C:/Users/16045/Desktop/code/my-project/low-code/packages/runtime-ui/src/page/src/event';
 
 (function () {
   const events = {
     page,
+    overlay,
   };
 
   window.lowcodePresetEvents = events;
