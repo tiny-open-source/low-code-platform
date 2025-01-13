@@ -2,7 +2,7 @@
 import type { MApp, MNode, MPage } from '@lowcode/schema';
 import type { Runtime, SortEventData, UpdateEventData } from '@lowcode/stage';
 import ScrollViewer from '@designer/components/ScrollViewer.vue';
-import { H_GUIDE_LINE_STORAGE_KEY, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '@designer/type';
+import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '@designer/type';
 import { getGuideLineFromCache } from '@designer/utils/editor';
 import StageCore, { GuidesType } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
@@ -123,6 +123,33 @@ const resizeObserver = new ResizeObserver((entries) => {
     });
   }
 });
+async function dropHandler(e: DragEvent) {
+  e.preventDefault();
+  if (e.dataTransfer && page.value && stageContainer.value && stage) {
+    // eslint-disable-next-line no-eval
+    const config = eval(`(${e.dataTransfer.getData('data')})`);
+    const layout = await services?.designerService.getLayout(page.value);
+
+    const containerRect = stageContainer.value.getBoundingClientRect();
+    const { scrollTop, scrollLeft } = stage.mask;
+    if (layout === Layout.ABSOLUTE) {
+      config.style = {
+        ...(config.style || {}),
+        position: 'absolute',
+        top: e.clientY - containerRect.top + scrollTop,
+        left: e.clientX - containerRect.left + scrollLeft,
+      };
+    }
+
+    services?.designerService.add(config, page.value);
+  }
+}
+function dragoverHandler(e: DragEvent) {
+  e.preventDefault();
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move';
+  }
+}
 onMounted(() => {
   stageWrap.value?.container && resizeObserver.observe(stageWrap.value.container);
 });
@@ -135,6 +162,9 @@ onUnmounted(() => {
 
 <template>
   <ScrollViewer ref="stageWrap" class="lc-d-stage" :width="stageRect?.width" :height="stageRect?.height" :zoom="zoom">
-    <div ref="stageContainer" class="lc-d-stage-container" :style="`transform: scale(${zoom})`" />
+    <div
+      ref="stageContainer" class="lc-d-stage-container" :style="`transform: scale(${zoom})`" @drop="dropHandler"
+      @dragover="dragoverHandler"
+    />
   </ScrollViewer>
 </template>

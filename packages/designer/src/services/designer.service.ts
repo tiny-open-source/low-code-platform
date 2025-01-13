@@ -524,4 +524,5 @@ class Designer extends BaseService {
   }
 }
 export type DesignerService = Designer;
-export default new Designer();
+const designer = new Designer();
+export default designer;

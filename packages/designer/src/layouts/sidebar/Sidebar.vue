@@ -5,6 +5,7 @@ import { NTabPane, NTabs } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import MIcon from '../../components/Icon.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
+import LayerPanel from './LayerPanel.vue';
 
 defineOptions({
   name: 'l-sidebar',
@@ -45,7 +46,7 @@ const dataConfigs = computed(() => {
           type: 'component',
           icon: CheckSquareOutlined,
           text: '已选组件',
-          component: null,
+          component: LayerPanel,
           slots: {},
         };
       default:
