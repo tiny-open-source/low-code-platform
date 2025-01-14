@@ -137,7 +137,6 @@ provide(
     updateDragEl: null,
   }),
 );
-
 onUnmounted(() => designerService.destroy());
 defineExpose({
   ...services,

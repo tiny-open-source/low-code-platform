@@ -39,23 +39,23 @@
     }
   }
 
-  &-layer-panel,
-  &-layer-panel .el-tree {
+  &,
+  & .el-tree {
     background-color: variables.$sidebar-content-background-color;
     color: #313a40;
   }
 
-  &-layer-panel .cus-tree-node {
+  & .cus-tree-node {
     width: 100%;
     overflow: hidden;
   }
 
-  &-layer-panel .cus-tree-node-hover {
+  & .cus-tree-node-hover {
     background-color: variables.$hover-color;
     width: 100%;
   }
 
-  &-layer-panel .el-tree-node:focus>.el-tree-node__content {
+  & .el-tree-node:focus>.el-tree-node__content {
     background-color: variables.$sidebar-header-background-color;
     color: #fff;
   }
