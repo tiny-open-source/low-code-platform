@@ -8,6 +8,7 @@ import { NConfigProvider, NDialogProvider, NDrawer, NDrawerContent } from 'naive
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
 import DeviceGroup from './components/DeviceGroup.vue';
+import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
 
@@ -137,19 +138,10 @@ const menu: MenuBarData = {
         :menu="menu"
       >
         <template #workspace-content>
-          <DeviceGroup v-model="stageRectStr" />
+          <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <NDrawer v-model:show="previewVisible" :width="1072" placement="right">
-        <NDrawerContent title="预览">
-          <iframe
-            v-if="previewVisible"
-            width="100%"
-            height="600"
-            :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`"
-          />
-        </NDrawerContent>
-      </NDrawer>
+      <Preview v-model:show="previewVisible" :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
     </NDialogProvider>
   </NConfigProvider>
 </template>
@@ -159,5 +151,12 @@ const menu: MenuBarData = {
   width: 100%;
   height: 100%;
   display: flex;
+}
+.device-group {
+  width: 180px;
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  z-index: 10;
 }
 </style>

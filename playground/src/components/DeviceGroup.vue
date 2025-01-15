@@ -40,13 +40,3 @@ const options = [
     :options="options"
   />
 </template>
-
-<style lang="scss" scoped>
-.select {
-  width:180px;
-  position: absolute;
-  top: 10px;
-  right: 40px;
-  z-index: 10;
-}
-</style>
