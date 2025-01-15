@@ -5,7 +5,7 @@ export function useApp(props: any) {
   const app: Core | undefined = inject('app');
 
   const node = app?.page?.getNode(props.config.id);
-  const vm = getCurrentInstance()?.proxy;
+  const vm = getCurrentInstance();
 
   node?.emit('created', vm);
 

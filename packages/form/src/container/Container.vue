@@ -10,12 +10,11 @@ defineOptions({
 const props = withDefaults(defineProps<{
   config: ChildConfig;
   model: FormValue;
-  size?: 'tiny' | 'small' | 'default' | 'large';
+  size?: 'small' | 'large' | 'medium';
   prop?: string;
   labelWidth?: string;
   expandMore?: boolean;
   stepActive?: number | string;
-
 }>(), {
   prop: '',
 });

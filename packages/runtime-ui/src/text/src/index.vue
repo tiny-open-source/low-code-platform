@@ -42,7 +42,7 @@ const classname = computed(() => props.config?.multiple ? 'magic-ui-text' : 'mag
 </script>
 
 <template>
-  <span
+  <div
     :id="`${props.config.id || ''}`"
     :class="classname"
     :style="style"
@@ -51,5 +51,5 @@ const classname = computed(() => props.config?.multiple ? 'magic-ui-text' : 'mag
     <span v-else>
       {{ text }}
     </span>
-  </span>
+  </div>
 </template>

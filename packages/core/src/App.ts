@@ -2,7 +2,7 @@ import type { Id, MApp } from '@lowcode/schema';
 // eslint-disable-next-line unicorn/prefer-node-protocol
 import { EventEmitter } from 'events';
 import Env from './Env';
-import { DEFAULT_EVENTS, getCommonEventName, isCommonMethod, triggerCommonMethod } from './events';
+import { bindCommonEventListener, DEFAULT_EVENTS, getCommonEventName, isCommonMethod, triggerCommonMethod } from './events';
 import Page from './Page';
 import { fillBackgroundImage, style2Obj } from './utils';
 
@@ -39,7 +39,7 @@ class App extends EventEmitter {
     options.jsEngine && (this.jsEngine = options.jsEngine);
 
     // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
-    if (this.platform === 'device' || this.platform === 'designer') {
+    if (this.platform === 'device' || this.platform === 'browser') {
       const calcFontsize = () => {
         let { width } = document.documentElement.getBoundingClientRect();
         width = Math.max(600, width);
@@ -59,6 +59,8 @@ class App extends EventEmitter {
     }
 
     options.config && this.setConfig(options.config, options.curPage);
+
+    bindCommonEventListener(this);
   }
 
   /**
@@ -149,7 +151,7 @@ class App extends EventEmitter {
 
     this.page = page;
 
-    if (this.platform !== 'magic') {
+    if (this.platform !== 'browser') {
       this.bindEvents();
     }
     this.calcZoomRatio(page);
@@ -204,14 +206,12 @@ class App extends EventEmitter {
           const toNode = this.page.getNode(event.to);
           if (!toNode)
             throw new Error(`ID为${event.to}的组件不存在`);
-
           const { method: methodName } = event;
           if (isCommonMethod(methodName)) {
             return triggerCommonMethod(methodName, toNode);
           }
-
-          if (typeof toNode.instance?.[methodName] === 'function') {
-            toNode.instance[methodName](fromCpt, ...args);
+          if (typeof toNode.instance.exposed?.[methodName] === 'function') {
+            toNode.instance.exposed[methodName](fromCpt, ...args);
           }
         });
       });

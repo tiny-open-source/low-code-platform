@@ -18,9 +18,11 @@ const props = withDefaults(defineProps<{
   name: string;
   prop: string;
   sortKey?: string;
+  size?: 'small' | 'medium' | 'large' ;
 }>(), {
   model: () => ({}),
   sortKey: '',
+  size: 'small',
 });
 const emit = defineEmits(['change']);
 const lForm = inject<FormState | undefined>('lForm');
@@ -47,6 +49,7 @@ const columns = computed(() => props.config.items.map(
           prop: getProp(index),
           config: makeConfig(item),
           model: row,
+          size: props.size,
           onChange: (value: any) => {
             console.log('change', value);
             emit('change', props.model[modelName.value]);
@@ -64,12 +67,11 @@ const mergedColumns = computed(() => {
       align: 'center',
       width: 50,
       fixed: 'left',
-      render(row, index) {
+      render(_, index) {
         return h(
           NButton,
           {
-            strong: true,
-            size: 'medium',
+            size: props.size,
             type: 'error',
             quaternary: true,
             onClick: () => {
@@ -173,13 +175,13 @@ const lTable = ref<HTMLElement | null>(null);
         :single-line="false"
         :columns="mergedColumns"
         :data="model[modelName]"
-        size="small"
+        :size="size"
       />
       <slot />
-      <NButton type="primary" size="small" @click="newHandler()">
+      <NButton type="primary" :size="size" @click="newHandler()">
         添加
       </NButton> &nbsp;
-      <NButton type="primary" size="small">
+      <NButton type="primary" :size="size">
         <template #icon>
           <NIcon>
             <ExpandAltOutlined />
@@ -187,7 +189,7 @@ const lTable = ref<HTMLElement | null>(null);
         </template>
         展开配置
       </NButton> &nbsp;
-      <NButton type="primary" size="small">
+      <NButton type="primary" :size="size">
         <template #icon>
           <NIcon>
             <FullscreenOutlined />

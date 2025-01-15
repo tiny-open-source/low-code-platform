@@ -178,6 +178,7 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                   name: 'name',
                   label: '事件名',
                   type: 'select',
+                  size: 'small',
                   options: (lForm: FormState, { formValue }: any) =>
                     eventsService.getEvent(formValue.type).map(option => ({
                       text: option.label,
@@ -187,11 +188,13 @@ export function fillConfig(config: FormConfig = []): FormConfig {
                 {
                   name: 'to',
                   label: '联动组件',
+                  size: 'small',
                   type: 'ui-select',
                 },
                 {
                   name: 'method',
                   label: '动作',
+                  size: 'small',
                   type: 'select',
                   options: (lForm: FormState, { model }: any) => {
                     const node = designerService.getNodeById(model.to);
