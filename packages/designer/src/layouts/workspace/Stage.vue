@@ -6,8 +6,8 @@ import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, typ
 import { getGuideLineFromCache } from '@designer/utils/editor';
 import StageCore, { GuidesType } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
-
 import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
+import ViewerMenu from './ViewerMenu.vue';
 
 const stageContainer = ref<HTMLDivElement | null>(null);
 const stageOptions = inject<StageOptions>('stageOptions');
@@ -22,7 +22,7 @@ const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMo
 const page = computed(() => services?.designerService.get<MPage>('page'));
 const node = computed(() => services?.designerService.get<MNode>('node'));
 const stageWrap = ref<InstanceType<typeof ScrollViewer> | null>(null);
-
+const menu = ref<InstanceType<typeof ViewerMenu>>();
 let stage: StageCore | null = null;
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
@@ -150,6 +150,12 @@ function dragoverHandler(e: DragEvent) {
     e.dataTransfer.dropEffect = 'move';
   }
 }
+function contextmenuHandler(e: MouseEvent) {
+  e.preventDefault();
+  if (menu.value) {
+    menu.value.show();
+  }
+}
 onMounted(() => {
   stageWrap.value?.container && resizeObserver.observe(stageWrap.value.container);
 });
@@ -163,8 +169,13 @@ onUnmounted(() => {
 <template>
   <ScrollViewer ref="stageWrap" class="lc-d-stage" :width="stageRect?.width" :height="stageRect?.height" :zoom="zoom">
     <div
-      ref="stageContainer" class="lc-d-stage-container" :style="`transform: scale(${zoom})`" @drop="dropHandler"
+      ref="stageContainer"
+      class="lc-d-stage-container"
+      :style="`transform: scale(${zoom})`"
+      @contextmenu="contextmenuHandler"
+      @drop="dropHandler"
       @dragover="dragoverHandler"
     />
+    <ViewerMenu ref="menu" />
   </ScrollViewer>
 </template>
