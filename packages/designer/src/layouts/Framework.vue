@@ -6,7 +6,7 @@ import { computed, inject } from 'vue';
 import Resizer from './Resizer.vue';
 
 defineProps<{
-  codeOptions: Record<string, any>;
+  codeOptions?: Record<string, any>;
 }>();
 const { uiService, designerService } = inject<Services>('services')!;
 const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'));

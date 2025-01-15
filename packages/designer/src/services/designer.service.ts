@@ -3,10 +3,11 @@ import type StageCore from '@lowcode/stage';
 import type { StepValue } from './history.service';
 import { Layout } from '@designer/type';
 
-import { change2Fixed, Fixed2Other, getNodeIndex, initPosition, isFixed, setLayout } from '@designer/utils/editor';
+import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, generatePageNameByApp, getNodeIndex, initPosition, isFixed, setLayout } from '@designer/utils/editor';
 import { type Id, type MApp, type MComponent, type MContainer, type MNode, type MPage, NodeType } from '@lowcode/schema';
-import { getNodePath, isPop } from '@lowcode/utils';
+import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
+import serialize from 'serialize-javascript';
 import { reactive, toRaw } from 'vue';
 import BaseService from './base.service';
 import historyService from './history.service';
@@ -89,6 +90,52 @@ class Designer extends BaseService {
     }
 
     return Layout.ABSOLUTE;
+  }
+
+  /**
+   * 将组将节点配置转化成string，然后存储到localStorage中
+   * @param config 组件节点配置
+   * @returns 组件节点配置
+   */
+  public async copy(config: MNode): Promise<void> {
+    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(config));
+  }
+
+  /**
+   * 从localStorage中获取节点，然后添加到当前容器中
+   * @param position 如果设置，指定组件位置
+   * @returns 添加后的组件节点配置
+   */
+  public async paste(position: { left?: number; top?: number } = {}): Promise<MNode | void> {
+    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    // eslint-disable-next-line prefer-const
+    let config: any = {};
+    if (!configStr) {
+      return;
+    }
+
+    try {
+      // eslint-disable-next-line no-eval
+      eval(`config = ${configStr}`);
+    }
+    catch (e) {
+      console.error(e);
+      return;
+    }
+
+    await propsService.setNewItemId(config, this.get('root'));
+    if (config.style) {
+      config.style = {
+        ...config.style,
+        ...position,
+      };
+    }
+
+    if (isPage(config)) {
+      config.name = generatePageNameByApp(this.get('root'));
+    }
+
+    return await this.add(config);
   }
 
   /**
@@ -245,6 +292,68 @@ class Designer extends BaseService {
     this.emit('add', newNode);
 
     return newNode;
+  }
+
+  public async move(left: number, top: number) {
+    console.log('🚀 ~ Designer ~ move ~ top:', top);
+    console.log('🚀 ~ Designer ~ move ~ left:', left);
+    const node = toRaw(this.get('node'));
+    if (!node || isPage(node))
+      return;
+
+    const { style, id } = node;
+    console.log('🚀 ~ Designer ~ move ~ style:', style);
+    if (!style || style.position !== 'absolute')
+      return;
+
+    if (top && !isNumber(style.top))
+      return;
+    if (left && !isNumber(style.left))
+      return;
+
+    this.update({
+      id,
+      style: {
+        ...style,
+        left: Number(style.left) + left,
+        top: Number(style.top) + top,
+      },
+    });
+  }
+
+  public async selectNextNode(): Promise<MNode> | never {
+    const node = toRaw(this.get('node'));
+
+    if (!node || isPage(node) || node.type === NodeType.ROOT)
+      return node;
+
+    const parent = toRaw(this.getParentById(node.id));
+
+    if (!parent)
+      return node;
+
+    const index = getNodeIndex(node, parent);
+
+    const nextNode = parent.items[index + 1] || parent.items[0];
+
+    await this.select(nextNode);
+    this.get<StageCore>('stage')?.select(nextNode.id);
+
+    return nextNode;
+  }
+
+  public async selectNextPage(): Promise<MNode> | never {
+    const root = toRaw(this.get<MApp>('root'));
+    const page = toRaw(this.get('page'));
+
+    const index = getNodeIndex(page, root);
+
+    const nextPage = root.items[index + 1] || root.items[0];
+
+    await this.select(nextPage);
+    this.get<StageCore>('stage')?.select(nextPage.id);
+
+    return nextPage;
   }
 
   /**

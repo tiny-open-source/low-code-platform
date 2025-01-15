@@ -36,8 +36,7 @@
   "dependencies": {
     "@vicons/antd": "^0.13.0",
     "lodash-es": "^4.17.21",
-    "tinycolor2": "^1.6.0",
-    "vue3-colorpicker": "^2.3.0"
+    "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
