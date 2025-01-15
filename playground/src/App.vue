@@ -7,6 +7,7 @@ import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { NConfigProvider, NDialogProvider, NDrawer, NDrawerContent } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
+import DeviceGroup from './components/DeviceGroup.vue';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
 
@@ -17,6 +18,11 @@ const value = ref(mockDSL);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
+const stageRectStr = ref('1024 * 600');
+const stageRect = computed(() => {
+  const [width, height] = stageRectStr.value.split('*').map(Number);
+  return { width, height };
+});
 
 asyncLoadJs(
   `/lowcode/runtime/vue3/dist/assets/config.js`,
@@ -127,10 +133,11 @@ const menu: MenuBarData = {
         :props-values="propsValues"
         :event-method-list="eventMethodList"
         :component-group-list="componentGroupList"
+        :stage-rect="stageRect"
         :menu="menu"
       >
         <template #workspace-content>
-          123
+          <DeviceGroup v-model="stageRectStr" />
         </template>
       </LowCodeDesigner>
       <NDrawer v-model:show="previewVisible" :width="1072" placement="right">

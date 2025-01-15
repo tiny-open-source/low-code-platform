@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import type { GetColumnWidth, Services } from '@designer/type';
+import type { MApp } from '@lowcode/schema';
 import { NScrollbar } from 'naive-ui';
 import { computed, inject } from 'vue';
 import Resizer from './Resizer.vue';
 
-const { uiService } = inject<Services>('services')!;
+defineProps<{
+  codeOptions: Record<string, any>;
+}>();
+const { uiService, designerService } = inject<Services>('services')!;
 const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'));
+
+const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
+const root = computed(() => designerService?.get<MApp>('root'));
 </script>
 
 <template>
@@ -13,7 +20,9 @@ const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'))
     <div class="lc-d-framework__nav">
       <slot name="header" />
     </div>
-    <div class="lc-d-framework__content">
+
+    <low-code-editor v-if="showSrc" :code-options="codeOptions" :init-values="root" class="lc-d-framework__content" />
+    <div v-else class="lc-d-framework__content">
       <div class="lc-d-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
         <slot name="sidebar" />
       </div>
