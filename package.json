@@ -6,7 +6,7 @@
   "scripts": {
     "build": "turbo build --filter=@lowcode/* ",
     "build:playground": "turbo build --filter=runtime-vue3 --filter=playground",
-    "postbuild:playground": "shx mkdir playground/dist/runtime && shx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3",
+    "postbuild:playground": "shx mkdir playground/dist/runtime && shx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3/dist",
     "dev": "pnpm build && turbo dev",
     "lint": "turbo lint",
     "clean:top": "rimraf */**/dist */**/types */dist */**/.turbo coverage dwt* temp",
