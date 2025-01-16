@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
   isSubMenu?: boolean;
 }>(), {
   isSubMenu: false,
+  menuData: () => [],
 });
 
 const emit = defineEmits(['hide', 'show']);
