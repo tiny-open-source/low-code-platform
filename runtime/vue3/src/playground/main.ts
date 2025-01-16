@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 
 import App from './App.vue';
 
-const componentUrl = import.meta.env.MODE === 'development' ? '../comp-entry.ts' : 'http://localhost:10002/lowcode/runtime/vue3/dist/assets/components.js';
+const componentUrl = import.meta.env.MODE === 'development' ? '../comp-entry.ts' : '/low-code-platform/playground/runtime/vue3/assets/components.js';
 
 import(/* @vite-ignore */ componentUrl).then(() => {
   const vm = createApp(App);

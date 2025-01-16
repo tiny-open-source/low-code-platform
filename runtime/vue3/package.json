@@ -9,9 +9,7 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "dev": "run-p dev:build dev:serve",
-    "dev:build": "vite build --watch",
-    "dev:serve": "vite --host",
+    "dev": "vite --host",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "test:unit": "vitest",
