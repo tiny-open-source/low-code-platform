@@ -24,19 +24,19 @@ const stageRect = computed(() => {
   const [width, height] = stageRectStr.value.split('*').map(Number);
   return { width, height };
 });
-
+const assetsPath = import.meta.env.VITE_RUNTIME_ASSETS_PATH;
 asyncLoadJs(
-  `/low-code-platform/playground/runtime/vue3/dist/assets/config.js`,
+  `${assetsPath}/config.js`,
 ).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
 asyncLoadJs(
-  `/low-code-platform/playground/runtime/vue3/dist/assets/value.js`,
+  `${assetsPath}/value.js`,
 ).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
 asyncLoadJs(
-  `/low-code-platform/playground/runtime/vue3/dist/assets/event.js`,
+  `${assetsPath}/event.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });

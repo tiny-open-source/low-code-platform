@@ -17,7 +17,12 @@ export default defineConfig({
   },
   server: {
     port: 10002,
+    fs: {
+      // 允许访问工作区上层目录
+      allow: ['..'],
+    },
   },
+  logLevel: 'error',
   build: {
     sourcemap: true,
 
