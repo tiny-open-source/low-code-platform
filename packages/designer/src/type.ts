@@ -227,3 +227,7 @@ export interface ComponentGroup {
 export interface ComponentGroupState {
   list: ComponentGroup[];
 }
+export enum LayerOffset {
+  TOP = 'top',
+  BOTTOM = 'bottom',
+}

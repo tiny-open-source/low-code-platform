@@ -153,7 +153,7 @@ function dragoverHandler(e: DragEvent) {
 function contextmenuHandler(e: MouseEvent) {
   e.preventDefault();
   if (menu.value) {
-    menu.value.show();
+    menu.value.show(e);
   }
 }
 onMounted(() => {
@@ -176,6 +176,8 @@ onUnmounted(() => {
       @drop="dropHandler"
       @dragover="dragoverHandler"
     />
-    <ViewerMenu ref="menu" />
+    <teleport to="body">
+      <ViewerMenu ref="menu" />
+    </teleport>
   </ScrollViewer>
 </template>

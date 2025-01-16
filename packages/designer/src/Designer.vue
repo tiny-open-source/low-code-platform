@@ -157,7 +157,7 @@ defineExpose({
       <slot name="workspace">
         <Workspace>
           <template #workspace-content>
-            <slot name="workspace-content" :designer-service="designerService" />
+            <slot name="workspace-content" />
           </template>
         </Workspace>
       </slot>

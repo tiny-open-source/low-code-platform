@@ -3,7 +3,7 @@ import { markRaw } from 'vue';
 
 export default [
   {
-    title: '示例容器',
+    title: '容器',
     items: [
       {
         icon: markRaw(GroupOutlined),
@@ -18,7 +18,7 @@ export default [
     ],
   },
   {
-    title: '示例组件',
+    title: '组件',
     items: [
       {
         icon: markRaw(FileTextOutlined),

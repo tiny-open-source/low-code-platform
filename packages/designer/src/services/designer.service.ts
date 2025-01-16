@@ -1,7 +1,7 @@
 import type { AddMNode, DesignerNodeInfo, StoreState } from '@designer/type';
 import type StageCore from '@lowcode/stage';
 import type { StepValue } from './history.service';
-import { Layout } from '@designer/type';
+import { LayerOffset, Layout } from '@designer/type';
 
 import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, generatePageNameByApp, getNodeIndex, initPosition, isFixed, setLayout } from '@designer/utils/editor';
 import { type Id, type MApp, type MComponent, type MContainer, type MNode, type MPage, NodeType } from '@lowcode/schema';
@@ -226,6 +226,67 @@ class Designer extends BaseService {
       return;
     const { parent } = this.getNodeInfo(id, raw);
     return parent;
+  }
+
+  /**
+   * 将指点节点设置居中
+   * @param config 组件节点配置
+   * @returns 当前组件节点配置
+   */
+  public async alignCenter(config: MNode): Promise<MNode | void> {
+    const parent = this.get<MContainer>('parent');
+    const node = this.get<MNode>('node');
+    const layout = await this.getLayout(toRaw(parent), toRaw(node));
+    if (layout === Layout.RELATIVE) {
+      return;
+    }
+
+    if (!node.style)
+      return;
+
+    const stage = this.get<StageCore>('stage');
+    const doc = stage?.renderer.contentWindow?.document;
+
+    if (doc) {
+      const parentEl = doc.getElementById(`${parent.id}`);
+      const el = doc.getElementById(`${node.id}`);
+      if (parentEl && el) {
+        node.style.left = (parentEl.clientWidth - el.clientWidth) / 2;
+      }
+    }
+    else if (parent.style && isNumber(parent.style?.width) && isNumber(node.style?.width)) {
+      node.style.left = (parent.style.width - node.style.width) / 2;
+    }
+
+    await this.update(node);
+    // this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(node)), root: this.get('root') });
+    this.addModifiedNodeId(config.id);
+    this.pushHistoryState();
+
+    return config;
+  }
+
+  /**
+   * 移动当前选中节点位置
+   * @param offset 偏移量
+   */
+  public async moveLayer(offset: number | LayerOffset): Promise<void> {
+    const parent = this.get<MContainer>('parent');
+    const node = this.get('node');
+    const brothers: MNode[] = parent?.items || [];
+    const index = brothers.findIndex(item => `${item.id}` === `${node?.id}`);
+
+    if (offset === LayerOffset.TOP) {
+      brothers.splice(brothers.length - 1, 0, brothers.splice(index, 1)[0]);
+    }
+    else if (offset === LayerOffset.BOTTOM) {
+      brothers.splice(0, 0, brothers.splice(index, 1)[0]);
+    }
+    else {
+      brothers.splice(index + Number.parseInt(`${offset}`, 10), 0, brothers.splice(index, 1)[0]);
+    }
+
+    this.get<StageCore | null>('stage')?.update({ config: cloneDeep(toRaw(parent)), root: this.get('root') });
   }
 
   /**

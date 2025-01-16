@@ -223,6 +223,14 @@ class StageCore extends EventEmitter {
     this.container = undefined;
   }
 
+  /**
+   * 清空所有参考线
+   */
+  public clearGuides() {
+    this.mask.clearGuides();
+    this.dr.clearGuides();
+  }
+
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
     if (typeof idOrEl === 'string' || typeof idOrEl === 'number') {
       const el = this.renderer.contentWindow?.document.getElementById(`${idOrEl}`);
