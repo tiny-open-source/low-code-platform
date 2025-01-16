@@ -26,17 +26,17 @@ const stageRect = computed(() => {
 });
 
 asyncLoadJs(
-  `/lowcode/runtime/vue3/dist/assets/config.js`,
+  `/low-code-platform/playground/runtime/vue3/dist/assets/config.js`,
 ).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
 asyncLoadJs(
-  `/lowcode/runtime/vue3/dist/assets/value.js`,
+  `/low-code-platform/playground/runtime/vue3/dist/assets/value.js`,
 ).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
 asyncLoadJs(
-  `/lowcode/runtime/vue3/dist/assets/event.js`,
+  `/low-code-platform/playground/runtime/vue3/dist/assets/event.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
@@ -141,7 +141,7 @@ const menu: MenuBarData = {
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <Preview v-model:show="previewVisible" :src="`/lowcode/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
+      <Preview v-model:show="previewVisible" :src="`/low-code-platform/playground/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
     </NDialogProvider>
   </NConfigProvider>
 </template>

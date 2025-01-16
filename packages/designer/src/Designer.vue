@@ -129,7 +129,7 @@ provide<Services>('services', services);
 provide(
   'stageOptions',
   reactive({
-    runtimeUrl: '/lowcode/runtime/vue3/playground',
+    runtimeUrl: '/low-code-platform/playground/runtime/vue3/playground',
     autoScrollIntoView: true,
     render: null,
     moveableOptions: props.moveableOptions,

@@ -10,7 +10,7 @@ import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/lowcode/playground',
+  base: '/low-code-platform/playground',
   css: {
     preprocessorOptions: {
       scss: {
@@ -46,7 +46,7 @@ export default defineConfig({
   server: {
     port: 10001,
     proxy: {
-      '^/lowcode/runtime/vue3': {
+      '^/low-code-platform/playground/runtime/vue3': {
         target: 'http://localhost:10002',
         changeOrigin: true,
         prependPath: false,
