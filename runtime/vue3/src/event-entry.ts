@@ -1,5 +1,5 @@
-import overlay from 'packages/runtime-ui/src/overlay/src/event';
-import page from 'packages/runtime-ui/src/page/src/event';
+import overlay from '../../../packages/runtime-ui/src/overlay/src/event';
+import page from '../../../packages/runtime-ui/src/page/src/event';
 
 (function () {
   const events = {
