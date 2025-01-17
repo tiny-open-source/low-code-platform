@@ -47,6 +47,7 @@ function dragstartHandler({ text, type, data = {} }: ComponentItem, event: DragE
 
 <template>
   <NScrollbar>
+    <slot name="component-list-panel" />
     <NCollapse class="ui-component-panel" :model-value="collapseValue" arrow-placement="right" :default-expanded-names="list!.map(i => i.title)">
       <div
         class="search-input"

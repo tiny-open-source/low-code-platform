@@ -25,8 +25,6 @@ watch(
   },
 );
 const dataConfigs = computed(() => {
-  console.log(props.data);
-
   return props.data?.items.map((item) => {
     if (typeof item !== 'string') {
       return item;
@@ -78,6 +76,14 @@ const dataConfigs = computed(() => {
       </template>
 
       <component :is="config.component" v-bind="config.props || {}" v-on="config?.listeners || {}">
+        <template v-if="config === 'layer'" #layer-panel>
+          <slot name="layer-panel" />
+        </template>
+
+        <template v-if="config === 'component-list'" #component-list-panel>
+          <slot name="component-list-panel" />
+        </template>
+
         <template v-if="config.slots?.layerNodeContent" #layer-node-content="{ data: innerData, node }">
           <component :is="config.slots?.layerNodeContent" :data="innerData" :node="node" />
         </template>

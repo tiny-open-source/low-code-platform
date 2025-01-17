@@ -171,6 +171,8 @@ const allowDrop: AllowDrop = ({ dropPosition, node }) => {
 
 <template>
   <div class="lc-d-layer-panel">
+    <slot name="layer-panel" />
+
     <div
       class="search-input"
     >
