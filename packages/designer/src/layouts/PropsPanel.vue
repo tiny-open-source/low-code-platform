@@ -55,7 +55,7 @@ onMounted(() => {
     <slot name="props-panel-header" />
     <LForm
       ref="configForm"
-      :class="`${propsPanelSize}`"
+      :class="propsPanelSize"
       :config="curFormConfig"
       :init-values="values"
       @change="submit"

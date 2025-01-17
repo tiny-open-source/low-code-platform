@@ -63,7 +63,7 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 
 function save() {
   localStorage.setItem(
-    'lowcodeUiConfig',
+    'lowcodeDSL',
     serialize(toRaw(value.value), {
       space: 2,
       unsafe: true,

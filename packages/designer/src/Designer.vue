@@ -172,8 +172,8 @@ defineExpose({
         </Workspace>
       </slot>
     </template>
-    <template #propsPanel>
-      <slot name="propsPanel">
+    <template #props-panel>
+      <slot name="props-panel">
         <PropsPanel
           ref="propsPanel"
           @mounted="(instance) => $emit('propsPanelMounted', instance)"

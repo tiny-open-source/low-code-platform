@@ -1,7 +1,7 @@
 import type { MApp } from '@lowcode/schema';
 
 export function getLocalConfig(): MApp[] {
-  const configStr = localStorage.getItem('lowcodeUiConfig');
+  const configStr = localStorage.getItem('lowcodeDSL');
   if (!configStr)
     return [];
   try {
