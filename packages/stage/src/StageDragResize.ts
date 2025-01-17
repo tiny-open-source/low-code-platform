@@ -1,14 +1,14 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import type { SortEventData, StageDragResizeConfig } from './types';
+import type { StageDragResizeConfig } from './types';
 
 import { addClassName, removeClassNameByClassName } from '@lowcode/utils';
 import { EventEmitter } from 'eventemitter3';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
-import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset, getTargetElStyle } from './utils';
+import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './utils';
 /** 拖动状态 */
 enum ActionStatus {
   /** 开始拖动 */
@@ -571,76 +571,3 @@ class StageDragResize extends EventEmitter {
   }
 }
 export default StageDragResize;
-
-/**
- * 下移组件位置
- * @param {number} deltaTop 偏移量
- * @param {object} detail 当前选中的组件配置
- */
-export function down(deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void {
-  let swapIndex = 0;
-  let addUpH = target.clientHeight;
-  const brothers = Array.from(target.parentNode?.children || []).filter(
-    node => !node.id.startsWith(GHOST_EL_ID_PREFIX),
-  );
-  const index = brothers.indexOf(target);
-  // 往下移动
-  const downEls = brothers.slice(index + 1) as HTMLElement[];
-
-  for (let i = 0; i < downEls.length; i++) {
-    const ele = downEls[i];
-    // 是 fixed 不做处理
-    if (ele.style?.position === 'fixed') {
-      continue;
-    }
-    addUpH += ele.clientHeight / 2;
-    if (deltaTop <= addUpH) {
-      break;
-    }
-    addUpH += ele.clientHeight / 2;
-    swapIndex = i;
-  }
-  return {
-    src: target.id,
-    dist: downEls.length && swapIndex > -1 ? downEls[swapIndex].id : target.id,
-  };
-}
-
-/**
- * 上移组件位置
- * @param {Array} brothers 处于同一容器下的所有子组件配置
- * @param {number} index 当前组件所处的位置
- * @param {number} deltaTop 偏移量
- * @param {object} detail 当前选中的组件配置
- */
-export function up(deltaTop: number, target: HTMLElement | SVGElement): SortEventData | void {
-  const brothers = Array.from(target.parentNode?.children || []).filter(
-    node => !node.id.startsWith(GHOST_EL_ID_PREFIX),
-  );
-  const index = brothers.indexOf(target);
-  // 往上移动
-  const upEls = brothers.slice(0, index) as HTMLElement[];
-
-  let addUpH = target.clientHeight;
-  let swapIndex = upEls.length - 1;
-
-  for (let i = upEls.length - 1; i >= 0; i--) {
-    const ele = upEls[i];
-    if (!ele)
-      continue;
-    // 是 fixed 不做处理
-    if (ele.style.position === 'fixed')
-      continue;
-
-    addUpH += ele.clientHeight / 2;
-    if (-deltaTop <= addUpH)
-      break;
-    addUpH += ele.clientHeight / 2;
-
-    swapIndex = i;
-  }
-  return {
-    src: target.id,
-    dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
-  };
-}
