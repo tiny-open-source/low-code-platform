@@ -33,8 +33,9 @@
   "dependencies": {
     "@lowcode/core": "workspace:^1.0.0",
     "@lowcode/schema": "workspace:^1.0.0",
+    "@lowcode/utils": "workspace:^",
     "@scena/guides": "^0.29.2",
-    "events": "^3.3.0",
+    "eventemitter3": "^5.0.1",
     "lodash-es": "^4.17.21",
     "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0"

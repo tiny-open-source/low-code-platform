@@ -2,8 +2,8 @@ import type StageCore from './StageCore';
 import type StageDragResize from './StageDragResize';
 import type StageMask from './StageMask';
 import type { Offset, TargetCalibrateConfig } from './types';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
+
+import { EventEmitter } from 'eventemitter3';
 import { Mode } from './const';
 import { getMode } from './utils';
 /**

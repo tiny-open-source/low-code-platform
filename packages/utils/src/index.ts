@@ -1,7 +1,8 @@
 import type { MNode } from '@lowcode/schema';
 import { NodeType } from '@lowcode/schema';
-
 import moment from 'moment';
+
+export * from './dom';
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -196,3 +197,13 @@ export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().
 export const isPage = (node: MNode): boolean => Boolean(node.type?.toLowerCase() === NodeType.PAGE);
 
 export const isNumber = (value: string) => /^-?\d+(?:\.\d+)?$/.test(value);
+export const getHost = (targetUrl: string) => targetUrl.match(/\/\/([^/]+)/)?.[1];
+
+export function isSameDomain(targetUrl = '', source = globalThis.location.host) {
+  const isHttpUrl = /^https?:\/\//.test(targetUrl);
+
+  if (!isHttpUrl)
+    return true;
+
+  return getHost(targetUrl) === source;
+}

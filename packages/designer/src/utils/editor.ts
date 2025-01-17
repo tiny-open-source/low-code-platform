@@ -5,7 +5,7 @@ import { NodeType } from '@lowcode/schema';
 
 import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 
-export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
+export const COPY_STORAGE_KEY = '$LowCodeDesignerCopyData';
 
 /**
  * 获取所有页面配置
@@ -64,22 +64,20 @@ export function getNodeIndex(node: MNode, parent: MContainer | MApp): number {
   return items.findIndex((item: MNode) => `${item.id}` === `${node.id}`);
 }
 
-export function toRelative(node: MNode) {
-  node.style = {
-    ...(node.style || {}),
+export function getRelativeStyle(style: Record<string, any> = {}): Record<string, any> {
+  return {
+    ...style,
     position: 'relative',
     top: 0,
     left: 0,
   };
-  return node;
 }
 
-function setTop2Middle(node: MNode, parentNode: MNode, stage: StageCore) {
-  const style = node.style || {};
+function getMiddleTop(style: Record<string, any> = {}, parentNode: MNode, stage: StageCore) {
   let height = style.height || 0;
 
   if (!stage || typeof style.top !== 'undefined' || !parentNode.style)
-    return style;
+    return style.top;
 
   if (!isNumber(height)) {
     height = 0;
@@ -89,29 +87,25 @@ function setTop2Middle(node: MNode, parentNode: MNode, stage: StageCore) {
 
   if (isPage(parentNode)) {
     const { scrollTop = 0, wrapperHeight } = stage.mask;
-    style.top = (wrapperHeight - height) / 2 + scrollTop;
+    return (wrapperHeight - height) / 2 + scrollTop;
   }
-  else {
-    style.top = (parentHeight - height) / 2;
-  }
-
-  return style;
+  return (parentHeight - height) / 2;
 }
 
-export function initPosition(node: MNode, layout: Layout, parentNode: MNode, stage: StageCore) {
+export function getInitPositionStyle(style: Record<string, any> = {}, layout: Layout, parentNode: MNode, stage: StageCore) {
   if (layout === Layout.ABSOLUTE) {
-    node.style = {
+    return {
+      ...style,
       position: 'absolute',
-      ...setTop2Middle(node, parentNode, stage),
+      top: getMiddleTop(style, parentNode, stage),
     };
-    return node;
   }
 
   if (layout === Layout.RELATIVE) {
-    return toRelative(node);
+    return getRelativeStyle(style);
   }
 
-  return node;
+  return style;
 }
 
 export function setLayout(node: MNode, layout: Layout) {
@@ -119,17 +113,17 @@ export function setLayout(node: MNode, layout: Layout) {
     if (isPop(child))
       return;
 
-    child.style = child.style || {};
+    const style = child.style || {};
 
     // 是 fixed 不做处理
-    if (child.style.position === 'fixed')
+    if (style.position === 'fixed')
       return;
 
     if (layout !== Layout.RELATIVE) {
-      child.style.position = 'absolute';
+      style.position = 'absolute';
     }
     else {
-      toRelative(child);
+      child.style = getRelativeStyle(style);
       child.style.right = 'auto';
       child.style.bottom = 'auto';
     }
@@ -149,11 +143,10 @@ export function change2Fixed(node: MNode, root: MApp) {
     offset.top = offset.top + Number.parseFloat(value.style?.top || 0);
   });
 
-  node.style = {
+  return {
     ...(node.style || {}),
     ...offset,
   };
-  return node;
 }
 
 export async function Fixed2Other(node: MNode, root: MApp, getLayout: (parent: MNode, node?: MNode) => Promise<Layout>) {
@@ -170,23 +163,23 @@ export async function Fixed2Other(node: MNode, root: MApp, getLayout: (parent: M
     offset.left = offset.left - Number.parseFloat(value.style?.left || 0);
     offset.top = offset.top - Number.parseFloat(value.style?.top || 0);
   });
+  const style = node.style || {};
 
   const parent = path.pop();
   if (!parent) {
-    return toRelative(node);
+    return getRelativeStyle(style);
   }
 
   const layout = await getLayout(parent);
   if (layout !== Layout.RELATIVE) {
-    node.style = {
-      ...(node.style || {}),
+    return {
+      ...style,
       ...offset,
       position: 'absolute',
     };
-    return node;
   }
 
-  return toRelative(node);
+  return getRelativeStyle(style);
 }
 
 export function getGuideLineFromCache(key: string): number[] {
@@ -204,4 +197,18 @@ export function getGuideLineFromCache(key: string): number[] {
   }
 
   return [];
+}
+
+export function fixNodeLeft(config: MNode, parent: MContainer, doc?: Document) {
+  if (!doc || !config.style || !isNumber(config.style.left))
+    return config.style?.left;
+
+  const el = doc.getElementById(`${config.id}`);
+  const parentEl = doc.getElementById(`${parent.id}`);
+
+  if (el && parentEl && el.offsetWidth + config.style?.left > parentEl.offsetWidth) {
+    return parentEl.offsetWidth - el.offsetWidth;
+  }
+
+  return config.style.left;
 }

@@ -2,8 +2,7 @@ import type StageCore from './StageCore';
 
 import type { StageHighlightConfig } from './types';
 
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'eventemitter3';
 import Moveable from 'moveable';
 import { HIGHLIGHT_EL_ID_PREFIX } from './const';
 import TargetCalibrate from './TargetCalibrate';

@@ -23,8 +23,11 @@ export interface Services {
 export interface StageOptions {
   runtimeUrl: string;
   autoScrollIntoView: boolean;
+  containerHighlightClassName: string;
+  containerHighlightDuration: number;
   render: () => HTMLDivElement;
   moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
+  isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
   updateDragEl: (el: HTMLDivElement) => void;
 }

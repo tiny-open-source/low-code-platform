@@ -1,7 +1,6 @@
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
-
 import { compose } from '@designer/utils/compose';
+
+import { EventEmitter } from 'eventemitter3';
 
 const methodName = (prefix: string, name: string) => `${prefix}${name[0].toUpperCase()}${name.substring(1)}`;
 

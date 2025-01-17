@@ -1,8 +1,9 @@
 import type StageCore from './StageCore';
 import type { Runtime, RuntimeWindow } from './types';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
-import { getHost, isSameDomain } from './utils';
+
+import { getHost, injectStyle, isSameDomain } from '@lowcode/utils';
+import { EventEmitter } from 'eventemitter3';
+import style from './style.css?raw';
 
 export default class StageRenderer extends EventEmitter {
   core: StageCore;
@@ -104,5 +105,7 @@ export default class StageRenderer extends EventEmitter {
       },
       '*',
     );
+
+    injectStyle(this.contentWindow.document, style);
   };
 }

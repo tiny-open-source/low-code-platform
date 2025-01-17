@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { MApp, MNode, MPage } from '@lowcode/schema';
+import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type { Runtime, SortEventData, UpdateEventData } from '@lowcode/stage';
 import ScrollViewer from '@designer/components/ScrollViewer.vue';
 import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '@designer/type';
 import { getGuideLineFromCache } from '@designer/utils/editor';
-import StageCore, { GuidesType } from '@lowcode/stage';
+import StageCore, { calcValueByFontsize, getOffset, GuidesType } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
 import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import ViewerMenu from './ViewerMenu.vue';
@@ -39,6 +39,9 @@ watchEffect(() => {
     runtimeUrl: stageOptions?.runtimeUrl,
     autoScrollIntoView: true,
     zoom: zoom.value,
+    isContainer: stageOptions.isContainer,
+    containerHighlightClassName: stageOptions.containerHighlightClassName,
+    containerHighlightDuration: stageOptions.containerHighlightDuration,
     canSelect: (el, event, stop) => {
       const elCanSelect = stageOptions.canSelect(el);
       // 在组件联动过程中不能再往下选择，返回并触发 ui-select
@@ -69,6 +72,10 @@ watchEffect(() => {
   });
 
   stage?.on('update', (ev: UpdateEventData) => {
+    if (ev.parentEl) {
+      services?.designerService.moveToContainer({ id: ev.el.id, style: ev.style }, ev.parentEl.id);
+      return;
+    }
     services?.designerService.update({ id: ev.el.id, style: ev.style });
   });
 
@@ -125,23 +132,50 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 async function dropHandler(e: DragEvent) {
   e.preventDefault();
-  if (e.dataTransfer && page.value && stageContainer.value && stage) {
+
+  const doc = stage?.renderer.contentWindow?.document;
+  const parentEl: HTMLElement | null | undefined = doc?.querySelector(
+    `.${stageOptions?.containerHighlightClassName}`,
+  );
+
+  let parent: MContainer | undefined = page.value;
+  if (parentEl) {
+    parent = services?.designerService.getNodeById(parentEl.id, false) as MContainer;
+  }
+
+  if (e.dataTransfer && parent && stageContainer.value && stage) {
     // eslint-disable-next-line no-eval
     const config = eval(`(${e.dataTransfer.getData('data')})`);
-    const layout = await services?.designerService.getLayout(page.value);
+    const layout = await services?.designerService.getLayout(parent);
 
     const containerRect = stageContainer.value.getBoundingClientRect();
     const { scrollTop, scrollLeft } = stage.mask;
+
+    const { style = {} } = config;
+
+    let top = 0;
+    let left = 0;
+    let position = 'relative';
+
     if (layout === Layout.ABSOLUTE) {
-      config.style = {
-        ...(config.style || {}),
-        position: 'absolute',
-        top: e.clientY - containerRect.top + scrollTop,
-        left: e.clientX - containerRect.left + scrollLeft,
-      };
+      position = 'absolute';
+      top = e.clientY - containerRect.top + scrollTop;
+      left = e.clientX - containerRect.left + scrollLeft;
+
+      if (parentEl && doc) {
+        const { left: parentLeft, top: parentTop } = getOffset(parentEl);
+        left = left - calcValueByFontsize(doc, parentLeft);
+        top = top - calcValueByFontsize(doc, parentTop);
+      }
     }
 
-    services?.designerService.add(config, page.value);
+    config.style = {
+      ...style,
+      position,
+      top,
+      left,
+    };
+    services?.designerService.add(config, parent);
   }
 }
 function dragoverHandler(e: DragEvent) {

@@ -1,7 +1,7 @@
 import type { GuidesEvents } from '@scena/guides';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import EventEmitter from 'events';
+
 import Guides from '@scena/guides';
+import EventEmitter from 'eventemitter3';
 import { GuidesType } from './const';
 
 export default class Rule extends EventEmitter {

@@ -1,6 +1,5 @@
 import type { Id, MApp } from '@lowcode/schema';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'eventemitter3';
 import Env from './Env';
 import { bindCommonEventListener, DEFAULT_EVENTS, getCommonEventName, isCommonMethod, triggerCommonMethod } from './events';
 import Page from './Page';

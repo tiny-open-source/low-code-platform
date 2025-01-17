@@ -44,9 +44,9 @@ importers:
       '@lowcode/schema':
         specifier: workspace:^1.0.0
         version: link:../schema
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
     devDependencies:
       '@types/node':
         specifier: ^20.17.9
@@ -75,9 +75,9 @@ importers:
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
       gesto:
         specifier: ^1.19.4
         version: 1.19.4
@@ -103,9 +103,6 @@ importers:
       '@tsconfig/node20':
         specifier: ^20.1.4
         version: 20.1.4
-      '@types/events':
-        specifier: ^3.0.3
-        version: 3.0.3
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
@@ -240,12 +237,15 @@ importers:
       '@lowcode/schema':
         specifier: workspace:^1.0.0
         version: link:../schema
+      '@lowcode/utils':
+        specifier: workspace:^
+        version: link:../utils
       '@scena/guides':
         specifier: ^0.29.2
         version: 0.29.2
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1535,9 +1535,6 @@ packages:
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
-
-  '@types/events@3.0.3':
-    resolution: {integrity: sha512-trOc4AAUThEz9hapPtSd7wf5tiQKvTtu5b371UxXdTuqzIh0ArcRspRP0i0Viu+LXstIQ1z96t1nsPxT9ol01g==}
 
   '@types/jsdom@21.1.7':
     resolution: {integrity: sha512-yOriVnggzrnQ3a9OKOCxaVuSug3w3/SbOj5i7VwXWZEyUNl3bLF9V3MfxGbZKuwqJOQyRfqXyROBB1CoZLFWzA==}
@@ -5631,8 +5628,6 @@ snapshots:
       '@types/ms': 0.7.34
 
   '@types/estree@1.0.6': {}
-
-  '@types/events@3.0.3': {}
 
   '@types/jsdom@21.1.7':
     dependencies:

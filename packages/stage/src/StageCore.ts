@@ -1,7 +1,7 @@
 import type { Id } from '@lowcode/schema';
-import type { CanSelect, GuidesEventData, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
+import type { CanSelect, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
+
+import { EventEmitter } from 'eventemitter3';
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
@@ -10,6 +10,7 @@ import StageRenderer from './StageRenderer';
 import { addSelectedClassName, removeSelectedClassName } from './utils';
 
 class StageCore extends EventEmitter {
+  public container?: HTMLDivElement;
   public selectedDom: Element | undefined;
   public highlightedDom: Element | undefined;
 
@@ -21,13 +22,20 @@ class StageCore extends EventEmitter {
   public dr: StageDragResize;
   public highlightLayer: StageHighlight;
 
-  public container?: HTMLDivElement;
+  public containerHighlightClassName: string;
+  public containerHighlightDuration: number;
+  public isContainer: IsContainer;
+
   private canSelect: CanSelect;
   constructor(config: StageCoreConfig) {
     super();
     this.config = config;
     this.setZoom(config.zoom);
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
+
+    this.isContainer = config.isContainer;
+    this.containerHighlightClassName = config.containerHighlightClassName;
+    this.containerHighlightDuration = config.containerHighlightDuration;
 
     this.renderer = new StageRenderer({ core: this });
     this.mask = new StageMask({ core: this });
@@ -82,7 +90,7 @@ class StageCore extends EventEmitter {
     return this.renderer?.getRuntime().then(runtime => runtime?.remove?.(data));
   }
 
-  public async setElementFromPoint(event: MouseEvent) {
+  public getElementsFromPoint(event: MouseEvent) {
     const { renderer, zoom } = this;
     const doc = renderer.contentWindow?.document;
     // 记录点击位置
@@ -98,8 +106,11 @@ class StageCore extends EventEmitter {
       }
     }
 
-    const els = doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+    return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
+  }
 
+  public async setElementFromPoint(event: MouseEvent) {
+    const els = this.getElementsFromPoint(event);
     let stopped = false;
     const stop = () => (stopped = true);
 

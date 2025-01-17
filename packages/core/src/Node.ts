@@ -1,6 +1,6 @@
 import type { EventItemConfig, MComponent, MContainer, MPage } from '@lowcode/schema';
-// eslint-disable-next-line unicorn/prefer-node-protocol
-import { EventEmitter } from 'events';
+
+import { EventEmitter } from 'eventemitter3';
 
 class Node extends EventEmitter {
   data: MComponent | MContainer | MPage;

@@ -1,18 +1,15 @@
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
+import { createDiv, injectStyle } from '@lowcode/utils';
 import { throttle } from 'lodash-es';
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Ruler';
-import { createDiv, getScrollParent, isFixedParent } from './utils';
+import { getScrollParent, isFixedParent } from './utils';
 
 const throttleTime = 100;
 const wrapperClassName = 'designer-mask-wrapper';
 function hideScrollbar() {
-  const style = globalThis.document.createElement('style');
-  style.innerHTML = `
-    .${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }
-  `;
-  globalThis.document.head.appendChild(style);
+  injectStyle(globalThis.document, `.${wrapperClassName}::-webkit-scrollbar { width: 0 !important; display: none }`);
 }
 
 function createContent(): HTMLDivElement {

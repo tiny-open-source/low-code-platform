@@ -9,6 +9,7 @@ import type StageDragResize from './StageDragResize';
 import type StageMask from './StageMask';
 
 export type CanSelect = (el: HTMLElement, event: MouseEvent, stop: () => boolean) => boolean | Promise<boolean>;
+export type IsContainer = (el: HTMLElement) => boolean | Promise<boolean>;
 
 export interface StageCoreConfig {
   /** 需要对齐的dom节点的CSS选择器字符串 */
@@ -16,6 +17,9 @@ export interface StageCoreConfig {
   /** 放大倍数，默认1倍 */
   zoom?: number;
   canSelect?: CanSelect;
+  isContainer: IsContainer;
+  containerHighlightClassName: string;
+  containerHighlightDuration: number;
   moveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
   /** runtime 的HTML地址，可以是一个HTTP地址，如果和编辑器不同域，需要设置跨域，也可以是一个相对或绝对路径 */
   runtimeUrl?: string;
@@ -54,6 +58,7 @@ export interface GuidesEventData {
 
 export interface UpdateEventData {
   el: HTMLElement;
+  parentEl: HTMLElement | null;
   ghostEl: HTMLElement;
   style: {
     width?: number;
