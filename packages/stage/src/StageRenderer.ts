@@ -34,24 +34,26 @@ export default class StageRenderer extends EventEmitter {
   }
 
   /**
-   * 挂载到指定的dom节点
+   * 挂载Dom节点
    * @param el 将页面挂载到该Dom节点上
    */
   public async mount(el: HTMLDivElement) {
-    if (this.iframe) {
-      if (this.runtimeUrl && !isSameDomain(this.runtimeUrl)) {
-        // 不同域，需要通过fetch获取html内容 需要目标地址支持跨域
-        let html = await fetch(this.runtimeUrl).then(res => res.text());
-        // 使用base, 解决相对路径或绝对路径的问题
-        const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
-        html = html.replace('<head>', `<head>\n<base href="${base}">`);
-        this.iframe.srcdoc = html;
-      }
-      el.appendChild<HTMLIFrameElement>(this.iframe);
-    }
-    else {
+    if (!this.iframe) {
       throw new Error('mount 失败');
     }
+
+    if (!isSameDomain(this.runtimeUrl) && this.runtimeUrl) {
+      // 不同域，使用srcdoc发起异步请求，需要目标地址支持跨域
+      let html = await fetch(this.runtimeUrl).then(res => res.text());
+      // 使用base, 解决相对路径或绝对路径的问题
+      const base = `${location.protocol}//${getHost(this.runtimeUrl)}`;
+      html = html.replace('<head>', `<head>\n<base href="${base}">`);
+      this.iframe.srcdoc = html;
+    }
+
+    el.appendChild<HTMLIFrameElement>(this.iframe);
+
+    this.postLowCodeRuntimeReady();
   }
 
   public getRuntime = (): Promise<Runtime> => {
@@ -88,24 +90,35 @@ export default class StageRenderer extends EventEmitter {
   }
 
   private loadHandler = async () => {
-    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
-    this.contentWindow.lowcode = this.getLowCodeApi();
+    if (!this.contentWindow?.lowcode) {
+      this.postLowCodeRuntimeReady();
+    }
+
+    if (!this.contentWindow)
+      return;
 
     if (this.render) {
       const el = await this.render(this.core);
       if (el) {
-        this.iframe?.contentDocument?.body?.appendChild(el);
+        this.contentWindow.document?.body?.appendChild(el);
       }
     }
 
     this.emit('onload');
-    this.contentWindow.postMessage(
-      {
-        lowcodeRuntimeReady: true,
-      },
-      '*',
-    );
 
     injectStyle(this.contentWindow.document, style);
   };
+
+  private postLowCodeRuntimeReady() {
+    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+
+    this.contentWindow.lowcode = this.getLowCodeApi();
+
+    this.contentWindow.postMessage(
+      {
+        lowCodeRuntimeReady: true,
+      },
+      '*',
+    );
+  }
 }
