@@ -111,7 +111,7 @@ function isMultipleValue(type?: string | TypeFunction) {
 }
 function initItemsValue(lForm: FormState | undefined, value: FormValue, initValue: FormValue, { items, name, extensible }: any) {
   if (Array.isArray(initValue[name])) {
-    value[name] = initValue[name].map((v: any) => init(lForm, items, v));
+    value[name] = initValue[name].map((v: any, index: number) => init(lForm, items, v, value[name]?.[index]));
   }
   else {
     value[name] = init(lForm, items, initValue[name], value[name]);
