@@ -1,6 +1,7 @@
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
 import { createDiv, injectStyle } from '@lowcode/utils';
+import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 import { Mode, MouseButton, ZIndex } from './const';
 import Rule from './Ruler';
@@ -63,6 +64,7 @@ export default class StageMask extends Rule {
   public maxScrollLeft = 0;
 
   public intersectionObserver: IntersectionObserver | null = null;
+  public shiftKeyDown: boolean = false;
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
@@ -79,6 +81,15 @@ export default class StageMask extends Rule {
     this.content.addEventListener('wheel', this.mouseWheelHandler, { passive: true });
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
+
+    KeyController.global.keydown('shift', (e) => {
+      e.inputEvent.preventDefault();
+      this.shiftKeyDown = true;
+    });
+    KeyController.global.keyup('shift', (e) => {
+      e.inputEvent.preventDefault();
+      this.shiftKeyDown = false;
+    });
   };
 
   /**
@@ -281,25 +292,38 @@ export default class StageMask extends Rule {
     this.maxScrollTop = Math.max(this.height - this.wrapperHeight, 0);
   }
 
+  /**
+   * 点击事件处理函数
+   * @param event 事件对象
+   */
   private mouseDownHandler = (event: MouseEvent): void => {
     this.emit('clearHighlight');
-
     event.stopImmediatePropagation();
-
     event.stopPropagation();
 
     if (event.button !== MouseButton.LEFT && event.button !== MouseButton.RIGHT)
       return;
 
-    // 点击的对象如果是选中框，则不需要再触发选中了，而可能是拖动行为
-    if ((event.target as HTMLDivElement).className.includes('moveable-control'))
+    // 如果单击多选选中区域，则不需要再触发选中了，而可能是拖动行为
+    if (!this.shiftKeyDown && (event.target as HTMLDivElement).className.includes('moveable-area')) {
       return;
+    }
+    // 点击对象如果是边框锚点，则可能是resize
+    if ((event.target as HTMLDivElement).className.includes('moveable-control')) {
+      return;
+    }
 
     this.content.removeEventListener('mousemove', this.highlightHandler);
 
-    this.emit('beforeSelect', event);
-
-    globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
+    // 判断触发多选还是单选
+    if (this.shiftKeyDown) {
+      this.emit('beforeMultiSelect', event);
+    }
+    else {
+      this.emit('beforeSelect', event);
+      // 如果是右键点击，这里的mouseup事件监听没有效果
+      globalThis.document.addEventListener('mouseup', this.mouseUpHandler);
+    }
   };
 
   private mouseUpHandler = (): void => {

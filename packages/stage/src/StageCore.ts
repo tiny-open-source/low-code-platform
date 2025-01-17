@@ -2,16 +2,20 @@ import type { Id } from '@lowcode/schema';
 import type { CanSelect, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
 
 import { EventEmitter } from 'eventemitter3';
-import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX } from './const';
+import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
+import StageMultiDragResize from './StageMultiDragResize';
 import StageRenderer from './StageRenderer';
 import { addSelectedClassName, removeSelectedClassName } from './utils';
 
 class StageCore extends EventEmitter {
   public container?: HTMLDivElement;
-  public selectedDom: Element | undefined;
+  // 当前选中的节点
+  public selectedDom: HTMLElement | undefined;
+  // 多选选中的节点组
+  public selectedDomList: HTMLElement[] = [];
   public highlightedDom: Element | undefined;
 
   public config: StageCoreConfig;
@@ -20,6 +24,7 @@ class StageCore extends EventEmitter {
   public renderer: StageRenderer;
   public mask: StageMask;
   public dr: StageDragResize;
+  public multiDr: StageMultiDragResize;
   public highlightLayer: StageHighlight;
 
   public containerHighlightClassName: string;
@@ -39,7 +44,8 @@ class StageCore extends EventEmitter {
 
     this.renderer = new StageRenderer({ core: this });
     this.mask = new StageMask({ core: this });
-    this.dr = new StageDragResize({ core: this, container: this.mask.content });
+    this.dr = new StageDragResize({ core: this, container: this.mask.content, mask: this.mask });
+    this.multiDr = new StageMultiDragResize({ core: this, container: this.mask.content, mask: this.mask });
     this.highlightLayer = new StageHighlight({ core: this, container: this.mask.wrapper });
     this.renderer.on('runtime-ready', (runtime: Runtime) => {
       this.emit('runtime-ready', runtime);
@@ -49,8 +55,12 @@ class StageCore extends EventEmitter {
     });
 
     this.mask
-      .on('beforeSelect', (event: MouseEvent) => {
-        this.setElementFromPoint(event);
+      .on('beforeSelect', async (event: MouseEvent) => {
+        this.clearSelectStatus('multiSelect');
+        const el = await this.setElementFromPoint(event);
+        if (!el)
+          return;
+        this.select(el, event);
       })
       .on('select', () => {
         this.emit('select', this.selectedDom);
@@ -60,17 +70,44 @@ class StageCore extends EventEmitter {
         this.emit('changeGuides', data);
       })
       .on('highlight', async (event: MouseEvent) => {
-        await this.setElementFromPoint(event);
+        const el = await this.setElementFromPoint(event, 'mousemove');
+        if (!el)
+          return;
+        await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
           this.highlightLayer.clearHighlight();
           return;
         }
-        this.highlightLayer.highlight(this.highlightedDom as HTMLElement);
         this.emit('highlight', this.highlightedDom);
       })
       .on('clearHighlight', async () => {
         this.highlightLayer.clearHighlight();
-      });
+      })
+      .on('beforeMultiSelect', async (event: MouseEvent) => {
+        const el = await this.setElementFromPoint(event);
+        if (!el)
+          return;
+        // 多选不可以选中magic-ui-page
+        if (el.className.includes(PAGE_CLASS))
+          return;
+        this.clearSelectStatus('select');
+        // 如果已有单选选中元素，不是magic-ui-page就可以加入多选列表
+        if (this.selectedDom && !this.selectedDom.className.includes(PAGE_CLASS)) {
+          this.selectedDomList.push(this.selectedDom as HTMLElement);
+          this.selectedDom = undefined;
+        }
+        // 判断元素是否已在多选列表
+        const existIndex = this.selectedDomList.findIndex(selectedDom => selectedDom.id === el.id);
+        if (existIndex !== -1) {
+          // 再次点击取消选中
+          this.selectedDomList.splice(existIndex, 1);
+        }
+        else {
+          this.selectedDomList.push(el);
+        }
+        this.multiDr.multiSelect(this.selectedDomList);
+        this.emit('multiSelect', this.selectedDomList);
+      }); ;
 
     // 要先触发select，在触发update
     this.dr
@@ -80,6 +117,10 @@ class StageCore extends EventEmitter {
       .on('sort', (data: UpdateEventData) => {
         setTimeout(() => this.emit('sort', data));
       });
+
+    this.multiDr.on('update', (data: UpdateEventData) => {
+      setTimeout(() => this.emit('update', data));
+    });
   }
 
   public add(data: UpdateData): Promise<void> {
@@ -109,21 +150,18 @@ class StageCore extends EventEmitter {
     return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
   }
 
-  public async setElementFromPoint(event: MouseEvent) {
+  public async setElementFromPoint(event: MouseEvent, type?: string) {
     const els = this.getElementsFromPoint(event);
     let stopped = false;
     const stop = () => (stopped = true);
-
     for (const el of els) {
       if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.canSelect(el, event, stop))) {
         if (stopped)
           break;
-        if (event.type === 'mousemove') {
-          this.highlight(el);
-          break;
+        if (event.type === type) {
+          return el;
         }
-        this.select(el, event);
-        break;
+        return el;
       }
     }
   }
@@ -146,6 +184,7 @@ class StageCore extends EventEmitter {
     }
 
     this.mask.setLayout(el);
+    this.multiDr.destroyDragElList();
     this.dr.select(el, event);
 
     if (this.config.autoScrollIntoView || el.dataset.autoScrollIntoView) {
@@ -197,7 +236,7 @@ class StageCore extends EventEmitter {
       this.highlightLayer.clearHighlight();
       return;
     }
-    if (el === this.highlightedDom)
+    if (el === this.highlightedDom || !el)
       return;
     this.highlightLayer.highlight(el);
     this.highlightedDom = el;
@@ -232,6 +271,20 @@ class StageCore extends EventEmitter {
     this.removeAllListeners();
 
     this.container = undefined;
+  }
+
+  /**
+   * 用于在切换选择模式时清除上一次的状态
+   * @param selectType 需要清理的选择模式 多选：multiSelect，单选：select
+   */
+  public clearSelectStatus(selectType: string) {
+    if (selectType === 'multiSelect') {
+      this.multiDr.clearSelectStatus();
+      this.selectedDomList = [];
+    }
+    else {
+      this.dr.clearSelectStatus();
+    }
   }
 
   /**

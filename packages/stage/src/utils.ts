@@ -1,6 +1,6 @@
 import type { Offset } from './types';
 import { removeClassName } from '@lowcode/utils';
-import { Mode, SELECTED_CLASS } from './const';
+import { Mode, SELECTED_CLASS, ZIndex } from './const';
 
 function getParents(el: Element, relative: Element) {
   let cur: Element | null = el.parentElement;
@@ -12,6 +12,20 @@ function getParents(el: Element, relative: Element) {
   return parents;
 }
 
+// 将蒙层占位节点覆盖在原节点上方
+export function getTargetElStyle(el: HTMLElement) {
+  const offset = getOffset(el);
+  const { transform } = getComputedStyle(el);
+  return `
+    position: absolute;
+    transform: ${transform};
+    left: ${offset.left}px;
+    top: ${offset.top}px;
+    width: ${el.clientWidth}px;
+    height: ${el.clientHeight}px;
+    z-index: ${ZIndex.DRAG_EL};
+  `;
+}
 export function getOffset(el: HTMLElement): Offset {
   const { offsetParent } = el;
 

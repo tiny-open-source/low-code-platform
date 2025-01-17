@@ -1,5 +1,6 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
+import type StageMask from './StageMask';
 import type { SortEventData, StageDragResizeConfig } from './types';
 
 import { addClassName, removeClassNameByClassName } from '@lowcode/utils';
@@ -7,7 +8,7 @@ import { EventEmitter } from 'eventemitter3';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
-import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset } from './utils';
+import { calcValueByFontsize, getAbsolutePosition, getMode, getOffset, getTargetElStyle } from './utils';
 /** 拖动状态 */
 enum ActionStatus {
   /** 开始拖动 */
@@ -19,6 +20,7 @@ enum ActionStatus {
 }
 class StageDragResize extends EventEmitter {
   public core: StageCore;
+  public mask: StageMask;
   /** 画布容器 */
   public container: HTMLElement;
   /** 目标节点 */
@@ -40,8 +42,7 @@ class StageDragResize extends EventEmitter {
   /** 垂直参考线 */
   public verticalGuidelines: number[] = [];
   /** 目标节点在蒙层中的占位节点 */
-  public dragEl: HTMLDivElement;
-
+  public dragEl?: HTMLDivElement;
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
   constructor(config: StageDragResizeConfig) {
@@ -50,9 +51,15 @@ class StageDragResize extends EventEmitter {
     this.core = config.core;
     this.container = config.container;
 
-    this.dragEl = globalThis.document.createElement('div');
+    this.mask = config.mask;
+  }
 
-    this.container.append(this.dragEl);
+  public clearSelectStatus(): void {
+    if (!this.moveable)
+      return;
+    this.destroyDragEl();
+    this.moveable.target = null;
+    this.moveable.updateRect();
   }
 
   /**
@@ -402,27 +409,6 @@ class StageDragResize extends EventEmitter {
     });
   }
 
-  private updateDragEl(el: HTMLElement) {
-    const offset = getOffset(el);
-    const { transform } = getComputedStyle(el);
-
-    this.dragEl.style.cssText = `
-      position: absolute;
-      transform: ${transform};
-      left: ${offset.left}px;
-      top: ${offset.top}px;
-      width: ${el.clientWidth}px;
-      height: ${el.clientHeight}px;
-      z-index: ${ZIndex.DRAG_EL};
-    `;
-
-    this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
-
-    if (typeof this.core.config.updateDragEl === 'function') {
-      this.core.config.updateDragEl(this.dragEl, el);
-    }
-  }
-
   /**
    * 销毁实例
    */
@@ -434,7 +420,7 @@ class StageDragResize extends EventEmitter {
     this.removeAllListeners();
   }
 
-  private destroyDragEl(): void {
+  public destroyDragEl(): void {
     this.dragEl?.remove();
   }
 
@@ -446,9 +432,15 @@ class StageDragResize extends EventEmitter {
     this.mode = getMode(el);
 
     this.destroyGhostEl();
+    this.destroyDragEl();
+    this.dragEl = globalThis.document.createElement('div');
+    this.container.append(this.dragEl);
+    this.dragEl.style.cssText = getTargetElStyle(el);
+    this.dragEl.id = `${DRAG_EL_ID_PREFIX}${el.id}`;
 
-    this.updateDragEl(el);
-
+    if (typeof this.core.config.updateDragEl === 'function') {
+      this.core.config.updateDragEl(this.dragEl, el);
+    }
     this.moveableOptions = this.getOptions({
       target: this.dragEl,
     });

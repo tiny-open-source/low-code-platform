@@ -9,6 +9,8 @@ export const HIGHLIGHT_EL_ID_PREFIX = 'highlight_el_';
 
 export const CONTAINER_HIGHLIGHT_CLASS = 'lowcode-stage-container-highlight';
 
+export const PAGE_CLASS = 'lowcode-ui-page';
+
 /** 默认放到缩小倍数 */
 export const DEFAULT_ZOOM = 1;
 

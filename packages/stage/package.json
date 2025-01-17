@@ -36,6 +36,7 @@
     "@lowcode/utils": "workspace:^",
     "@scena/guides": "^0.29.2",
     "eventemitter3": "^5.0.1",
+    "keycon": "^1.4.0",
     "lodash-es": "^4.17.21",
     "moveable": "^0.53.0",
     "moveable-helper": "^0.4.0"
