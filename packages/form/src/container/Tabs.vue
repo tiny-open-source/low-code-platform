@@ -11,6 +11,7 @@ const props = defineProps<{
   config: TabConfig;
   model: any;
   prop: string;
+  name: string;
 }>();
 
 const emit = defineEmits(['change']);
@@ -77,7 +78,15 @@ function changeHandler() {
             v-for="item in tabItems(tab)"
             :key="item[lForm?.keyProp || '__key']"
             :config="item"
-            :model="config.dynamic ? model[config.name || ''][tabIndex] : tab.name ? model[tab.name] : model"
+            :model="
+              config.dynamic
+                ? (name ? model[name] : model)[tabIndex]
+                : tab.name
+                  ? (name ? model[name] : model)[tab.name]
+                  : name
+                    ? model[name]
+                    : model
+            "
             :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
             @change="changeHandler"
           />
