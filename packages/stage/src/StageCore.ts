@@ -172,6 +172,7 @@ class StageCore extends EventEmitter {
    * @param idOrEl 组件Dom节点的id属性，或者Dom节点
    */
   public async select(idOrEl: Id | HTMLElement, event?: MouseEvent): Promise<void> {
+    this.clearSelectStatus('multiSelect');
     const el = await this.getTargetElement(idOrEl);
     if (el === this.selectedDom)
       return;
@@ -185,7 +186,6 @@ class StageCore extends EventEmitter {
     }
 
     this.mask.setLayout(el);
-    this.multiDr.destroyDragElList();
     this.dr.select(el, event);
 
     if (this.config.autoScrollIntoView || el.dataset.autoScrollIntoView) {
