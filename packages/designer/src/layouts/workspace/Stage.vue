@@ -175,6 +175,8 @@ async function dropHandler(e: DragEvent) {
       top,
       left,
     };
+
+    config.inputEvent = e;
     services?.designerService.add(config, parent);
   }
 }

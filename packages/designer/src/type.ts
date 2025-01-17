@@ -206,6 +206,7 @@ export interface MenuBarData {
 export interface AddMNode {
   type: string;
   name?: string;
+  inputEvent?: DragEvent;
   [key: string]: any;
 }
 
