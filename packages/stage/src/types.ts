@@ -1,6 +1,6 @@
 import type Core from '@lowcode/core';
 
-import type { Id, MApp, MNode } from '@lowcode/schema';
+import type { Id, MApp, MContainer, MNode } from '@lowcode/schema';
 import type { MoveableOptions } from 'moveable';
 
 import type { GuidesType } from './const';
@@ -83,6 +83,7 @@ export interface SortEventData {
 export interface UpdateData {
   config: MNode;
   root: MApp;
+  parent?: MContainer;
 }
 
 export interface RemoveData {

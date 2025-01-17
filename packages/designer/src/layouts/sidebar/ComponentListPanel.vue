@@ -2,8 +2,7 @@
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@designer/type';
 import type StageCore from '@lowcode/stage';
 import MIcon from '@designer/components/Icon.vue';
-import { GHOST_EL_ID_PREFIX } from '@lowcode/stage';
-import { addClassName, removeClassNameByClassName } from '@lowcode/utils';
+import { removeClassNameByClassName } from '@lowcode/utils';
 import { SearchOutlined } from '@vicons/antd';
 
 import { NCollapse, NCollapseItem, NIcon, NInput, NScrollbar } from 'naive-ui';
@@ -79,21 +78,10 @@ function dragHandler(e: DragEvent) {
     return;
   }
 
-  if (timeout)
+  if (timeout || !stage.value)
     return;
 
-  timeout = globalThis.setTimeout(async () => {
-    if (!stageOptions || !stage.value)
-      return;
-    const doc = stage.value.renderer.contentWindow?.document;
-    const els = stage.value.getElementsFromPoint(e);
-    for (const el of els) {
-      if (doc && !el.id.startsWith(GHOST_EL_ID_PREFIX) && (await stageOptions.isContainer(el))) {
-        addClassName(el, doc, stageOptions?.containerHighlightClassName);
-        break;
-      }
-    }
-  }, stageOptions?.containerHighlightDuration);
+  timeout = stage.value.getAddContainerHighlightClassNameTimeout(e);
 }
 </script>
 

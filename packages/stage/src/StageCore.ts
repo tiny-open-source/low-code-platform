@@ -1,5 +1,6 @@
 import type { Id } from '@lowcode/schema';
 import type { CanSelect, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
+import { addClassName } from '@lowcode/utils';
 
 import { EventEmitter } from 'eventemitter3';
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
@@ -57,7 +58,7 @@ class StageCore extends EventEmitter {
     this.mask
       .on('beforeSelect', async (event: MouseEvent) => {
         this.clearSelectStatus('multiSelect');
-        const el = await this.setElementFromPoint(event);
+        const el = await this.getElementFromPoint(event);
         if (!el)
           return;
         this.select(el, event);
@@ -70,7 +71,7 @@ class StageCore extends EventEmitter {
         this.emit('changeGuides', data);
       })
       .on('highlight', async (event: MouseEvent) => {
-        const el = await this.setElementFromPoint(event, 'mousemove');
+        const el = await this.getElementFromPoint(event, 'mousemove');
         if (!el)
           return;
         await this.highlight(el);
@@ -84,7 +85,7 @@ class StageCore extends EventEmitter {
         this.highlightLayer.clearHighlight();
       })
       .on('beforeMultiSelect', async (event: MouseEvent) => {
-        const el = await this.setElementFromPoint(event);
+        const el = await this.getElementFromPoint(event);
         if (!el)
           return;
         // 多选不可以选中magic-ui-page
@@ -150,7 +151,7 @@ class StageCore extends EventEmitter {
     return doc?.elementsFromPoint(x / zoom, y / zoom) as HTMLElement[];
   }
 
-  public async setElementFromPoint(event: MouseEvent, type?: string) {
+  public async getElementFromPoint(event: MouseEvent, type?: string) {
     const els = this.getElementsFromPoint(event);
     let stopped = false;
     const stop = () => (stopped = true);
@@ -293,6 +294,28 @@ class StageCore extends EventEmitter {
   public clearGuides() {
     this.mask.clearGuides();
     this.dr.clearGuides();
+  }
+
+  public async addContainerHighlightClassName(event: MouseEvent, exclude: Element[]) {
+    const els = this.getElementsFromPoint(event);
+    const { renderer } = this;
+    const doc = renderer.contentWindow?.document;
+
+    if (!doc)
+      return;
+
+    for (const el of els) {
+      if (!el.id.startsWith(GHOST_EL_ID_PREFIX) && (await this.isContainer(el)) && !exclude.includes(el)) {
+        addClassName(el, doc, this.containerHighlightClassName);
+        break;
+      }
+    }
+  }
+
+  public getAddContainerHighlightClassNameTimeout(event: MouseEvent, exclude: Element[] = []) {
+    return globalThis.setTimeout(() => {
+      this.addContainerHighlightClassName(event, exclude);
+    }, this.containerHighlightDuration);
   }
 
   private async getTargetElement(idOrEl: Id | HTMLElement): Promise<HTMLElement> {
