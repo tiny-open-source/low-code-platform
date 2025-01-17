@@ -1,4 +1,4 @@
-import type { Id, MApp } from '@lowcode/schema';
+import type { EventItemConfig, Id, MApp } from '@lowcode/schema';
 import { EventEmitter } from 'eventemitter3';
 import Env from './Env';
 import { bindCommonEventListener, DEFAULT_EVENTS, getCommonEventName, isCommonMethod, triggerCommonMethod } from './events';
@@ -14,21 +14,30 @@ interface AppOptionsConfig {
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
 }
 
+interface EventCache {
+  eventConfig: EventItemConfig;
+  fromCpt: any;
+  args: any[];
+}
 class App extends EventEmitter {
-  env;
-  pages = new Map<Id, Page>();
-  page: Page | undefined;
+  public env;
 
-  platform = 'device';
-  jsEngine = 'browser';
+  public pages = new Map<Id, Page>();
 
-  rootFontSize = document.documentElement.style.fontSize;
-  zoomRatio = {
+  public page: Page | undefined;
+
+  public platform = 'device';
+  public jsEngine = 'browser';
+
+  public rootFontSize = document.documentElement.style.fontSize;
+  public zoomRatio = {
     x: 1,
     y: 1,
   };
 
-  components = new Map();
+  public components = new Map();
+
+  public eventQueueMap: Record<string, EventCache[]> = {};
 
   constructor(options: AppOptionsConfig) {
     super();
@@ -67,7 +76,7 @@ class App extends EventEmitter {
    * @param style Object
    * @returns Object
    */
-  transformStyle(style: Record<string, any>) {
+  public transformStyle(style: Record<string, any>) {
     if (!style) {
       return {};
     }
@@ -122,7 +131,7 @@ class App extends EventEmitter {
    * @param config dsl跟节点
    * @param curPage 当前页面id
    */
-  setConfig(config: MApp, curPage?: Id) {
+  public setConfig(config: MApp, curPage?: Id) {
     this.pages = new Map();
 
     config.items?.forEach((page) => {
@@ -130,6 +139,7 @@ class App extends EventEmitter {
         page.id,
         new Page({
           config: page,
+          app: this,
         }),
       );
     });
@@ -137,7 +147,7 @@ class App extends EventEmitter {
     this.setPage(curPage || this.page?.data?.id);
   }
 
-  setPage(id?: Id) {
+  public setPage(id?: Id) {
     let page;
 
     if (id) {
@@ -156,7 +166,7 @@ class App extends EventEmitter {
     this.calcZoomRatio(page);
   }
 
-  calcZoomRatio(page?: Page) {
+  public calcZoomRatio(page?: Page) {
     if (!page)
       return;
     if (this.platform !== 'device')
@@ -174,52 +184,81 @@ class App extends EventEmitter {
     };
   }
 
-  registerComponent(type: string, Component: any) {
+  public registerComponent(type: string, Component: any) {
     this.components.set(type, Component);
   }
 
-  unregisterComponent(type: string) {
+  public unregisterComponent(type: string) {
     this.components.delete(type);
   }
 
-  resolveComponent(type: string) {
+  public resolveComponent(type: string) {
     return this.components.get(type);
   }
 
-  bindEvents() {
+  public bindEvents() {
     if (!this.page)
       return;
+
     this.removeAllListeners();
+
     for (const [, value] of this.page.nodes) {
-      value.events?.forEach((event) => {
-        let { name: eventName } = event;
-        if (DEFAULT_EVENTS.findIndex(defaultEvent => defaultEvent.value === eventName) > -1) {
-          // common 事件名通过 node id 避免重复触发
-          eventName = getCommonEventName(eventName, `${value.data.id}`);
-        }
+      value.events?.forEach(event => this.bindEvent(event, `${value.data.id}`));
+    }
+  }
 
-        this.on(eventName, (fromCpt, ...args) => {
-          if (!this.page)
-            throw new Error('当前没有页面');
+  public bindEvent(event: EventItemConfig, id: string) {
+    let { name: eventName } = event;
+    if (DEFAULT_EVENTS.findIndex(defaultEvent => defaultEvent.value === eventName) > -1) {
+      // common 事件名通过 node id 避免重复触发
+      eventName = getCommonEventName(eventName, id);
+    }
 
-          const toNode = this.page.getNode(event.to);
-          if (!toNode)
-            throw new Error(`ID为${event.to}的组件不存在`);
-          const { method: methodName } = event;
-          if (isCommonMethod(methodName)) {
-            return triggerCommonMethod(methodName, toNode);
-          }
-          if (typeof toNode.instance.exposed?.[methodName] === 'function') {
-            toNode.instance.exposed[methodName](fromCpt, ...args);
-          }
-        });
+    this.on(eventName, (fromCpt, ...args) => {
+      this.eventHandler(event, fromCpt, args);
+    });
+  }
+
+  public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
+    if (!this.page)
+      throw new Error('当前没有页面');
+
+    const { method: methodName, to } = eventConfig;
+
+    const toNode = this.page.getNode(to);
+    if (!toNode)
+      throw new Error(`ID为${to}的组件不存在`);
+
+    if (isCommonMethod(methodName)) {
+      return triggerCommonMethod(methodName, toNode);
+    }
+
+    if (toNode.instance) {
+      if (typeof toNode.instance[methodName] === 'function') {
+        toNode.instance[methodName](fromCpt, ...args);
+      }
+    }
+    else {
+      this.addEventToMap({
+        eventConfig,
+        fromCpt,
+        args,
       });
     }
   }
 
-  destroy() {
+  public destroy() {
     this.removeAllListeners();
     this.pages.clear();
+  }
+
+  private addEventToMap(event: EventCache) {
+    if (this.eventQueueMap[event.eventConfig.to]) {
+      this.eventQueueMap[event.eventConfig.to].push(event);
+    }
+    else {
+      this.eventQueueMap[event.eventConfig.to] = [event];
+    }
   }
 }
 
