@@ -153,12 +153,12 @@ defineExpose({
     <template #sidebar>
       <slot name="sidebar" :designer-service="designerService">
         <Sidebar :data="sidebar">
-          <template #layer-panel>
-            <slot name="layer-panel" />
+          <template #layer-panel-header>
+            <slot name="layer-panel-header" />
           </template>
 
-          <template #component-list-panel>
-            <slot name="component-list-panel" />
+          <template #component-list-panel-header>
+            <slot name="component-list-panel-header" />
           </template>
         </Sidebar>
       </slot>

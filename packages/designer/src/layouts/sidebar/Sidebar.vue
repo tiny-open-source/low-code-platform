@@ -77,11 +77,11 @@ const dataConfigs = computed(() => {
 
       <component :is="config.component" v-bind="config.props || {}" v-on="config?.listeners || {}">
         <template v-if="config === 'layer'" #layer-panel>
-          <slot name="layer-panel" />
+          <slot name="layer-panel-header" />
         </template>
 
         <template v-if="config === 'component-list'" #component-list-panel>
-          <slot name="component-list-panel" />
+          <slot name="component-list-panel-header" />
         </template>
 
         <template v-if="config.slots?.layerNodeContent" #layer-node-content="{ data: innerData, node }">
