@@ -65,7 +65,10 @@ const dataConfigs = computed(() => {
     type="line"
     style="height: 100%;"
   >
-    <NTabPane v-for="(config, index) in dataConfigs" :key="index" :name="config.text" :tab="config.text">
+    <NTabPane
+      v-for="(config, index) in dataConfigs"
+      :key="index" style="height: 100%;" :name="config.text" :tab="config.text"
+    >
       <template #tab>
         <div :key="config.text">
           <MIcon v-if="config.icon" :icon="config.icon" />

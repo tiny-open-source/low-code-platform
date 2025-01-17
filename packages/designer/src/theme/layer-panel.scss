@@ -3,6 +3,7 @@
 
 .#{variables.$namespace}-layer-panel {
   background: variables.$sidebar-content-background-color;
+  height: 100%;
 
   .search-input {
     width: 100%;
@@ -10,9 +11,11 @@
     padding: 10px 10px 0;
     box-sizing: border-box;
   }
+
   &__tree {
     padding: 16px 0 0 0;
   }
+
   .node-content {
     flex: 1;
     display: flex;

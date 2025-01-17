@@ -7,7 +7,7 @@ import type { TreeDropInfo, TreeOption, TreeOverrideNodeClickBehavior, TreeOverr
 import type { AllowDrop } from 'naive-ui/es/tree/src/interface';
 import { SearchOutlined } from '@vicons/antd';
 import { cloneDeep, throttle } from 'lodash-es';
-import { NIcon, NInput, NTree } from 'naive-ui';
+import { NIcon, NInput, NScrollbar, NTree } from 'naive-ui';
 import { computed, h, inject, ref, type Ref, toRaw, watchEffect } from 'vue';
 
 defineOptions({
@@ -123,7 +123,7 @@ interface LTreeDropInfo extends TreeDropInfo {
   node: LTreeOption;
 }
 function handleDrop({ node, dragNode, dropPosition }: LTreeDropInfo) {
-  const data = cloneDeep(toRaw(values.value));
+  const data = values.value;
   const [dragNodeSiblings, dragNodeIndex] = findSiblingsAndIndex(
     dragNode,
     data,
@@ -187,32 +187,37 @@ const allowDrop: AllowDrop = ({ dropPosition, node }) => {
         </template>
       </NInput>
     </div>
-    <NTree
-      ref="tree"
-      class="lc-d-layer-panel__tree"
-      block-line
-      show-line
-      draggable
-      key-field="id"
-      label-field="name"
-      children-field="items"
-      :allow-drop="allowDrop"
-      :watch-props="['defaultSelectedKeys']"
-      :pattern="filterText"
-      :filter="filterNode"
-      :override-default-node-click-behavior="override"
-      :default-selected-keys="defaultSelectedKeys"
-      :data="values"
-      :render-label="({ option }) => h('div', {
-        id: option.id,
-        class: {
-          'cus-tree-node-hover': canHighlight && option.id === highlightNode?.id,
-        },
-        onMousedown: toggleClickFlag,
-        onMouseup: toggleClickFlag,
-        onMousemove: () => highlightHandler(option as MNode),
-      }, h('span', `${option.name} (${option.id})`))"
-      @drop="handleDrop"
-    />
+    <NScrollbar style="height: calc(100% - 40px)">
+      <NTree
+        ref="tree"
+        class="lc-d-layer-panel__tree"
+        block-line
+        block-node
+        show-line
+        draggable
+        key-field="id"
+        label-field="name"
+        children-field="items"
+        :allow-drop="allowDrop"
+        :watch-props="['defaultSelectedKeys']"
+        :pattern="filterText"
+        :filter="filterNode"
+        :override-default-node-click-behavior="override"
+        :default-selected-keys="defaultSelectedKeys"
+        :data="values"
+        :render-label="({ option }) => h('div', {
+          id: option.id,
+          class: {
+            'cus-tree-node-hover': canHighlight && option.id === highlightNode?.id,
+          },
+          style: {
+          },
+          onMousedown: toggleClickFlag,
+          onMouseup: toggleClickFlag,
+          onMousemove: () => highlightHandler(option as MNode),
+        }, h('span', `${option.name} (${option.id})`))"
+        @drop="handleDrop"
+      />
+    </NScrollbar>
   </div>
 </template>
