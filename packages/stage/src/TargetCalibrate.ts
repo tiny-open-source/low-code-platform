@@ -4,7 +4,7 @@ import type StageMask from './StageMask';
 import type { Offset, TargetCalibrateConfig } from './types';
 
 import { EventEmitter } from 'eventemitter3';
-import { Mode } from './const';
+import { Mode, ZIndex } from './const';
 import { getMode } from './utils';
 /**
  * 将选中的节点修正定位后，添加一个操作节点到蒙层上
@@ -38,6 +38,7 @@ export default class TargetCalibrate extends EventEmitter {
       top: ${top}px;
       width: ${el.clientWidth}px;
       height: ${el.clientHeight}px;
+      z-index: ${ZIndex.DRAG_EL};
     `;
 
     this.operationEl.id = `${prefix}${el.id}`;
