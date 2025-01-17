@@ -109,7 +109,7 @@ class Designer extends BaseService {
    */
   public async paste(position: { left?: number; top?: number } = {}): Promise<MNode | void> {
     const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
-    // eslint-disable-next-line prefer-const
+
     let config: any = {};
     if (!configStr) {
       return;
@@ -124,7 +124,7 @@ class Designer extends BaseService {
       return;
     }
 
-    await propsService.setNewItemId(config, this.get('root'));
+    config = await propsService.setNewItemId(config, this.get('root'));
     if (config.style) {
       config.style = {
         ...config.style,

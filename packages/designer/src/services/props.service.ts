@@ -1,7 +1,7 @@
 import type { PropsState } from '@designer/type';
 import type { FormConfig } from '@lowcode/form';
 import type { Id, MComponent, MNode, MPage } from '@lowcode/schema';
-import { DEFAULT_CONFIG, fillConfig, getDefaultPropsValue } from '@designer/utils/props';
+import { DEFAULT_CONFIG, fillConfig } from '@designer/utils/props';
 import { NodeType } from '@lowcode/schema';
 import { isPop, toLine } from '@lowcode/utils';
 import { cloneDeep, mergeWith, random } from 'lodash-es';
@@ -15,7 +15,15 @@ class Props extends BaseService {
   });
 
   constructor() {
-    super(['setPropsConfig', 'getPropsConfig', 'setPropsValue', 'getPropsValue', 'createId', 'setNewItemId']);
+    super([
+      'setPropsConfig',
+      'getPropsConfig',
+      'setPropsValue',
+      'getPropsValue',
+      'createId',
+      'setNewItemId',
+      'getDefaultPropsValue',
+    ]);
   }
 
   public setPropsConfigs(configs: Record<string, FormConfig>) {
@@ -78,12 +86,20 @@ class Props extends BaseService {
       return value;
     }
 
-    const data = cloneDeep(defaultValue as any);
-
-    await this.setNewItemId(data);
+    const [id, defaultPropsValue, data] = await Promise.all([
+      this.createId(type),
+      this.getDefaultPropsValue(type),
+      this.setNewItemId(
+        cloneDeep({
+          type,
+          ...defaultValue,
+        } as any),
+      ),
+    ]);
 
     return {
-      ...getDefaultPropsValue(type, await this.createId(type)),
+      id,
+      ...defaultPropsValue,
       ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), data),
     };
   }
@@ -96,6 +112,7 @@ class Props extends BaseService {
    * 将组件与组件的子元素配置中的id都设置成一个新的ID
    * @param {object} config 组件配置
    */
+  /* eslint no-param-reassign: ["error", { "props": false }] */
   public async setNewItemId(config: MNode, parent?: MPage) {
     const oldId = config.id;
 
@@ -111,8 +128,32 @@ class Props extends BaseService {
         await this.setNewItemId(item, config as MPage);
       }
     }
+
+    return config;
+  }
+
+  /**
+   * 获取默认属性配置
+   * @param type 组件类型
+   * @returns Object
+   */
+  public async getDefaultPropsValue(type: string) {
+    return ['page', 'container'].includes(type)
+      ? {
+          type,
+          layout: 'absolute',
+          style: {},
+          name: type,
+          items: [],
+        }
+      : {
+          type,
+          style: {},
+          name: type,
+        };
   }
 }
+
 /**
  * 复制页面时，需要把组件下关联的弹窗id换测复制出来的弹窗的id
  * @param {number} oldId 复制的源弹窗id
