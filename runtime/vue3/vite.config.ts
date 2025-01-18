@@ -2,12 +2,13 @@ import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
+import externalGlobals from 'rollup-plugin-external-globals';
 import { defineConfig } from 'vite';
-import pkg from './package.json';
 // https://vite.dev/config/
 export default defineConfig({
   base: '/low-code-platform/playground/runtime/vue3',
-  plugins: [vue(), vueJsx()],
+  plugins: [vue(), vueJsx(), externalGlobals({ vue: 'Vue' }, { exclude: ['page.html', 'playground.html'] }),
+  ],
   resolve: {
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },
@@ -37,12 +38,11 @@ export default defineConfig({
         value: './src/value-entry.ts',
         event: './src/event-entry.ts',
       },
-      // 确保外部化处理那些你不想打包进库的依赖
-      external(id: string) {
-        return Object.keys(pkg.dependencies).some(k => new RegExp(`^${k}`).test(id));
-      },
+
       output: {
         entryFileNames: 'assets/[name].js',
+        // fix： 为了避免出现下划线开头文件，导致gh-page部分文件无法访问
+        chunkFileNames: 'assets/lowcode_[name].js',
       },
     },
   },
