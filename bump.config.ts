@@ -8,5 +8,5 @@ export default defineConfig({
   changelog: true,
   mode: 'monorepo',
   allowedBranches: ['main'],
-  packages: ['packages/**', 'playground', 'runtime/**'],
+  packages: ['packages/**', 'playground/*', 'runtime/**'],
 }) as any;
