@@ -401,10 +401,12 @@ class Designer extends BaseService {
       this.pushHistoryState();
     }
 
-    stage?.select(newNode.id);
-
     if (isPage) {
       this.state.pageLength += 1;
+    }
+    else {
+      // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
+      stage?.select(newNode.id);
     }
 
     this.emit('add', newNode);
