@@ -4,7 +4,7 @@ import { defineConfig } from 'nbump';
 export default defineConfig({
   leading: ['git pull --rebase', 'pnpm i'],
   trailing: [],
-  publish: true,
+  publish: false,
   changelog: true,
   mode: 'monorepo',
   allowedBranches: ['main'],
