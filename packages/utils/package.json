@@ -1,7 +1,7 @@
 {
   "name": "@lowcode/utils",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "exports": {
     ".": {
       "types": "./dist/types/src/index.d.ts",
