@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [1.0.4](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.3...v1.0.4) (2025-01-18)
+
+
+
 ## [1.0.3](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.2...v1.0.3) (2025-01-18)
 
 

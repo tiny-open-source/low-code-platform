@@ -1,7 +1,7 @@
 {
   "name": "@lowcode/designer",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "style": "dist/low-code-designer.css",
   "exports": {
     ".": {
