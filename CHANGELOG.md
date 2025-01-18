@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [1.0.2](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.1...v1.0.2) (2025-01-18)
+
+
+### Features
+
+* no publish ([b76f81f](https://github.com/tiny-open-source/low-code-platform/commit/b76f81f394fa116b34b62a969908a40fc4a597c4))
+
+
+
 ## [1.0.1](https://github.com/tiny-open-source/low-code-platform/compare/c888b16d25b8c58fedd8c408a4de1c1f00e3be63...v1.0.1) (2025-01-18)
 
 
