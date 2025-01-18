@@ -8,6 +8,7 @@ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/low-code-platform/playground',

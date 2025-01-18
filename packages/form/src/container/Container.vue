@@ -182,7 +182,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
             :prop="itemProp"
             @change="onChangeHandler"
           />
-          <template #title>
+          <template #trigger>
             <div v-html="tooltip" />
           </template>
         </NTooltip>
@@ -204,7 +204,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
       </NFormItem>
 
       <NTooltip v-if="config.tip" placement="left">
-        <template #title>
+        <template #trigger>
           <div v-html="config.tip" />
         </template>
       </NTooltip>

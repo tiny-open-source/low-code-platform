@@ -393,6 +393,9 @@ importers:
       vite:
         specifier: ^6.0.7
         version: 6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0)
+      vite-plugin-chunk-split:
+        specifier: ^0.5.0
+        version: 0.5.0(vite@6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0))
       vite-plugin-vue-devtools:
         specifier: ^7.7.0
         version: 7.7.0(rollup@4.30.1)(vite@6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.2))
@@ -3055,6 +3058,9 @@ packages:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
     engines: {node: '>=8'}
 
+  import-meta-resolve@4.1.0:
+    resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
+
   importx@0.5.1:
     resolution: {integrity: sha512-YrRaigAec1sC2CdIJjf/hCH1Wp9Ii8Cq5ROw4k5nJ19FVl2FcJUHZ5gGIb1vs8+JNYIyOJpc2fcufS2330bxDw==}
 
@@ -4635,6 +4641,11 @@ packages:
     resolution: {integrity: sha512-uPAwSr57kYjAUux+8E2j0q0Fxpn8M9VoyfGiRI8Kfktz9NcYMCenwY5RnZxnF1WTu3TGiYipirIzacLL3VVGFg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
+
+  vite-plugin-chunk-split@0.5.0:
+    resolution: {integrity: sha512-pasNKLhH+ICjoCF6HoKKvgmZ1LEPSCIKAa8Lz0ZpMyQC9bLmCLT7UxgKMULewsc9SUw89OX0udsGiIQCtr8wLA==}
+    peerDependencies:
+      vite: ^4 || ^5
 
   vite-plugin-dts@4.5.0:
     resolution: {integrity: sha512-M1lrPTdi7gilLYRZoLmGYnl4fbPryVYsehPN9JgaxjJKTs8/f7tuAlvCCvOLB5gRDQTTKnptBcB0ACsaw2wNLw==}
@@ -7776,6 +7787,8 @@ snapshots:
 
   import-lazy@4.0.0: {}
 
+  import-meta-resolve@4.1.0: {}
+
   importx@0.5.1:
     dependencies:
       bundle-require: 5.1.0(esbuild@0.24.2)
@@ -9541,6 +9554,13 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vite-plugin-chunk-split@0.5.0(vite@6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0)):
+    dependencies:
+      es-module-lexer: 1.6.0
+      import-meta-resolve: 4.1.0
+      magic-string: 0.30.17
+      vite: 6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0)
 
   vite-plugin-dts@4.5.0(@types/node@20.17.14)(rollup@4.30.1)(typescript@5.7.2)(vite@6.0.7(@types/node@20.17.14)(jiti@2.4.2)(sass-embedded@1.83.4)(sass@1.83.0)(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0)):
     dependencies:
