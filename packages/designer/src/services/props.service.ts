@@ -4,7 +4,7 @@ import type { Id, MComponent, MNode, MPage } from '@lowcode/schema';
 import { DEFAULT_CONFIG, fillConfig } from '@designer/utils/props';
 import { NodeType } from '@lowcode/schema';
 import { isPop, toLine } from '@lowcode/utils';
-import { cloneDeep, mergeWith, random } from 'lodash-es';
+import { cloneDeep, mergeWith } from 'lodash-es';
 import { reactive } from 'vue';
 import BaseService from './base.service';
 
@@ -100,12 +100,25 @@ class Props extends BaseService {
     return {
       id,
       ...defaultPropsValue,
-      ...mergeWith(cloneDeep(this.state.propsValueMap[type] || {}), data),
+      ...mergeWith({}, cloneDeep(this.state.propsValueMap[type] || {}), data),
     };
   }
 
+  /**
+   * 生成指定位数的GUID，无【-】格式
+   * @param digit 位数，默认值8
+   * @returns
+   */
+  guid(digit = 8): string {
+    return 'x'.repeat(digit).replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c == 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
   public async createId(type: string | number): Promise<string> {
-    return `${type}_${random(10000, false)}`;
+    return `${type}_${this.guid()}`;
   }
 
   /**
