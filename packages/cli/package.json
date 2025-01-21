@@ -1,0 +1,36 @@
+{
+  "name": "@lowcode/cli",
+  "version": "1.0.4",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "lowcode": "bin/lowcode.js"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "clean": "rimraf lib *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@vuepress/cli": "2.0.0-rc.2",
+    "cac": "^6.7.14",
+    "chalk": "^5.4.1",
+    "chokidar": "^4.0.3",
+    "fs-extra": "^11.3.0",
+    "recast": "^0.23.9",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4"
+  }
+}
