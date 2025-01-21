@@ -19,7 +19,7 @@ export default class Core {
   };
 
   public dir = {
-    temp: () => path.resolve(this.options.source, 'src/.lowcode'),
+    temp: () => path.resolve(this.options.source, this.options.temp),
   };
 
   constructor(options: UserConfig) {

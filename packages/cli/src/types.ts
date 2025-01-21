@@ -37,4 +37,5 @@ export interface UserConfig {
   packages: Record<string, any>;
   componentFileAffix: string;
   cleanTemp: boolean;
+  temp: string;
 }
