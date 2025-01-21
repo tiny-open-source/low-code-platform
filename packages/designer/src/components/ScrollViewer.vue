@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ScrollViewer } from '@designer/utils/scroll-viewer';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { ScrollViewer } from '../utils/scroll-viewer';
 
 const props = withDefaults(defineProps<{
   width?: number;

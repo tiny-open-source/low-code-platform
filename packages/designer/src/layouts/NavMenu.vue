@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GetColumnWidth, MenuBarData, Services } from '@designer/type';
+import type { GetColumnWidth, MenuBarData, Services } from '../type';
 import { computed, inject } from 'vue';
 import ToolButton from '../components/ToolButton.vue';
 

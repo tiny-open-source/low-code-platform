@@ -5,10 +5,8 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
 import pkg from './package.json';
 // https://vite.dev/config/
-const alias = [{ find: /@designer/, replacement: path.join(__dirname, './src') }];
 export default defineConfig({
   css: {
     preprocessorOptions: {
@@ -17,19 +15,13 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts({
-    outDir: 'dist/types',
-    include: ['src/**/*'],
-    staticImport: true,
-    insertTypesEntry: true,
-  }), vue(), vueJsx(), Components({
+  plugins: [vue(), vueJsx(), Components({
     resolvers: [AntDesignVueResolver()],
   })],
   resolve: {
     alias: process.env.NODE_ENV === 'production'
-      ? alias
+      ? []
       : [
-          ...alias,
           { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../$1/src') },
         ],
   },
@@ -56,12 +48,7 @@ export default defineConfig({
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external(id: string) {
-        return (
-          id.startsWith('vue')
-          || id.startsWith('naive-ui')
-          || /^@lowcode\//.test(id)
-          || Object.keys(pkg.dependencies).some(k => new RegExp(`^${k}`).test(id))
-        );
+        return Object.keys(pkg.dependencies).some(k => new RegExp(`^${k}`).test(id));
       },
 
       output: {

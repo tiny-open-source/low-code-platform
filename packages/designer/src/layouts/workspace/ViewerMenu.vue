@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { MenuItem, Services } from '@designer/type';
 import type { MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
-import ContentMenu from '@designer/components/ContentMenu.vue';
-import storageService from '@designer/services/storage.service';
-import { LayerOffset, Layout } from '@designer/type';
-import { COPY_STORAGE_KEY } from '@designer/utils/editor';
+import type { MenuItem, Services } from '../../type';
 import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
 import { CopyOutlined, DeleteOutlined, DownOutlined, UpOutlined } from '@vicons/antd';
 import { computed, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
+import ContentMenu from '../../components/ContentMenu.vue';
+import storageService from '../../services/storage.service';
+import { LayerOffset, Layout } from '../../type';
+import { COPY_STORAGE_KEY } from '../../utils/editor';
 
 const props = defineProps<{
   isMultiSelect: boolean;

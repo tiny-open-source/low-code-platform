@@ -10,31 +10,29 @@
       "dom.iterable",
       "scripthost"
     ],
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "baseUrl": "../..",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "types": [
       "node",
-      "vite/client",
-      "naive-ui/volar"
+      "vite/client"
     ],
     "strict": true,
+    "noImplicitAny": false,
+    "declaration": true,
+    "declarationDir": "types",
     "importHelpers": true,
-    "noEmit": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
   "include": [
-    "vite.config.*",
-    "./env.d.ts",
-    "auto-imports.d.ts",
-    "components.d.ts",
     "src/**/*",
     "src/**/*.vue"
+  ],
+  "exclude": [
+    "**/dist/**/*",
+    "src/**/__tests__/*"
   ]
 }

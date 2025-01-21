@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { ComponentGroup, ComponentItem, Services, StageOptions } from '@designer/type';
 import type StageCore from '@lowcode/stage';
-import MIcon from '@designer/components/Icon.vue';
+import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
 import { removeClassNameByClassName } from '@lowcode/utils';
 import { SearchOutlined } from '@vicons/antd';
-
 import { NCollapse, NCollapseItem, NIcon, NInput, NScrollbar } from 'naive-ui';
+
 import serialize from 'serialize-javascript';
 import { computed, inject, ref } from 'vue';
+import MIcon from '../../components/Icon.vue';
 
 defineOptions({
   name: 'ComponentListPanel',

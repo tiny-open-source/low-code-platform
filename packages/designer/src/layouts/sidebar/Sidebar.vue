@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SideBarData } from '@designer/type';
+import type { SideBarData } from '../../type';
 import { BlockOutlined, CheckSquareOutlined } from '@vicons/antd';
 import { NTabPane, NTabs } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
@@ -69,7 +69,7 @@ const dataConfigs = computed(() => {
       v-for="(config, index) in dataConfigs"
       :key="index" style="height: 100%;" :name="config.text" :tab="config.text"
     >
-      <template #tab>
+      <template #prefix>
         <div :key="config.text">
           <MIcon v-if="config.icon" :icon="config.icon" />
           <div v-if="config.text" class="lc-d-tab-panel-title">

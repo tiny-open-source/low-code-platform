@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { GetColumnWidth, Services } from '@designer/type';
 import type { MApp } from '@lowcode/schema';
+import type { GetColumnWidth, Services } from '../type';
 import { NScrollbar } from 'naive-ui';
 import { computed, inject } from 'vue';
 import Resizer from './Resizer.vue';

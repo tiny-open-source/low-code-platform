@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { DesignerService } from '@designer/services/designer.service';
-import type { Services } from '@designer/type';
 import type { MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { TreeDropInfo, TreeOption, TreeOverrideNodeClickBehavior, TreeOverrideNodeClickBehaviorReturn } from 'naive-ui';
 import type { AllowDrop } from 'naive-ui/es/tree/src/interface';
+import type { DesignerService } from '../../services/designer.service';
+import type { Services } from '../../type';
 import { SearchOutlined } from '@vicons/antd';
-import { cloneDeep, throttle } from 'lodash-es';
+import { throttle } from 'lodash-es';
 import { NIcon, NInput, NScrollbar, NTree } from 'naive-ui';
-import { computed, h, inject, ref, type Ref, toRaw, watchEffect } from 'vue';
+import { computed, h, inject, ref, type Ref, watchEffect } from 'vue';
 
 defineOptions({
   name: 'low-code-layer-panel',

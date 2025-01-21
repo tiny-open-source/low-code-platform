@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GetColumnWidth, Services } from '@designer/type';
+import type { GetColumnWidth, Services } from '../type';
 import Gesto from 'gesto';
 import { inject, onMounted, onUnmounted, ref, toRaw } from 'vue';
 

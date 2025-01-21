@@ -1,6 +1,6 @@
 import type { FormConfig, FormState } from '@lowcode/form';
-import designerService from '@designer/services/designer.service';
-import eventsService from '@designer/services/events.service';
+import designerService from '../services/designer.service';
+import eventsService from '../services/events.service';
 
 /**
  * 统一为组件属性表单加上事件、高级、样式配置

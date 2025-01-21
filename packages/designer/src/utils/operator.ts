@@ -1,17 +1,17 @@
-import type { AddMNode, PastePosition } from '@designer/type';
 import type { Id, MApp, MContainer, MNode } from '@lowcode/schema';
-
 import type StageCore from '@lowcode/stage';
-import designerService from '@designer/services/designer.service';
-import historyService from '@designer/services/history.service';
-import propsService from '@designer/services/props.service';
-import { Layout } from '@designer/type';
 
-import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '@designer/utils/editor';
+import type { AddMNode, PastePosition } from '../type';
 import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
 import { cloneDeep, isEmpty } from 'lodash-es';
 import { toRaw } from 'vue';
+
+import designerService from '../services/designer.service';
+import historyService from '../services/history.service';
+import propsService from '../services/props.service';
+import { Layout } from '../type';
+import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '../utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置

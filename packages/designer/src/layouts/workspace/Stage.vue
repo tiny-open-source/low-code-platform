@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type { Runtime, SortEventData, UpdateEventData } from '@lowcode/stage';
-import ScrollViewer from '@designer/components/ScrollViewer.vue';
-import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '@designer/type';
-import { getGuideLineFromCache } from '@designer/utils/editor';
 import StageCore, { calcValueByFontsize, getOffset, GuidesType } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
 import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
+import ScrollViewer from '../../components/ScrollViewer.vue';
+import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '../../type';
+import { getGuideLineFromCache } from '../../utils/editor';
 import ViewerMenu from './ViewerMenu.vue';
 
 const stageContainer = ref<HTMLDivElement | null>(null);

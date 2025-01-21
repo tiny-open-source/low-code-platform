@@ -1,7 +1,7 @@
-import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '@designer/type';
 import type StageCore from '@lowcode/stage';
-import BaseService from '@designer/services/base.service';
+import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '../type';
 import { reactive, toRaw } from 'vue';
+import BaseService from '../services/base.service';
 import designerService from './designer.service';
 
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;

@@ -1,4 +1,4 @@
-import type { ComponentGroup, ComponentGroupState } from '@designer/type';
+import type { ComponentGroup, ComponentGroupState } from '../type';
 
 import { reactive } from 'vue';
 

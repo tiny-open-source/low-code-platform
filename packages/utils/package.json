@@ -11,13 +11,14 @@
   },
   "main": "dist/lowcode-utils.umd.cjs",
   "module": "dist/lowcode-utils.js",
-  "types": "dist/types/src/index.d.ts",
+  "types": "types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "build": "vite build",
-    "build:watch": "vite build --watch"
+    "build": "npm run build:type && vite build",
+    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "clear:type": "rimraf ./types"
   },
   "dependencies": {
     "@lowcode/schema": "workspace:^",
@@ -25,7 +26,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.14",
+    "rimraf": "^6.0.1",
     "vite": "^6.0.7",
-    "vite-plugin-dts": "^4.5.0"
+    "vue-tsc": "2.0.29"
   }
 }

@@ -1,11 +1,11 @@
-import type { PropsState } from '@designer/type';
 import type { FormConfig } from '@lowcode/form';
 import type { Id, MComponent, MNode, MPage } from '@lowcode/schema';
-import { DEFAULT_CONFIG, fillConfig } from '@designer/utils/props';
+import type { PropsState } from '../type';
 import { NodeType } from '@lowcode/schema';
 import { isPop, toLine } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { reactive } from 'vue';
+import { DEFAULT_CONFIG, fillConfig } from '../utils/props';
 import BaseService from './base.service';
 
 class Props extends BaseService {

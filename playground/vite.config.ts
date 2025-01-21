@@ -33,7 +33,6 @@ export default defineConfig({
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },
       { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../packages/$1/src') },
-      { find: /@designer/, replacement: path.join(__dirname, '../packages/designer/src') },
     ],
   },
   optimizeDeps: {

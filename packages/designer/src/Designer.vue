@@ -4,13 +4,6 @@ import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from './type';
-import componentListService from '@designer/services/component-list.service';
-import designerService from '@designer/services/designer.service';
-import eventsService from '@designer/services/events.service';
-import historyService from '@designer/services/history.service';
-import propsService from '@designer/services/props.service';
-import storageService from '@designer/services/storage.service';
-import uiService from '@designer/services/ui.service';
 import { CONTAINER_HIGHLIGHT_CLASS, type MoveableOptions } from '@lowcode/stage';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
@@ -18,6 +11,13 @@ import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
+import componentListService from './services/component-list.service';
+import designerService from './services/designer.service';
+import eventsService from './services/events.service';
+import historyService from './services/history.service';
+import propsService from './services/props.service';
+import storageService from './services/storage.service';
+import uiService from './services/ui.service';
 
 defineOptions({
   name: 'LowCodeDesigner',
@@ -162,7 +162,7 @@ defineExpose({
       </slot>
     </template>
     <template #sidebar>
-      <slot name="sidebar" :designer-service="designerService">
+      <slot name="sidebar">
         <Sidebar :data="sidebar">
           <template #layer-panel-header>
             <slot name="layer-panel-header" />

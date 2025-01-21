@@ -24,10 +24,11 @@
   "style": "dist/low-code-form.css",
   "main": "dist/lowcode-form.umd.cjs",
   "module": "dist/lowcode-form.js",
-  "types": "dist/types/index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
-    "build": "vite build",
-    "build:watch": "vite build --watch"
+    "build": "npm run build:type && vite build",
+    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
+    "clear:type": "rimraf ./types"
   },
   "peerDependencies": {
     "naive-ui": "^2.40.4",
@@ -44,7 +45,8 @@
     "@types/tinycolor2": "^1.4.6",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
+    "rimraf": "^6.0.1",
     "vite": "^6.0.7",
-    "vite-plugin-dts": "^4.5.0"
+    "vue-tsc": "2.0.29"
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts" name="UISelect">
-import type { Services } from '@designer/type';
 import type { FormState } from '@lowcode/form';
+import type { Services } from '../type';
 import { DeleteOutlined } from '@vicons/antd';
 
 import { NButton, NIcon, NTooltip } from 'naive-ui';

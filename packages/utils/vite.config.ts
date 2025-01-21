@@ -1,18 +1,10 @@
 import path from 'node:path';
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
 import pkg from './package.json';
 
 const deps = Object.keys(pkg.dependencies);
 export default defineConfig({
   plugins: [
-    dts({
-      outDir: 'dist/types',
-      include: ['src/**/*'],
-      staticImport: true,
-      insertTypesEntry: true,
-      pathsToAliases: false,
-    }),
   ],
   resolve: {
     alias: [

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Services } from '@designer/type';
 import type { MNode } from '@lowcode/schema';
+import type { Services } from '../../type';
 import { isPage } from '@lowcode/utils';
 import KeyController from 'keycon';
 import { computed, inject, onMounted, ref } from 'vue';

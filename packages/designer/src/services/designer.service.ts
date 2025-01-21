@@ -1,16 +1,16 @@
-import type { AddMNode, DesignerNodeInfo, StoreState } from '@designer/type';
 import type { Id, MApp, MComponent, MContainer, MNode, MPage, PastePosition } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
+import type { AddMNode, DesignerNodeInfo, StoreState } from '../type';
 import type { StepValue } from './history.service';
-import { LayerOffset, Layout } from '@designer/type';
-
-import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, getInitPositionStyle, getNodeIndex, isFixed, setLayout } from '@designer/utils/editor';
-import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '@designer/utils/operator';
 import { NodeType } from '@lowcode/schema';
 
 import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith, uniq } from 'lodash-es';
 import { reactive, toRaw } from 'vue';
+
+import { LayerOffset, Layout } from '../type';
+import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, getInitPositionStyle, getNodeIndex, isFixed, setLayout } from '../utils/editor';
+import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '../utils/operator';
 import BaseService from './base.service';
 import historyService from './history.service';
 import storageService, { Protocol } from './storage.service';

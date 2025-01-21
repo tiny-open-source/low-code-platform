@@ -1,14 +1,14 @@
-import type { ComponentListService } from '@designer/services/component-list.service';
-import type { HistoryService } from '@designer/services/history.service';
-import type { UiService } from '@designer/services/ui.service';
 import type { FormConfig } from '@lowcode/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
 import type { Component } from 'vue';
+import type { ComponentListService } from './services/component-list.service';
 import type { DesignerService } from './services/designer.service';
+import type { HistoryService } from './services/history.service';
 import type { PropsService } from './services/props.service';
 import type { StorageService } from './services/storage.service';
+import type { UiService } from './services/ui.service';
 
 export interface InstallOptions {
   [key: string]: any;

@@ -1,4 +1,4 @@
-import { Keys } from '@designer/type';
+import { Keys } from '../type';
 
 interface ScrollViewerOptions {
   container: HTMLDivElement;

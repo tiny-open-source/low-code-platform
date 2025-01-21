@@ -1,6 +1,6 @@
-import { compose } from '@designer/utils/compose';
-
 import { EventEmitter } from 'eventemitter3';
+
+import { compose } from '../utils/compose';
 
 const methodName = (prefix: string, name: string) => `${prefix}${name[0].toUpperCase()}${name.substring(1)}`;
 

@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { MenuButton, MenuComponent, MenuItem, Services } from '@designer/type';
 import type { PropType } from 'vue';
-import MIcon from '@designer/components/Icon.vue';
+import type { MenuButton, MenuComponent, MenuItem, Services } from '../type';
 import { NodeType } from '@lowcode/schema';
 import { ArrowLeftOutlined, ArrowRightOutlined, BorderInnerOutlined, BorderOuterOutlined, DeleteOutlined, TableOutlined, ZoomInOutlined, ZoomOutOutlined } from '@vicons/antd';
 import { NButton, NDivider, NTooltip } from 'naive-ui';
 import { computed, defineComponent, inject, markRaw } from 'vue';
+import MIcon from '../components/Icon.vue';
 
 export default defineComponent({
   components: { MIcon, NDivider, NButton, NTooltip },

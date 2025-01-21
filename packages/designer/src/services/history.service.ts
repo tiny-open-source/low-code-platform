@@ -1,7 +1,7 @@
 import type { Id, MPage } from '@lowcode/schema';
-import { UndoRedo } from '@designer/utils/undo-redo';
-
 import { reactive } from 'vue';
+
+import { UndoRedo } from '../utils/undo-redo';
 import BaseService from './base.service';
 
 export interface StepValue {
