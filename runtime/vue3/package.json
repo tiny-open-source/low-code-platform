@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run build:libs && vite --config dev.vite.config.ts --host",
-    "build": "npm run build:libs & npm run build:page && npm run build:playground",
+    "build": "npm run build:libs && npm run build:page && npm run build:playground",
     "build:page": "vite build --config prod.vite.config.ts --mode page",
     "build:playground": "vite build --config prod.vite.config.ts --mode playground",
     "build:libs": "lowcode entry && npm run build:config & npm run build:value & npm run build:event",

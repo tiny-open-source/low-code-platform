@@ -10,11 +10,10 @@ import { NodeType } from '@lowcode/schema';
 
 import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 import { cloneDeep, mergeWith, uniq } from 'lodash-es';
-import serialize from 'serialize-javascript';
 import { reactive, toRaw } from 'vue';
 import BaseService from './base.service';
 import historyService from './history.service';
-import storageService from './storage.service';
+import storageService, { Protocol } from './storage.service';
 
 class Designer extends BaseService {
   public state: StoreState = reactive({
@@ -107,7 +106,9 @@ class Designer extends BaseService {
    * @returns 组件节点配置
    */
   public async copy(config: MNode | MNode[]): Promise<void> {
-    await storageService.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
+    await storageService.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
+      protocol: Protocol.OBJECT,
+    });
   }
 
   /**
@@ -116,21 +117,11 @@ class Designer extends BaseService {
    * @returns 添加后的组件节点配置
    */
   public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
-    const configStr = await storageService.getItem(COPY_STORAGE_KEY);
-    // eslint-disable-next-line prefer-const
-    let config: any = {};
-    if (!configStr) {
-      return;
-    }
+    const config = await storageService.getItem(COPY_STORAGE_KEY);
 
-    try {
-    // eslint-disable-next-line no-eval
-      eval(`config = ${configStr}`);
-    }
-    catch (e) {
-      console.error(e);
+    if (!config)
       return;
-    }
+
     const pasteConfigs = await beforePaste(position, config);
 
     return await this.multiAdd(pasteConfigs);

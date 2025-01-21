@@ -10,7 +10,7 @@
     "postbuild:playground": "shx mkdir playground/dist/runtime && shx cp -r runtime/vue3/dist ./playground/dist/runtime/vue3 && shx cp -r runtime/vue3/entry-dist/* ./playground/dist/runtime/vue3",
     "dev": "pnpm build && turbo dev",
     "lint": "turbo lint",
-    "clean:top": "rimraf */**/dist */**/types */dist */**/.turbo coverage dwt* temp",
+    "clean:top": "rimraf */**/dist */**/entry-dist */dist coverage dwt*",
     "clean:modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "prepare": "simple-git-hooks"
   },
