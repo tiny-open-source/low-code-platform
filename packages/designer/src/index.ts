@@ -31,6 +31,7 @@ export { default as LowCodeDesigner } from './Designer.vue';
 
 export { default as designerService } from './services/designer.service';
 export { default as historyService } from './services/history.service';
+export { default as storageService } from './services/storage.service';
 export { default as uiService } from './services/ui.service';
 export * from './type';
 

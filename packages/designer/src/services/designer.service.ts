@@ -14,6 +14,7 @@ import serialize from 'serialize-javascript';
 import { reactive, toRaw } from 'vue';
 import BaseService from './base.service';
 import historyService from './history.service';
+import storageService from './storage.service';
 
 class Designer extends BaseService {
   public state: StoreState = reactive({
@@ -106,7 +107,7 @@ class Designer extends BaseService {
    * @returns 组件节点配置
    */
   public async copy(config: MNode | MNode[]): Promise<void> {
-    globalThis.localStorage.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
+    await storageService.setItem(COPY_STORAGE_KEY, serialize(Array.isArray(config) ? config : [config]));
   }
 
   /**
@@ -115,7 +116,7 @@ class Designer extends BaseService {
    * @returns 添加后的组件节点配置
    */
   public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
-    const configStr = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+    const configStr = await storageService.getItem(COPY_STORAGE_KEY);
     // eslint-disable-next-line prefer-const
     let config: any = {};
     if (!configStr) {

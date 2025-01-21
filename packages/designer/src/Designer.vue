@@ -9,6 +9,7 @@ import designerService from '@designer/services/designer.service';
 import eventsService from '@designer/services/events.service';
 import historyService from '@designer/services/history.service';
 import propsService from '@designer/services/props.service';
+import storageService from '@designer/services/storage.service';
 import uiService from '@designer/services/ui.service';
 import { CONTAINER_HIGHLIGHT_CLASS, type MoveableOptions } from '@lowcode/stage';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
@@ -71,6 +72,7 @@ const services: Services = {
   designerService,
   propsService,
   componentListService,
+  storageService,
 };
 
 watch(

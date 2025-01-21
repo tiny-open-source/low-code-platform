@@ -8,6 +8,7 @@ import type { MoveableOptions } from '@lowcode/stage';
 import type { Component } from 'vue';
 import type { DesignerService } from './services/designer.service';
 import type { PropsService } from './services/props.service';
+import type { StorageService } from './services/storage.service';
 
 export interface InstallOptions {
   [key: string]: any;
@@ -18,6 +19,7 @@ export interface Services {
   designerService: DesignerService;
   propsService: PropsService;
   componentListService: ComponentListService;
+  storageService: StorageService;
 }
 
 export interface StageOptions {

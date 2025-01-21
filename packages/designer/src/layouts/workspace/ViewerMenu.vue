@@ -3,6 +3,7 @@ import type { MenuItem, Services } from '@designer/type';
 import type { MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import ContentMenu from '@designer/components/ContentMenu.vue';
+import storageService from '@designer/services/storage.service';
 import { LayerOffset, Layout } from '@designer/type';
 import { COPY_STORAGE_KEY } from '@designer/utils/editor';
 import { NodeType } from '@lowcode/schema';
@@ -132,8 +133,8 @@ const menuData = reactive<MenuItem[]>([
   ...stageContentMenu,
 ]);
 
-onMounted(() => {
-  const data = globalThis.localStorage.getItem(COPY_STORAGE_KEY);
+onMounted(async () => {
+  const data = await storageService.getItem(COPY_STORAGE_KEY);
   allowPaste.value = data !== 'undefined' && !!data;
 });
 
