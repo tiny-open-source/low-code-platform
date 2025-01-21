@@ -237,6 +237,9 @@ importers:
       '@lowcode/schema':
         specifier: workspace:^
         version: link:../schema
+      '@lowcode/utils':
+        specifier: workspace:^
+        version: link:../utils
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
