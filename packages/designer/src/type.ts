@@ -55,6 +55,7 @@ export interface StoreState {
   page: MPage | null;
   parent: MContainer | null;
   node: MNode | null;
+  nodes: MNode[];
   highlightNode: MNode | null;
   stage: StageCore | null;
   modifiedNodeIds: Map<Id, Id>;
@@ -234,4 +235,9 @@ export interface ComponentGroupState {
 export enum LayerOffset {
   TOP = 'top',
   BOTTOM = 'bottom',
+}
+
+export interface PastePosition {
+  left?: number;
+  top?: number;
 }

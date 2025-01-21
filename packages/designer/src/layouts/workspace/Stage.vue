@@ -12,18 +12,18 @@ import ViewerMenu from './ViewerMenu.vue';
 const stageContainer = ref<HTMLDivElement | null>(null);
 const stageOptions = inject<StageOptions>('stageOptions');
 const services = inject<Services>('services');
-
+let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
 const root = computed(() => services?.designerService.get<MApp>('root'));
 const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
 const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
 const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
+const isMultiSelect = computed(() => services?.designerService.get('nodes')?.length > 1);
 const page = computed(() => services?.designerService.get<MPage>('page'));
 const node = computed(() => services?.designerService.get<MNode>('node'));
 const stageWrap = ref<InstanceType<typeof ScrollViewer> | null>(null);
 const menu = ref<InstanceType<typeof ViewerMenu>>();
-let stage: StageCore | null = null;
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
 watchEffect(() => {
@@ -69,6 +69,10 @@ watchEffect(() => {
 
   stage?.on('highlight', (el: HTMLElement) => {
     services?.designerService.highlight(el.id);
+  });
+
+  stage?.on('multiSelect', (els: HTMLElement[]) => {
+    services?.designerService.multiSelect(els.map(el => el.id));
   });
 
   stage?.on('update', (ev: UpdateEventData) => {
@@ -213,7 +217,7 @@ onUnmounted(() => {
       @dragover="dragoverHandler"
     />
     <teleport to="body">
-      <ViewerMenu ref="menu" />
+      <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" />
     </teleport>
   </ScrollViewer>
 </template>

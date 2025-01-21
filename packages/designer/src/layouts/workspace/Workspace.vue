@@ -11,6 +11,7 @@ defineOptions({
 });
 const services = inject<Services>('services');
 const workspace = ref<HTMLElement | null>(null);
+const nodes = computed(() => services?.designerService.get<MNode[]>('nodes'));
 let keycon: KeyController;
 function mouseenterHandler() {
   workspace.value?.focus();
@@ -25,7 +26,6 @@ onMounted(() => {
   }
   workspace.value?.addEventListener('mouseenter', mouseenterHandler);
   workspace.value?.addEventListener('mouseleave', mouseleaveHandler);
-  const node = computed(() => services?.designerService.get<MNode>('node'));
 
   keycon = new KeyController(workspace.value);
 
@@ -36,30 +36,30 @@ onMounted(() => {
   keycon
     .keyup('delete', (e) => {
       e.inputEvent.preventDefault();
-      if (!node.value || isPage(node.value))
+      if (!nodes.value || isPage(nodes.value[0]))
         return;
-      services?.designerService.remove(node.value);
+      services?.designerService.remove(nodes.value);
     })
     .keyup('backspace', (e) => {
       e.inputEvent.preventDefault();
-      if (!node.value || isPage(node.value))
+      if (!nodes.value || isPage(nodes.value[0]))
         return;
-      services?.designerService.remove(node.value);
+      services?.designerService.remove(nodes.value);
     })
     .keydown([ctrl, 'c'], (e) => {
       e.inputEvent.preventDefault();
-      node.value && services?.designerService.copy(node.value);
+      nodes.value && services?.designerService.copy(nodes.value);
     })
     .keydown([ctrl, 'v'], (e) => {
       e.inputEvent.preventDefault();
-      node.value && services?.designerService.paste();
+      nodes.value && services?.designerService.paste();
     })
     .keydown([ctrl, 'x'], (e) => {
       e.inputEvent.preventDefault();
-      if (!node.value || isPage(node.value))
+      if (!nodes.value || isPage(nodes.value[0]))
         return;
-      services?.designerService.copy(node.value);
-      services?.designerService.remove(node.value);
+      services?.designerService.copy(nodes.value);
+      services?.designerService.remove(nodes.value);
     })
     .keydown([ctrl, 'z'], (e) => {
       e.inputEvent.preventDefault();
