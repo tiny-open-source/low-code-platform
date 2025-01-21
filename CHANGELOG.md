@@ -1,5 +1,32 @@
 # CHANGELOG
 
+# [1.1.0-alpha.0](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.4...v1.1.0-alpha.0) (2025-01-21)
+
+
+### Bug Fixes
+
+* **designer:** 添加组件粘贴操作支持偏移量 ([befbdf1](https://github.com/tiny-open-source/low-code-platform/commit/befbdf13adc85d9ee45f9d813d0bfbade9225b7c))
+* **designer:** id可能重复 ([6fef441](https://github.com/tiny-open-source/low-code-platform/commit/6fef4417d5873c89465cea1953dc507075e897d1))
+* **stage:** 单选后，粘贴多个组件，原来的单选状态没有取消 ([3e107a1](https://github.com/tiny-open-source/low-code-platform/commit/3e107a15b6cea6d555f1dfd77f1f95e1d9d5295b))
+
+
+### Features
+
+* **cli, runtime:** 优化入口配置文件生成 ([6bf68fa](https://github.com/tiny-open-source/low-code-platform/commit/6bf68facfe3b88fb23b6879cb0b13de1b2ceced1))
+* **cli:** 生成的entry文件不再在window挂对象，通过构建自动挂载 ([0c135eb](https://github.com/tiny-open-source/low-code-platform/commit/0c135eb45a71f46d4301c12f70c79c31194e7bed))
+* **cli:** 新增lowcode-cli,用于runtime 入口配置文件生成 ([6c8e414](https://github.com/tiny-open-source/low-code-platform/commit/6c8e414eb395226d58917d0660fc7d8ca68bd464))
+* **cli:** 支持配置temp文件夹，默认.lowcode ([46d2d7f](https://github.com/tiny-open-source/low-code-platform/commit/46d2d7f747140eed24c7a1762a19a202d240121c))
+* **designer:** 多选菜单支持复制粘贴删除 ([6ca1497](https://github.com/tiny-open-source/low-code-platform/commit/6ca1497bd5fd55efb1543510f5b7fc2385c5f012))
+* **designer:** 多选粘贴后同步选中粘贴的多个元素,并支持拖拽,粘贴删除支持多个元素同时撤销到上一步 ([a1c199d](https://github.com/tiny-open-source/low-code-platform/commit/a1c199dcb7717153ec7449a80e50b8953f3583ee))
+* **designer:** 添加storageService服务 ([8c8213f](https://github.com/tiny-open-source/low-code-platform/commit/8c8213fc3c7fca6296ffb54c33c77c4f14652a69))
+* **designer:** 完善storageService功能 ([d9d68a7](https://github.com/tiny-open-source/low-code-platform/commit/d9d68a72255c79006e77c946343dda4d8ca774bc))
+* release script ([6903c61](https://github.com/tiny-open-source/low-code-platform/commit/6903c6156a9dab3ef68d9a7ac6440affe54a3994))
+* **runtime,playground:** vue3使用lowcode-cli生成组件依赖入口 ([79ac6f5](https://github.com/tiny-open-source/low-code-platform/commit/79ac6f5c98dbd1ee02c4d3a74835b9c02e4bf13d))
+* **stage,runtime:** 去掉runtime getSnapElements 定义 ([3397903](https://github.com/tiny-open-source/low-code-platform/commit/33979039cd1cfc5ea8da2c81f43abded097383ab))
+* **stage:** 多选快捷键改成ctrl/cmd ([81c990a](https://github.com/tiny-open-source/low-code-platform/commit/81c990a08d276d65bc31ac6d5be60c4ba02f6ed0))
+
+
+
 ## [1.0.4](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.3...v1.0.4) (2025-01-18)
 
 
