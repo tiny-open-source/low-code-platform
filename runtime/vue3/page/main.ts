@@ -1,18 +1,19 @@
 import Core from '@lowcode/core';
 import { getUrlParam } from '@lowcode/utils';
 import { createApp } from 'vue';
-import entry from '../comp-entry';
+import components from '../.lowcode/comp-entry';
+import plugins from '../.lowcode/plugin-entry';
 
 import { getLocalConfig } from '../utils';
 import App from './App.vue';
 
 const vm = createApp(App);
 
-Object.values(entry.components).forEach((component: any) => {
+Object.values(components).forEach((component: any) => {
   vm.component(component.name, component);
 });
 
-Object.values(entry.plugins).forEach((plugin: any) => {
+Object.values(plugins).forEach((plugin: any) => {
   vm.use(plugin);
 });
 

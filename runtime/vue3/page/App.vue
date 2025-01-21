@@ -9,15 +9,3 @@ const pageConfig = reactive(app?.page?.data || {});
 <template>
   <low-code-runtime-ui-page :config="pageConfig" />
 </template>
-
-<style>
-#app {
-  position: relative;
-  overflow: auto;
-}
-
-#app::-webkit-scrollbar {
-  width: 0 !important;
-  display: none;
-}
-</style>

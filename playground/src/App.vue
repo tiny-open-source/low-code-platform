@@ -4,7 +4,7 @@ import type StageCore from '@lowcode/stage';
 import { type Id, NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
-import { NConfigProvider, NDialogProvider, NDrawer, NDrawerContent } from 'naive-ui';
+import { NConfigProvider, NDialogProvider } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
 import DeviceGroup from './components/DeviceGroup.vue';
@@ -24,19 +24,19 @@ const stageRect = computed(() => {
   const [width, height] = stageRectStr.value.split('*').map(Number);
   return { width, height };
 });
-const assetsPath = import.meta.env.VITE_RUNTIME_ASSETS_PATH;
+const assetsPath = import.meta.env.VITE_RUNTIME_PATH;
 asyncLoadJs(
-  `${assetsPath}/config.js`,
+  `${assetsPath}/config-entry/index.umd.js`,
 ).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
 asyncLoadJs(
-  `${assetsPath}/value.js`,
+  `${assetsPath}/value-entry/index.umd.js`,
 ).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
 asyncLoadJs(
-  `${assetsPath}/event.js`,
+  `${assetsPath}/event-entry/index.umd.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
@@ -141,7 +141,7 @@ const menu: MenuBarData = {
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <Preview v-model:show="previewVisible" :src="`/low-code-platform/playground/runtime/vue3/page.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
+      <Preview v-model:show="previewVisible" :src="`/low-code-platform/playground/runtime/vue3/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
     </NDialogProvider>
   </NConfigProvider>
 </template>

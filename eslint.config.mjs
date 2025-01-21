@@ -21,6 +21,7 @@ export default antfu({
     overrides: {},
   },
   ignores: [
+    '.entry-dist/**',
     '.lowcode/**',
     '.prettierrc',
     '**/.prettierrc/**',
