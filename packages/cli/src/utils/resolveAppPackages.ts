@@ -70,7 +70,7 @@ export function resolveAppPackages(app: App) {
         }
         else {
           // 组件
-          setItem(i.type, parseEntry({ ast, package: `${module} | ${i.name}`, indexPath: i.indexPath }));
+          setItem(i.type, parseEntry({ ast, package: `${i.indexPath} | ${i.name}`, indexPath: i.indexPath }));
         }
       });
     }

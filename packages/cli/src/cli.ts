@@ -1,6 +1,6 @@
 import type { UserConfig } from './types';
 import process from 'node:process';
-import { info } from '@vuepress/cli';
+import { allowTs, info } from '@vuepress/cli';
 import { cac } from 'cac';
 import chalk from 'chalk';
 import { scripts } from './commands';
@@ -22,7 +22,7 @@ function wrapCommand(cmd: (...args: any[]) => Promise<void>): typeof cmd {
  */
 export function cli(defaultAppConfig: UserConfig): void {
   // allow ts files globally
-  // allowTs();
+  allowTs();
 
   // create cac instance
   const program = cac('lowcode');

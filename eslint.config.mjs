@@ -21,6 +21,7 @@ export default antfu({
     overrides: {},
   },
   ignores: [
+    '.lowcode/**',
     '.prettierrc',
     '**/.prettierrc/**',
     'pnpm*',
