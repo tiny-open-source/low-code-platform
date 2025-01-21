@@ -47,9 +47,6 @@ window.lowcode?.onRuntimeReady({
     curPageId.value = id;
     app?.setPage(id);
   },
-  getSnapElements() {
-    return Array.from(document.querySelectorAll<HTMLElement>('[class*=magic-ui][id]'));
-  },
   select(id: Id) {
     console.log('select config', id);
     selectedId.value = id;
