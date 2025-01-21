@@ -11,7 +11,8 @@
     "lint": "turbo lint",
     "clean:top": "rimraf */**/dist */**/entry-dist */dist coverage dwt*",
     "clean:modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "release": "vv"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.14.0",
