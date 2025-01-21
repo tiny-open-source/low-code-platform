@@ -12,7 +12,7 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./dist/lowcode-form.js",
       "require": "./dist/lowcode-form.umd.cjs"
     },

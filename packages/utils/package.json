@@ -4,7 +4,7 @@
   "version": "1.0.4",
   "exports": {
     ".": {
-      "types": "./dist/types/src/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./dist/lowcode-utils.js",
       "require": "./dist/lowcode-utils.umd.cjs"
     }

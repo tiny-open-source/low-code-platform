@@ -24,19 +24,20 @@ const stageRect = computed(() => {
   const [width, height] = stageRectStr.value.split('*').map(Number);
   return { width, height };
 });
-const assetsPath = import.meta.env.VITE_RUNTIME_PATH;
+const { VITE_RUNTIME_PATH, VITE_ENTRY_PATH } = import.meta.env;
+const runtimeUrl = `${VITE_RUNTIME_PATH}/playground/index.html`;
 asyncLoadJs(
-  `${assetsPath}/config-entry/index.umd.js`,
+  `${VITE_ENTRY_PATH}/config/index.umd.js`,
 ).then(() => {
   propsConfigs.value = (globalThis as any).lowcodePresetConfigs;
 });
 asyncLoadJs(
-  `${assetsPath}/value-entry/index.umd.js`,
+  `${VITE_ENTRY_PATH}/value/index.umd.js`,
 ).then(() => {
   propsValues.value = (globalThis as any).lowcodePresetValues;
 });
 asyncLoadJs(
-  `${assetsPath}/event-entry/index.umd.js`,
+  `${VITE_ENTRY_PATH}/event/index.umd.js`,
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
@@ -136,12 +137,13 @@ const menu: MenuBarData = {
         :component-group-list="componentGroupList"
         :stage-rect="stageRect"
         :menu="menu"
+        :runtime-url="runtimeUrl"
       >
         <template #workspace-content>
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <Preview v-model:show="previewVisible" :src="`/low-code-platform/playground/runtime/vue3/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
+      <Preview v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
     </NDialogProvider>
   </NConfigProvider>
 </template>

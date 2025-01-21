@@ -6,6 +6,7 @@ import { defineConfig } from 'vite';
 // https://vite.dev/config/
 export default defineConfig({
   base: '/low-code-platform/playground/runtime/vue3',
+  publicDir: 'public',
   plugins: [vue(), vueJsx()],
   resolve: {
     alias: [

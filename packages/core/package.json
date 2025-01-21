@@ -10,6 +10,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/lowcode-core.js",
       "require": "./dist/lowcode-core.umd.cjs"
     },

@@ -11,11 +11,12 @@ export default defineConfig(({ mode }) => {
     const capitalToken = mode.charAt(0).toUpperCase() + mode.slice(1);
     return {
       build: {
+        publicDir: './.lowcode/public',
         cssCodeSplit: false,
         sourcemap: true,
         minify: false,
         target: 'esnext',
-        outDir: `entry-dist/${mode}-entry`,
+        outDir: `../../playground/public/entry/vue3/${mode}`,
 
         lib: {
           entry: `.lowcode/${mode}-entry.ts`,
@@ -29,7 +30,7 @@ export default defineConfig(({ mode }) => {
 
   if (['page', 'playground'].includes(mode)) {
     const base = `/low-code-platform/playground/runtime/vue3/${mode}`;
-    const outDir = path.resolve(process.cwd(), `./dist/${mode}`);
+    const outDir = path.resolve(process.cwd(), `../../playground/public/runtime/vue3/${mode}`);
     return {
       plugins: [
         vue(),
@@ -39,9 +40,11 @@ export default defineConfig(({ mode }) => {
 
       root: `./${mode}/`,
 
+      publicDir: '../public',
       base,
 
       build: {
+        publicDir: './.tmagic/public',
         emptyOutDir: true,
         sourcemap: true,
         outDir,

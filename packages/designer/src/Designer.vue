@@ -38,6 +38,7 @@ const props = withDefaults(
     isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
     containerHighlightClassName?: string;
     containerHighlightDuration?: number;
+    runtimeUrl?: string;
   }>(),
   {
     defaultSelected: '',
@@ -137,7 +138,7 @@ provide<Services>('services', services);
 provide(
   'stageOptions',
   reactive({
-    runtimeUrl: '/low-code-platform/playground/runtime/vue3/playground/index.html',
+    runtimeUrl: props.runtimeUrl,
     autoScrollIntoView: true,
     render: null,
     moveableOptions: props.moveableOptions,
