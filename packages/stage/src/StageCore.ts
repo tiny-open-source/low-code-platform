@@ -103,8 +103,7 @@ class StageCore extends EventEmitter {
         else {
           this.selectedDomList.push(el);
         }
-        this.multiDr.multiSelect(this.selectedDomList);
-        this.emit('multiSelect', this.selectedDomList);
+        this.multiSelect(this.selectedDomList);
       }); ;
 
     // 要先触发select，在触发update
@@ -205,6 +204,16 @@ class StageCore extends EventEmitter {
         addSelectedClassName(this.selectedDom, this.renderer.contentWindow.document);
       }
     }
+  }
+
+  /**
+   * 多选
+   * @param idOrElList 多选节点
+   */
+  public async multiSelect(idOrElList: HTMLElement[] | Id[]): Promise<void> {
+    const elList = await Promise.all(idOrElList.map(async idOrEl => await this.getTargetElement(idOrEl)));
+    this.multiDr.multiSelect(elList);
+    this.emit('multiSelect', elList);
   }
 
   /**

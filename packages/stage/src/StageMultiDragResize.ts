@@ -197,10 +197,10 @@ export default class StageMultiDragResize extends EventEmitter {
    * @return {MoveableOptions} moveable options参数
    */
   private getOptions(options: MoveableOptions = {}): MoveableOptions {
-    let { moveableOptions = {} } = this.core.config;
+    let { multiMoveableOptions = {} } = this.core.config;
 
-    if (typeof moveableOptions === 'function') {
-      moveableOptions = moveableOptions(this.core);
+    if (typeof multiMoveableOptions === 'function') {
+      multiMoveableOptions = multiMoveableOptions(this.core);
     }
     return {
       defaultGroupRotate: 0,
@@ -214,7 +214,7 @@ export default class StageMultiDragResize extends EventEmitter {
       origin: true,
       padding: { left: 0, top: 0, right: 0, bottom: 0 },
       ...options,
-      ...moveableOptions,
+      ...multiMoveableOptions,
     };
   }
 }

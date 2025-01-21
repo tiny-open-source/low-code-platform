@@ -3,18 +3,19 @@ import type { Id, MApp, MContainer, MNode } from '@lowcode/schema';
 
 import type StageCore from '@lowcode/stage';
 import designerService from '@designer/services/designer.service';
+import historyService from '@designer/services/history.service';
 import propsService from '@designer/services/props.service';
 import { Layout } from '@designer/type';
-import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '@designer/utils/editor';
 
+import { fixNodeLeft, generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '@designer/utils/editor';
 import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 import { toRaw } from 'vue';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置
- * @param position 粘贴的坐标,如果为空则默认在元素坐标基础上偏移10px
+ * @param position 粘贴的坐标
  * @param config 待粘贴的元素配置(复制时保存的那份配置)
  * @returns
  */
@@ -28,7 +29,8 @@ export async function beforePaste(position: PastePosition, config: MNode[]) {
   const pasteConfigs: MNode[] = await Promise.all(
     config.map(async (configItem: MNode): Promise<MNode> => {
       let pastePosition = position;
-      if (curNode.items) {
+      if (!isEmpty(pastePosition) && curNode.items) {
+        // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
         // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
         pastePosition = getPositionInContainer(pastePosition, curNode.id);
       }
@@ -150,10 +152,11 @@ export async function notifyAddToStage(parentNode: MContainer, newNode: MNode, l
  * @param node 待删除的节点
  * @returns 父级元素，root根元素
  */
-export function beforeRemove(node: MNode): { parent: MContainer; root: MApp } | void {
+export async function beforeRemove(node: MNode): Promise<MContainer | void> {
   if (!node?.id)
     return;
 
+  const stage = designerService.get<StageCore | null>('stage');
   const root = designerService.get<MApp | null>('root');
 
   if (!root)
@@ -170,8 +173,35 @@ export function beforeRemove(node: MNode): { parent: MContainer; root: MApp } | 
     throw new Error('找不要删除的节点');
   // 从配置中删除元素
   parent.items?.splice(index, 1);
-  return {
-    parent,
-    root,
-  };
+
+  // 通知stage更新
+  stage?.remove({ id: node.id, root: cloneDeep(root) });
+
+  if (node.type === NodeType.PAGE) {
+    designerService.state.pageLength -= 1;
+
+    if (root.items[0]) {
+      await designerService.select(root.items[0]);
+      stage?.select(root.items[0].id);
+    }
+    else {
+      designerService.set('node', null);
+      designerService.set('nodes', []);
+      designerService.set('parent', null);
+      designerService.set('page', null);
+      designerService.set('stage', null);
+      designerService.set('highlightNode', null);
+      designerService.resetModifiedNodeId();
+      historyService.reset();
+
+      designerService.emit('remove', node);
+
+      return;
+    }
+  }
+  else {
+    await designerService.select(parent);
+    stage?.select(parent.id);
+  }
+  return parent;
 }
