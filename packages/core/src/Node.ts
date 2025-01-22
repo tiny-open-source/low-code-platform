@@ -1,9 +1,10 @@
 import type { EventItemConfig, MComponent, MContainer, MPage } from '@lowcode/schema';
 
 import type App from './App';
-
 import type Page from './Page';
+
 import { EventEmitter } from 'eventemitter3';
+import Store from './Store';
 
 interface NodeOptions {
   config: MComponent | MContainer;
@@ -22,6 +23,7 @@ class Node extends EventEmitter {
   public page?: Page;
   public parent?: Node;
   public app: App;
+  public store = new Store();
 
   constructor(options: NodeOptions) {
     super();
