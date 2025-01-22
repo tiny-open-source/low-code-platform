@@ -166,7 +166,7 @@ class StageCore extends EventEmitter {
       return false;
     // 多选规则
     if (this.mask.isMultiSelectStatus) {
-      return this.multiDr.canSelect(el);
+      return this.multiDr.canSelect(el, stop);
     }
     return true;
   }
