@@ -9,6 +9,7 @@ import { SearchOutlined } from '@vicons/antd';
 import { throttle } from 'lodash-es';
 import { NIcon, NInput, NScrollbar, NTree } from 'naive-ui';
 import { computed, h, inject, ref, type Ref, watchEffect } from 'vue';
+import LayerMenu from './LayerMenu.vue';
 
 defineOptions({
   name: 'low-code-layer-panel',
@@ -167,6 +168,16 @@ const allowDrop: AllowDrop = ({ dropPosition, node }) => {
   }
   return dropPosition !== 'inside';
 };
+const menu = ref<InstanceType<typeof LayerMenu>>();
+function nodeProps({ option }: { option: any }) {
+  return {
+    async onContextmenu(e: MouseEvent) {
+      e.preventDefault();
+      await select(option, designerService);
+      menu.value?.show(e);
+    },
+  };
+}
 </script>
 
 <template>
@@ -198,6 +209,7 @@ const allowDrop: AllowDrop = ({ dropPosition, node }) => {
         key-field="id"
         label-field="name"
         children-field="items"
+        :node-props="nodeProps"
         :allow-drop="allowDrop"
         :watch-props="['defaultSelectedKeys']"
         :pattern="filterText"
@@ -219,5 +231,8 @@ const allowDrop: AllowDrop = ({ dropPosition, node }) => {
         @drop="handleDrop"
       />
     </NScrollbar>
+    <teleport to="body">
+      <LayerMenu ref="menu" />
+    </teleport>
   </div>
 </template>

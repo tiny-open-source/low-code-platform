@@ -15,7 +15,7 @@ const emit = defineEmits(['hide', 'show']);
 const menu = ref<HTMLDivElement>();
 const visible = ref(false);
 const subMenu = ref<any>();
-const subMenuData = ref<MenuItem[]>([]);
+const subMenuData = ref<any[]>([]);
 
 const menuStyle = ref({
   left: '0',
@@ -108,5 +108,14 @@ defineExpose({
         @mouseenter="showSubMenu(item)"
       />
     </div>
+    <teleport to="body">
+      <content-menu
+        ref="subMenu"
+        class="sub-menu"
+        :menu-data="subMenuData"
+        :is-sub-menu="true"
+        @hide="hide"
+      />
+    </teleport>
   </div>
 </template>
