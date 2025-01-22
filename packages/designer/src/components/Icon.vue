@@ -24,9 +24,11 @@ export default defineComponent({
 
 <template>
   <NIcon v-if="!icon">
-    haha
+    todo
   </NIcon>
-  <img v-else-if="typeof icon === 'string' && icon.startsWith('http')" :src="icon">
+  <NIcon v-else-if="typeof icon === 'string' && icon.startsWith('http')">
+    <img :src="icon">
+  </NIcon>
   <i v-else-if="typeof icon === 'string'" :class="icon" />
   <NIcon v-else size="16">
     <component :is="icon" />
