@@ -35,6 +35,8 @@ export default class StageMultiDragResize extends EventEmitter {
    * @param els
    */
   public multiSelect(els: HTMLElement[]): void {
+    console.log('multiSelect', els);
+
     this.targetList = els;
     this.core.dr.destroyDragEl();
     this.destroyDragElList();
@@ -110,6 +112,13 @@ export default class StageMultiDragResize extends EventEmitter {
       })
       .on('dragGroupEnd', () => {
         this.update();
+      })
+      .on('clickGroup', (params) => {
+        const { inputTarget, targets } = params;
+        // 如果此时mask不处于多选状态下，且有多个元素被选中，同时点击的元素在选中元素中的其中一项，代表多选态切换为该元素的单选态
+        if (!this.mask.isMultiSelectStatus && targets.length > 1 && targets.includes(inputTarget)) {
+          this.emit('select', inputTarget.id.replace(DRAG_EL_ID_PREFIX, ''));
+        }
       });
   }
 
@@ -150,7 +159,7 @@ export default class StageMultiDragResize extends EventEmitter {
       return;
     this.destroyDragElList();
     this.moveableForMulti.target = null;
-    this.moveableForMulti.updateTarget();
+    this.moveableForMulti.updateRect();
     this.targetList = [];
   }
 

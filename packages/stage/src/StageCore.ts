@@ -114,9 +114,15 @@ class StageCore extends EventEmitter {
         setTimeout(() => this.emit('sort', data));
       });
 
-    this.multiDr.on('update', (data: UpdateEventData) => {
-      setTimeout(() => this.emit('update', data));
-    });
+    this.multiDr
+      .on('update', (data: UpdateEventData) => {
+        setTimeout(() => this.emit('update', data));
+      })
+      .on('select', async (id: Id) => {
+        const el = await this.getTargetElement(id);
+        this.select(el); // 选中
+        setTimeout(() => this.emit('select', el)); // set node
+      });
   }
 
   public add(data: UpdateData): Promise<void> {
@@ -294,6 +300,7 @@ class StageCore extends EventEmitter {
    * @param selectType 需要清理的选择模式 多选：multiSelect，单选：select
    */
   public clearSelectStatus(selectType: string) {
+    console.log('🚀 ~ StageCore ~ clearSelectStatus ~ selectType:', selectType);
     if (selectType === 'multiSelect') {
       this.multiDr.clearSelectStatus();
       this.selectedDomList = [];
