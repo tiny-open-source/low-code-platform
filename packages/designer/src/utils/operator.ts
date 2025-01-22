@@ -2,15 +2,13 @@ import type { Id, MApp, MContainer, MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 
 import type { AddMNode, PastePosition } from '../type';
-import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
-import { cloneDeep, isEmpty } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 import { toRaw } from 'vue';
 
 import designerService from '../services/designer.service';
-import historyService from '../services/history.service';
 import propsService from '../services/props.service';
-import { generatePageNameByApp, getInitPositionStyle, getNodeIndex } from '../utils/editor';
+import { generatePageNameByApp, getInitPositionStyle } from '../utils/editor';
 
 /**
  * 粘贴前置操作：返回分配了新id以及校准了坐标的配置
@@ -87,65 +85,6 @@ export function getPositionInContainer(position: PastePosition = {}, id: Id) {
     left,
     top,
   };
-}
-
-/**
- * 删除前置操作：实现了在编辑器中删除元素节点，并返回父级元素信息以供stage更新
- * @param node 待删除的节点
- * @returns 父级元素，root根元素
- */
-export async function beforeRemove(node: MNode): Promise<MContainer | void> {
-  if (!node?.id)
-    return;
-
-  const stage = designerService.get<StageCore | null>('stage');
-  const root = designerService.get<MApp | null>('root');
-
-  if (!root)
-    throw new Error('没有root');
-
-  const { parent, node: curNode } = designerService.getNodeInfo(node.id, false);
-
-  if (!parent || !curNode)
-    throw new Error('找不要删除的节点');
-
-  const index = getNodeIndex(curNode, parent);
-
-  if (typeof index !== 'number' || index === -1)
-    throw new Error('找不要删除的节点');
-  // 从配置中删除元素
-  parent.items?.splice(index, 1);
-
-  // 通知stage更新
-  stage?.remove({ id: node.id, root: cloneDeep(root) });
-
-  if (node.type === NodeType.PAGE) {
-    designerService.state.pageLength -= 1;
-
-    if (root.items[0]) {
-      await designerService.select(root.items[0]);
-      stage?.select(root.items[0].id);
-    }
-    else {
-      designerService.set('node', null);
-      designerService.set('nodes', []);
-      designerService.set('parent', null);
-      designerService.set('page', null);
-      designerService.set('stage', null);
-      designerService.set('highlightNode', null);
-      designerService.resetModifiedNodeId();
-      historyService.reset();
-
-      designerService.emit('remove', node);
-
-      return;
-    }
-  }
-  else {
-    await designerService.select(parent);
-    stage?.select(parent.id);
-  }
-  return parent;
 }
 
 export function getAddParent(addNode: AddMNode | MNode[]) {

@@ -11,7 +11,7 @@ import { reactive, toRaw } from 'vue';
 
 import { LayerOffset, Layout } from '../type';
 import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, fixNodePosition, getInitPositionStyle, getNodeIndex, isFixed, setLayout } from '../utils/editor';
-import { beforePaste, beforeRemove, getAddParent } from '../utils/operator';
+import { beforePaste, getAddParent } from '../utils/operator';
 import BaseService from './base.service';
 import historyService from './history.service';
 import propsService from './props.service';
@@ -226,7 +226,7 @@ class Designer extends BaseService {
       throw new Error('未找到父元素');
 
     // 新增多个组件只存在于粘贴多个组件,粘贴的是一个完整的config,所以不再需要getPropsValue
-    const addNodes = [];
+    const addNodes: MNode[] = [];
     if (!Array.isArray(addNode)) {
       const { type, inputEvent, ...config } = addNode;
 
@@ -487,48 +487,67 @@ class Designer extends BaseService {
     return nextPage;
   }
 
+  public async doRemove(node: MNode): Promise<void> {
+    const root = this.get<MApp | null>('root');
+
+    if (!root)
+      throw new Error('没有root');
+
+    const { parent, node: curNode } = this.getNodeInfo(node.id);
+
+    if (!parent || !curNode)
+      throw new Error('找不要删除的节点');
+
+    const index = getNodeIndex(curNode, parent);
+
+    if (typeof index !== 'number' || index === -1)
+      throw new Error('找不要删除的节点');
+
+    parent.items?.splice(index, 1);
+    const stage = this.get<StageCore | null>('stage');
+    stage?.remove({ id: node.id, root: this.get('root') });
+
+    if (node.type === NodeType.PAGE) {
+      this.state.pageLength -= 1;
+
+      if (root.items[0]) {
+        await this.select(root.items[0]);
+        stage?.select(root.items[0].id);
+      }
+      else {
+        this.set('node', null);
+        this.set('parent', null);
+        this.set('page', null);
+        this.set('stage', null);
+        this.set('highlightNode', null);
+        this.resetModifiedNodeId();
+        historyService.reset();
+
+        return;
+      }
+    }
+    else {
+      await this.select(parent);
+      stage?.select(parent.id);
+    }
+
+    this.addModifiedNodeId(parent.id);
+  }
+
   /**
    * 删除组件
    * @param {object} node
    * @return {object} 删除的组件配置
    */
-  public async remove(nodeOrNodeList: MNode | MNode[]): Promise<MNode | MNode[]> {
-    if (Array.isArray(nodeOrNodeList)) {
-      // 多选批量删除
-      const nodes = nodeOrNodeList;
-      return this.multiRemove(nodes);
-    }
-    const node = nodeOrNodeList;
-    const removeParent = await beforeRemove(node);
-    // 删除的是页面
-    if (!removeParent)
-      return node;
+  public async remove(nodeOrNodeList: MNode | MNode[]): Promise<void> {
+    const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];
+
+    await Promise.all(nodes.map(node => this.doRemove(node)));
+
     // 更新历史记录
-    this.addModifiedNodeId(removeParent.id);
     this.pushHistoryState();
 
-    this.emit('remove', node);
-
-    return node;
-  }
-
-  /**
-   * 批量删除
-   * @param nodes 批量删除的节点
-   * @returns 批量删除的节点
-   */
-  public async multiRemove(nodes: MNode[]): Promise<MNode[]> {
-    await Promise.all(
-      nodes.map(async (removeNode) => {
-        await beforeRemove(removeNode);
-      }),
-    );
-    const nodeIds = nodes.map(node => node.id);
-    this.addModifiedNodeId(nodeIds.join('-'));
-    this.pushHistoryState();
-
-    this.emit('multiRemove', nodes);
-    return nodes;
+    this.emit('remove');
   }
 
   /**
