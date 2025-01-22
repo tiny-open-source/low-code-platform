@@ -1,6 +1,7 @@
-import type { Id, MApp, MComponent, MContainer, MNode, MPage, PastePosition } from '@lowcode/schema';
+import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@lowcode/schema';
+
 import type StageCore from '@lowcode/stage';
-import type { AddMNode, DesignerNodeInfo, StoreState } from '../type';
+import type { AddMNode, DesignerNodeInfo, PastePosition, StoreState } from '../type';
 import type { StepValue } from './history.service';
 import { NodeType } from '@lowcode/schema';
 
@@ -9,10 +10,11 @@ import { cloneDeep, mergeWith, uniq } from 'lodash-es';
 import { reactive, toRaw } from 'vue';
 
 import { LayerOffset, Layout } from '../type';
-import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, getInitPositionStyle, getNodeIndex, isFixed, setLayout } from '../utils/editor';
-import { beforeAdd, beforePaste, beforeRemove, notifyAddToStage } from '../utils/operator';
+import { change2Fixed, COPY_STORAGE_KEY, Fixed2Other, fixNodePosition, getInitPositionStyle, getNodeIndex, isFixed, setLayout } from '../utils/editor';
+import { beforePaste, beforeRemove, getAddParent } from '../utils/operator';
 import BaseService from './base.service';
 import historyService from './history.service';
+import propsService from './props.service';
 import storageService, { Protocol } from './storage.service';
 
 class Designer extends BaseService {
@@ -116,15 +118,15 @@ class Designer extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode[] | void> {
-    const config = await storageService.getItem(COPY_STORAGE_KEY);
+  public async paste(position: PastePosition = {}): Promise<MNode | MNode[]> {
+    const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
 
-    if (!config)
-      return;
+    if (!Array.isArray(config))
+      return [];
 
     const pasteConfigs = await beforePaste(position, config);
 
-    return await this.multiAdd(pasteConfigs);
+    return this.add(pasteConfigs);
   }
 
   /**
@@ -184,34 +186,84 @@ class Designer extends BaseService {
     this.set('nodes', nodes);
   }
 
+  public async doAdd(node: MNode, parent: MContainer): Promise<MNode> {
+    const root = this.get<MApp>('root');
+    const curNode = this.get<MNode>('node');
+    const stage = this.get<StageCore | null>('stage');
+
+    if ((parent?.type === NodeType.ROOT || curNode.type === NodeType.ROOT) && node.type !== NodeType.PAGE) {
+      throw new Error('app下不能添加组件');
+    }
+
+    const layout = await this.getLayout(toRaw(parent), node as MNode);
+    node.style = getInitPositionStyle(node.style, layout);
+
+    await stage?.add({ config: cloneDeep(node), parent: cloneDeep(parent), root: cloneDeep(root) });
+
+    node.style = fixNodePosition(node, parent, stage);
+
+    await stage?.update({ config: cloneDeep(node), root: cloneDeep(root) });
+
+    // 新增节点添加到配置中
+    parent?.items?.push(node);
+
+    this.addModifiedNodeId(node.id);
+
+    return node;
+  }
+
   /**
-   * 批量向容器添加节点
-   * @param configs 将要添加的节点数组
+   * 向指点容器添加组件节点
+   * @param addConfig 将要添加的组件节点配置
+   * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
    * @returns 添加后的节点
    */
-  public async multiAdd(configs: MNode[]): Promise<MNode[]> {
+  public async add(addNode: AddMNode | MNode[], parent?: MContainer | null): Promise<MNode | MNode[]> {
     const stage = this.get<StageCore | null>('stage');
-    const newNodes: MNode[] = await Promise.all(
-      configs.map(async (configItem: MNode): Promise<MNode> => {
-        // 新增元素到配置
-        const { parentNode, newNode, layout } = await beforeAdd(configItem as AddMNode);
-        // 将新增元素事件通知到stage以更新渲染
-        await notifyAddToStage(parentNode, newNode, layout);
-        return newNode;
-      }),
-    );
-    const newNodeIds: Id[] = newNodes.map(node => node.id);
 
-    // 增加历史记录 多选不可能选中page
-    this.addModifiedNodeId(newNodeIds.join('-'));
+    const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(addNode);
+    if (!parentNode)
+      throw new Error('未找到父元素');
+
+    // 新增多个组件只存在于粘贴多个组件,粘贴的是一个完整的config,所以不再需要getPropsValue
+    const addNodes = [];
+    if (!Array.isArray(addNode)) {
+      const { type, inputEvent, ...config } = addNode;
+
+      if (!type)
+        throw new Error('组件类型不能为空');
+
+      addNodes.push({ ...toRaw(await propsService.getPropsValue(type, config)) });
+    }
+    else {
+      addNodes.push(...addNode);
+    }
+
+    const newNodes = await Promise.all(addNodes.map(node => this.doAdd(node, parentNode)));
+
+    if (newNodes.length > 1) {
+      const newNodeIds = newNodes.map(node => node.id);
+      // 触发选中样式
+      stage?.multiSelect(newNodeIds);
+      await this.multiSelect(newNodeIds);
+    }
+    else {
+      await this.select(newNodes[0]);
+
+      if (isPage(newNodes[0])) {
+        this.state.pageLength += 1;
+      }
+      else {
+        // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
+        stage?.select(newNodes[0].id);
+      }
+    }
+
     this.pushHistoryState();
 
-    // 触发选中样式
-    stage?.multiSelect(newNodeIds);
+    this.emit('add', newNodes);
 
-    this.emit('multiAdd', newNodes);
-
-    return newNodes;
+    return newNodes.length > 1 ? newNodes[0] : newNodes;
   }
 
   /**
@@ -357,7 +409,7 @@ class Designer extends BaseService {
           return srcValue;
         }
       });
-      newConfig.style = getInitPositionStyle(newConfig.style, layout, target, stage);
+      newConfig.style = getInitPositionStyle(newConfig.style, layout);
 
       target.items.push(newConfig);
 
@@ -376,48 +428,12 @@ class Designer extends BaseService {
     }
   }
 
-  /**
-   * 向指点容器添加组件节点
-   * @param addConfig 将要添加的组件节点配置
-   * @param parent 要添加到的容器组件节点配置，如果不设置，默认为当前选中的组件的父节点
-   * @returns 添加后的节点
-   */
-  public async add(addNode: AddMNode, parent?: MContainer | null): Promise<MNode> {
-    const stage = this.get<StageCore | null>('stage');
-    // 新增元素到配置
-    const { parentNode, newNode, layout, isPage } = await beforeAdd(addNode, parent);
-    // 将新增元素事件通知到stage以更新渲染
-    await notifyAddToStage(parentNode, newNode, layout);
-    // 更新编辑器选中元素
-    await this.select(newNode);
-    // 增加历史记录
-    this.addModifiedNodeId(newNode.id);
-    if (!isPage) {
-      this.pushHistoryState();
-    }
-
-    if (isPage) {
-      this.state.pageLength += 1;
-    }
-    else {
-      // 新增页面，这个时候页面还有渲染出来，此时select会出错，在runtime-ready的时候回去select
-      stage?.select(newNode.id);
-    }
-
-    this.emit('add', newNode);
-
-    return newNode;
-  }
-
   public async move(left: number, top: number) {
-    console.log('🚀 ~ Designer ~ move ~ top:', top);
-    console.log('🚀 ~ Designer ~ move ~ left:', left);
     const node = toRaw(this.get('node'));
     if (!node || isPage(node))
       return;
 
-    const { style, id } = node;
-    console.log('🚀 ~ Designer ~ move ~ style:', style);
+    const { style, id, type } = node;
     if (!style || style.position !== 'absolute')
       return;
 
@@ -428,6 +444,7 @@ class Designer extends BaseService {
 
     this.update({
       id,
+      type,
       style: {
         ...style,
         left: Number(style.left) + left,

@@ -73,11 +73,11 @@ export function getRelativeStyle(style: Record<string, any> = {}): Record<string
   };
 }
 
-function getMiddleTop(style: Record<string, any> = {}, parentNode: MNode, stage: StageCore) {
-  let height = style.height || 0;
+function getMiddleTop(node: MNode, parentNode: MNode, stage: StageCore | null) {
+  let height = node.style?.height || 0;
 
-  if (!stage || typeof style.top !== 'undefined' || !parentNode.style)
-    return style.top;
+  if (!stage || typeof node.style?.top !== 'undefined' || !parentNode.style)
+    return node.style?.top;
 
   if (!isNumber(height)) {
     height = 0;
@@ -89,15 +89,15 @@ function getMiddleTop(style: Record<string, any> = {}, parentNode: MNode, stage:
     const { scrollTop = 0, wrapperHeight } = stage.mask;
     return (wrapperHeight - height) / 2 + scrollTop;
   }
+
   return (parentHeight - height) / 2;
 }
 
-export function getInitPositionStyle(style: Record<string, any> = {}, layout: Layout, parentNode: MNode, stage: StageCore) {
+export function getInitPositionStyle(style: Record<string, any> = {}, layout: Layout) {
   if (layout === Layout.ABSOLUTE) {
     return {
       ...style,
       position: 'absolute',
-      top: getMiddleTop(style, parentNode, stage),
     };
   }
 
@@ -212,4 +212,16 @@ export function fixNodeLeft(config: MNode, parent: MContainer, doc?: Document) {
   }
 
   return config.style.left;
+}
+
+export function fixNodePosition(config: MNode, parent: MContainer, stage: StageCore | null) {
+  if (config.style?.position !== 'absolute') {
+    return config.style;
+  }
+
+  return {
+    ...(config.style || {}),
+    top: getMiddleTop(config, parent, stage),
+    left: fixNodeLeft(config, parent, stage?.renderer.contentWindow?.document),
+  };
 }

@@ -52,7 +52,7 @@ onMounted(() => {
     })
     .keydown([ctrl, 'v'], (e) => {
       e.inputEvent.preventDefault();
-      nodes.value && services?.designerService.paste();
+      nodes.value && services?.designerService.paste({ offsetX: 10, offsetY: 10 });
     })
     .keydown([ctrl, 'x'], (e) => {
       e.inputEvent.preventDefault();
