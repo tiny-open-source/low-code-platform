@@ -133,11 +133,6 @@ const menuData = reactive<MenuItem[]>([
   ...stageContentMenu,
 ]);
 
-onMounted(async () => {
-  const data = await storageService.getItem(COPY_STORAGE_KEY);
-  allowPaste.value = data !== 'undefined' && !!data;
-});
-
 watch(
   parent,
   async () => {
@@ -153,8 +148,10 @@ watch(
   { immediate: true },
 );
 defineExpose({
-  show(e: MouseEvent) {
+  async show(e: MouseEvent) {
     menu.value?.show(e);
+    const data = await storageService.getItem(COPY_STORAGE_KEY);
+    allowPaste.value = data !== 'undefined' && !!data;
   },
 });
 </script>
