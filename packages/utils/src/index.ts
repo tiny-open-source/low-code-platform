@@ -1,7 +1,9 @@
 import type { MNode } from '@lowcode/schema';
 import { NodeType } from '@lowcode/schema';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
+dayjs.extend(utc);
 export * from './dom';
 
 export function sleep(ms: number): Promise<void> {
@@ -13,27 +15,22 @@ export function sleep(ms: number): Promise<void> {
   });
 }
 
-export function datetimeFormatter(v: string | Date, defaultValue = '-', f = 'YYYY-MM-DD HH:mm:ss') {
-  let format = f;
-  if (format === 'timestamp') {
-    format = 'x';
-  }
-
+export function datetimeFormatter(v: string | Date, defaultValue = '-', format = 'YYYY-MM-DD HH:mm:ss'): any {
   if (v) {
     let time = null;
-    if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
+    if (['x', 'timestamp'].includes(format)) {
+      time = dayjs(v).valueOf();
+    }
+    else if ((typeof v === 'string' && v.includes('Z')) || v.constructor === Date) {
       // UTC字符串时间或Date对象格式化为北京时间
-      time = moment(v).utcOffset('+08:00').format(format);
+      time = dayjs(v).utcOffset(8).format(format);
     }
     else {
-      time = moment(v).format(format);
+      time = dayjs(v).format(format);
     }
 
-    if (format === 'x') {
-      return +time;
-    }
     // 格式化为北京时间
-    if (time !== 'Invalid date') {
+    if (time !== 'Invalid Date') {
       return time;
     }
     return defaultValue;
