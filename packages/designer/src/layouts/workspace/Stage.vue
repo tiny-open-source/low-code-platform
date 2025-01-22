@@ -77,10 +77,13 @@ watchEffect(() => {
 
   stage?.on('update', (ev: UpdateEventData) => {
     if (ev.parentEl) {
-      services?.designerService.moveToContainer({ id: ev.el.id, style: ev.style }, ev.parentEl.id);
+      for (const data of ev.data) {
+        services?.designerService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
+      }
       return;
     }
-    services?.designerService.update({ id: ev.el.id, style: ev.style });
+
+    services?.designerService.update(ev.data.map(data => ({ id: data.el.id, style: data.style })));
   });
 
   stage?.on('sort', (ev: SortEventData) => {
