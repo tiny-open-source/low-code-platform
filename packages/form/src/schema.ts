@@ -1,3 +1,5 @@
+import type { DefaultTime } from 'naive-ui/es/date-picker/src/interface';
+
 /**
  * 整个表单的数据，会注入到各个组件中去
  */
@@ -219,7 +221,7 @@ interface CascaderOption {
  */
 export interface DaterangeConfig extends FormItem {
   type: 'daterange';
-  defaultTime?: Date[];
+  defaultTime?: DefaultTime;
   names?: string[];
 }
 

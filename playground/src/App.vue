@@ -4,7 +4,7 @@ import type StageCore from '@lowcode/stage';
 import { type Id, NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
-import { NConfigProvider, NDialogProvider } from 'naive-ui';
+import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
 import DeviceGroup from './components/DeviceGroup.vue';
@@ -124,6 +124,8 @@ const menu: MenuBarData = {
     abstract :theme-overrides="{
       common: colorRef,
     }"
+    :locale="zhCN"
+    :date-locale="dateZhCN"
   >
     <NDialogProvider>
       <LowCodeDesigner

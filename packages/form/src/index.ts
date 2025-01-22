@@ -7,6 +7,7 @@ import LFormTabs from './container/Tabs.vue';
 import LFormDialog from './Dialog.vue';
 import LFieldsCheckbox from './fields/Checkbox.vue';
 import LFieldsColorPicker from './fields/ColorPicker.vue';
+import LFieldsDatepicker from './fields/Daterange.vue';
 import LFieldsDisplay from './fields/Display.vue';
 import LFieldsHidden from './fields/Hidden.vue';
 import LFieldsLink from './fields/Link.vue';
@@ -24,6 +25,7 @@ export { default as LFormTabs } from './container/Tabs.vue';
 export { default as LFormDialog } from './Dialog.vue';
 export { default as LFieldsCheckbox } from './fields/Checkbox.vue';
 export { default as LFieldsColorPicker } from './fields/ColorPicker.vue';
+export { default as LFieldsDatepicker } from './fields/Daterange.vue';
 export { default as LFieldsDisplay } from './fields/Display.vue';
 export { default as LFieldsHidden } from './fields/Hidden.vue';
 export { default as LFieldsLink } from './fields/Link.vue';
@@ -55,6 +57,7 @@ function install(app: App, options: any) {
   app.component(LFieldsNumber.name!, LFieldsNumber);
   app.component(LFormTable.name!, LFormTable);
   app.component(LFieldsLink.name!, LFieldsLink);
+  app.component(LFieldsDatepicker.name!, LFieldsDatepicker);
   app.component(LFormDialog.name!, LFormDialog);
   app.component(LForm.name!, LForm);
 }

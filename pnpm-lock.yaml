@@ -200,6 +200,9 @@ importers:
 
   packages/form:
     dependencies:
+      '@lowcode/utils':
+        specifier: workspace:^
+        version: link:../utils
       '@vicons/antd':
         specifier: ^0.13.0
         version: 0.13.0
