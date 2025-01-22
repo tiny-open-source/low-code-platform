@@ -1,23 +1,15 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import type { StageDragResizeConfig } from './types';
-
 import { addClassName, removeClassNameByClassName } from '@lowcode/utils';
+
 import { EventEmitter } from 'eventemitter3';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
+import { type StageDragResizeConfig, StageDragStatus } from './types';
 import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './utils';
-/** 拖动状态 */
-enum ActionStatus {
-  /** 开始拖动 */
-  START = 'start',
-  /** 拖动中 */
-  ING = 'ing',
-  /** 拖动结束 */
-  END = 'end',
-}
+
 class StageDragResize extends EventEmitter {
   public core: StageCore;
   public mask: StageMask;
@@ -35,7 +27,7 @@ class StageDragResize extends EventEmitter {
   private moveableOptions: MoveableOptions = {};
   private moveableHelper?: MoveableHelper;
   /** 拖动状态 */
-  private dragStatus: ActionStatus = ActionStatus.END;
+  private dragStatus: StageDragStatus = StageDragStatus.END;
 
   /** 水平参考线 */
   public horizontalGuidelines: number[] = [];
@@ -145,19 +137,19 @@ class StageDragResize extends EventEmitter {
 
     this.moveable
       .on('scaleStart', (e) => {
-        this.dragStatus = ActionStatus.START;
+        this.dragStatus = StageDragStatus.START;
         this.moveableHelper?.onScaleStart(e);
       })
       .on('scale', (e) => {
         if (!this.target || !this.dragEl)
           return;
-        this.dragStatus = ActionStatus.ING;
+        this.dragStatus = StageDragStatus.ING;
         this.moveableHelper?.onScale(e);
         const frame = this.moveableHelper?.getFrame(e.target);
         this.target.style.transform = frame?.toCSSObject().transform || '';
       })
       .on('scaleEnd', (e) => {
-        this.dragStatus = ActionStatus.END;
+        this.dragStatus = StageDragStatus.END;
         const frame = this.moveableHelper?.getFrame(e.target);
         this.emit('update', {
           el: this.target,
@@ -174,19 +166,19 @@ class StageDragResize extends EventEmitter {
 
     this.moveable
       .on('rotateStart', (e) => {
-        this.dragStatus = ActionStatus.START;
+        this.dragStatus = StageDragStatus.START;
         this.moveableHelper?.onRotateStart(e);
       })
       .on('rotate', (e) => {
         if (!this.target || !this.dragEl)
           return;
-        this.dragStatus = ActionStatus.ING;
+        this.dragStatus = StageDragStatus.ING;
         this.moveableHelper?.onRotate(e);
         const frame = this.moveableHelper?.getFrame(e.target);
         this.target.style.transform = frame?.toCSSObject().transform || '';
       })
       .on('rotateEnd', (e) => {
-        this.dragStatus = ActionStatus.END;
+        this.dragStatus = StageDragStatus.END;
         const frame = this.moveableHelper?.getFrame(e.target);
         this.emit('update', {
           el: this.target,
@@ -216,7 +208,7 @@ class StageDragResize extends EventEmitter {
         if (!this.target)
           throw new Error('未选中组件');
 
-        this.dragStatus = ActionStatus.START;
+        this.dragStatus = StageDragStatus.START;
 
         this.moveableHelper?.onDragStart(e);
 
@@ -251,7 +243,7 @@ class StageDragResize extends EventEmitter {
           }
         }, this.core.containerHighlightDuration);
 
-        this.dragStatus = ActionStatus.ING;
+        this.dragStatus = StageDragStatus.ING;
 
         // 流式布局
         if (this.ghostEl) {
@@ -275,7 +267,7 @@ class StageDragResize extends EventEmitter {
         }
 
         // 点击不拖动时会触发dragStart和dragEnd，但是不会有drag事件
-        if (this.dragStatus === ActionStatus.ING) {
+        if (this.dragStatus === StageDragStatus.ING) {
           if (parentEl) {
             this.update(false, parentEl);
           }
@@ -290,7 +282,7 @@ class StageDragResize extends EventEmitter {
           }
         }
 
-        this.dragStatus = ActionStatus.END;
+        this.dragStatus = StageDragStatus.END;
         this.destroyGhostEl();
       });
   }
@@ -317,7 +309,7 @@ class StageDragResize extends EventEmitter {
         if (!this.target)
           return;
 
-        this.dragStatus = ActionStatus.START;
+        this.dragStatus = StageDragStatus.START;
         this.moveableHelper?.onResizeStart(e);
 
         frame.top = this.target.offsetTop;
@@ -329,7 +321,7 @@ class StageDragResize extends EventEmitter {
           return;
 
         const { beforeTranslate } = drag;
-        this.dragStatus = ActionStatus.ING;
+        this.dragStatus = StageDragStatus.ING;
 
         this.moveableHelper?.onResize(e);
 
@@ -346,7 +338,7 @@ class StageDragResize extends EventEmitter {
         this.target.style.height = `${height}px`;
       })
       .on('resizeEnd', () => {
-        this.dragStatus = ActionStatus.END;
+        this.dragStatus = StageDragStatus.END;
         this.update(true);
       });
   }
@@ -396,8 +388,8 @@ class StageDragResize extends EventEmitter {
       const { left: parentLeft, top: parentTop } = getOffset(parentEl);
       left
         = calcValueByFontsize(doc, this.dragEl.offsetLeft)
-        + Number.parseFloat(translateX)
-        - calcValueByFontsize(doc, parentLeft);
+          + Number.parseFloat(translateX)
+          - calcValueByFontsize(doc, parentLeft);
       top
         = calcValueByFontsize(doc, this.dragEl.offsetTop) + Number.parseFloat(translateY) - calcValueByFontsize(doc, parentTop);
     }
@@ -416,7 +408,8 @@ class StageDragResize extends EventEmitter {
     this.moveable?.destroy();
     this.destroyGhostEl();
     this.destroyDragEl();
-    this.dragStatus = ActionStatus.END;
+    this.dragStatus = StageDragStatus.END;
+
     this.removeAllListeners();
   }
 

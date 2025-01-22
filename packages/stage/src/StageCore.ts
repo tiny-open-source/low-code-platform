@@ -1,14 +1,14 @@
 import type { Id } from '@lowcode/schema';
-import type { CanSelect, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
 import { addClassName } from '@lowcode/utils';
-
 import { EventEmitter } from 'eventemitter3';
+
 import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
 import StageMultiDragResize from './StageMultiDragResize';
 import StageRenderer from './StageRenderer';
+import { type CanSelect, type GuidesEventData, type IsContainer, type RemoveData, type Runtime, type StageCoreConfig, StageDragStatus, type UpdateData, type UpdateEventData } from './types';
 import { addSelectedClassName, removeSelectedClassName } from './utils';
 
 class StageCore extends EventEmitter {
@@ -73,6 +73,9 @@ class StageCore extends EventEmitter {
       .on('highlight', async (event: MouseEvent) => {
         const el = await this.getElementFromPoint(event);
         if (!el)
+          return;
+          // 如果多选组件处于拖拽状态时不进行组件高亮
+        if (this.multiDr.dragStatus === StageDragStatus.ING)
           return;
         await this.highlight(el);
         if (this.highlightedDom === this.selectedDom) {
@@ -300,7 +303,6 @@ class StageCore extends EventEmitter {
    * @param selectType 需要清理的选择模式 多选：multiSelect，单选：select
    */
   public clearSelectStatus(selectType: string) {
-    console.log('🚀 ~ StageCore ~ clearSelectStatus ~ selectType:', selectType);
     if (selectType === 'multiSelect') {
       this.multiDr.clearSelectStatus();
       this.selectedDomList = [];

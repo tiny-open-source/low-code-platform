@@ -1,12 +1,12 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import type { StageDragResizeConfig } from './types';
-
 import { EventEmitter } from 'eventemitter3';
+
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, PAGE_CLASS } from './const';
+import { type StageDragResizeConfig, StageDragStatus } from './types';
 import { calcValueByFontsize, getMode, getTargetElStyle } from './utils';
 
 export default class StageMultiDragResize extends EventEmitter {
@@ -21,6 +21,8 @@ export default class StageMultiDragResize extends EventEmitter {
   /** Moveable多选拖拽类实例 */
   public moveableForMulti?: Moveable;
   private multiMoveableHelper?: MoveableHelper;
+  /** 拖动状态 */
+  public dragStatus: StageDragStatus = StageDragStatus.END;
 
   constructor(config: StageDragResizeConfig) {
     super();
@@ -84,6 +86,7 @@ export default class StageMultiDragResize extends EventEmitter {
             top: matchEventTarget.offsetTop,
             id: matchEventTarget.id,
           });
+          this.dragStatus = StageDragStatus.START;
         });
       })
       .on('dragGroup', (params) => {
@@ -109,9 +112,11 @@ export default class StageMultiDragResize extends EventEmitter {
           }
         });
         this.multiMoveableHelper?.onDragGroup(params);
+        this.dragStatus = StageDragStatus.ING;
       })
       .on('dragGroupEnd', () => {
         this.update();
+        this.dragStatus = StageDragStatus.END;
       })
       .on('clickGroup', (params) => {
         const { inputTarget, targets } = params;
