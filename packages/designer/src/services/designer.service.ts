@@ -118,11 +118,11 @@ class Designer extends BaseService {
    * @param position 粘贴的坐标
    * @returns 添加后的组件节点配置
    */
-  public async paste(position: PastePosition = {}): Promise<MNode | MNode[]> {
+  public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
     const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
 
     if (!Array.isArray(config))
-      return [];
+      return;
 
     const pasteConfigs = await beforePaste(position, config);
 
