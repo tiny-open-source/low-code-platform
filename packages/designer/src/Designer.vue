@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EventOption } from '@lowcode/core';
 import type { FormConfig } from '@lowcode/form';
-import type { MApp, MNode } from '@lowcode/schema';
+import type { MApp, MContainer, MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
 import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from './type';
@@ -154,6 +154,21 @@ provide(
   }),
 );
 onUnmounted(() => designerService.destroy());
+designerService.usePlugin({
+  beforeDoAdd: (config: MNode, parent?: MContainer | null) => {
+    if (config.type === 'overlay') {
+      config.style = {
+        ...config.style,
+        left: 0,
+        top: 0,
+      };
+
+      return [config, designerService.get('page')];
+    }
+
+    return [config, parent];
+  },
+});
 defineExpose({
   ...services,
 });
