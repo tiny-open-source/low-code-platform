@@ -31,11 +31,16 @@ export interface EntryFile {
   componentFileAffix: string;
 }
 
+export interface NpmConfig {
+  registry?: string;
+  client?: 'npm' | 'yarn' | 'pnpm';
+}
+
 export interface UserConfig {
   source: string;
-  scripts: Record<string, string>;
-  packages: Record<string, any>;
+  temp: string;
+  packages: (string | Record<string, string>)[];
   componentFileAffix: string;
   cleanTemp: boolean;
-  temp: string;
+  npmConfig?: NpmConfig;
 }
