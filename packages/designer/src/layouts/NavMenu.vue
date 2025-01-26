@@ -2,7 +2,7 @@
 import type { GetColumnWidth, MenuBarData, MenuButton, MenuComponent, MenuItem, Services } from '../type';
 import { NodeType } from '@lowcode/schema';
 
-import { ArrowLeftOutlined, ArrowRightOutlined, BorderInnerOutlined, BorderOuterOutlined, DeleteOutlined, TableOutlined, ZoomInOutlined, ZoomOutOutlined } from '@vicons/antd';
+import { ArrowLeftOutlined, ArrowRightOutlined, BorderInnerOutlined, BorderOuterOutlined, DeleteOutlined, FullscreenOutlined, TableOutlined, ZoomInOutlined, ZoomOutOutlined } from '@vicons/antd';
 
 import { computed, inject, markRaw } from 'vue';
 import ToolButton from '../components/ToolButton.vue';
@@ -29,6 +29,9 @@ const showGuides = computed((): boolean => uiService?.get<boolean>('showGuides')
 const showRule = computed((): boolean => uiService?.get<boolean>('showRule') ?? true);
 const zoom = computed((): number => uiService?.get<number>('zoom') ?? 1);
 
+const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
+const ctrl = isMac ? 'Command' : 'Ctrl';
+
 function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
   if (typeof item !== 'string') {
     return [item];
@@ -46,6 +49,8 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         ...getConfig('zoom-out'),
         ...getConfig(`${Number.parseInt(`${zoom.value * 100}`, 10)}%`),
         ...getConfig('zoom-in'),
+        ...getConfig('scale-to-original'),
+        ...getConfig('scale-to-fit'),
       );
       break;
     case 'delete':
@@ -53,7 +58,7 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         type: 'button',
         className: 'delete',
         icon: markRaw(DeleteOutlined),
-        tooltip: '刪除',
+        tooltip: `刪除(Delete)`,
         disabled: () => services?.designerService.get('node')?.type === NodeType.PAGE,
         handler: () => services?.designerService.remove(services?.designerService.get('node')),
       });
@@ -63,7 +68,7 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         type: 'button',
         className: 'undo',
         icon: markRaw(ArrowLeftOutlined),
-        tooltip: '后退',
+        tooltip: `后退(${ctrl}+z)`,
         disabled: () => !services?.historyService.state.canUndo,
         handler: () => services?.designerService.undo(),
       });
@@ -73,7 +78,7 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         type: 'button',
         className: 'redo',
         icon: markRaw(ArrowRightOutlined),
-        tooltip: '前进',
+        tooltip: `前进(${ctrl}+Shift+z)`,
         disabled: () => !services?.historyService.state.canRedo,
         handler: () => services?.designerService.redo(),
       });
@@ -83,7 +88,7 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         type: 'button',
         className: 'zoom-in',
         icon: markRaw(ZoomInOutlined),
-        tooltip: '放大',
+        tooltip: `放大(${ctrl}+=)`,
         handler: () => uiService?.zoom(0.1),
       });
       break;
@@ -92,8 +97,26 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         type: 'button',
         className: 'zoom-out',
         icon: markRaw(ZoomOutOutlined),
-        tooltip: '縮小',
+        tooltip: `缩小(${ctrl}+-)`,
         handler: () => uiService?.zoom(-0.1),
+      });
+      break;
+    case 'scale-to-original':
+      config.push({
+        type: 'button',
+        className: 'scale-to-original',
+        icon: markRaw(BorderOuterOutlined),
+        tooltip: `缩放到实际大小(${ctrl}+1)`,
+        handler: () => uiService?.set('zoom', 1),
+      });
+      break;
+    case 'scale-to-fit':
+      config.push({
+        type: 'button',
+        className: 'scale-to-fit',
+        icon: markRaw(FullscreenOutlined),
+        tooltip: `缩放以适应(${ctrl}+0)`,
+        handler: () => uiService?.set('zoom', uiService.calcZoom()),
       });
       break;
     case 'rule':

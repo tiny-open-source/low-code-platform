@@ -85,7 +85,7 @@ function mouseupHandler(item: MenuButton | MenuComponent, event: MouseEvent) {
   <div
     v-if="display"
     class="menu-item"
-    :class="`${data.type} ${data.className}`"
+    :class="`${data.type} ${data.className || ''}`"
     @click="clickHandler(data, $event)"
     @mousedown="mousedownHandler(data, $event)"
     @mouseup="mouseupHandler(data, $event)"

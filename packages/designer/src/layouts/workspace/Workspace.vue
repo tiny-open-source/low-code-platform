@@ -124,7 +124,15 @@ onMounted(() => {
     .keydown([ctrl, 'numpad-'], (e) => {
       e.inputEvent.preventDefault();
       services?.uiService.zoom(-0.1);
-    });
+    })
+    .keydown([ctrl, '0'], (e) => {
+      e.inputEvent.preventDefault();
+      services?.uiService.set('zoom', services.uiService.calcZoom());
+    })
+    .keydown([ctrl, '1'], (e) => {
+      e.inputEvent.preventDefault();
+      services?.uiService.set('zoom', 1);
+    }); ;
 });
 const page = computed(() => services?.designerService.get<MPage>('page'));
 </script>

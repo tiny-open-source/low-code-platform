@@ -76,10 +76,6 @@ class Ui extends BaseService {
     }
 
     (state as any)[name] = value;
-
-    if (name === 'stageContainerRect') {
-      state.zoom = this.calcZoom();
-    }
   }
 
   public zoom(zoom: number) {
@@ -126,7 +122,7 @@ class Ui extends BaseService {
     state.columnWidth = columnWidth;
   }
 
-  private calcZoom() {
+  public calcZoom() {
     const { stageRect, stageContainerRect } = state;
     const { height, width } = stageContainerRect;
     if (!width || !height)
