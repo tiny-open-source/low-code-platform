@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
-import type { Runtime, SortEventData, UpdateEventData } from '@lowcode/stage';
-import StageCore, { calcValueByFontsize, getOffset, GuidesType } from '@lowcode/stage';
+import type { Runtime } from '@lowcode/stage';
+import type StageCore from '@lowcode/stage';
+import { calcValueByFontsize, getOffset } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
 import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
 import ScrollViewer from '../../components/ScrollViewer.vue';
-import { H_GUIDE_LINE_STORAGE_KEY, Layout, type Services, type StageOptions, type StageRect, V_GUIDE_LINE_STORAGE_KEY } from '../../type';
-import { getGuideLineFromCache } from '../../utils/editor';
+import { Layout, type Services, type StageOptions, type StageRect } from '../../type';
+import { useStage } from '../../utils';
 import ViewerMenu from './ViewerMenu.vue';
 
 const stageContainer = ref<HTMLDivElement | null>(null);
@@ -18,95 +19,26 @@ let runtime: Runtime | null = null;
 const root = computed(() => services?.designerService.get<MApp>('root'));
 const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
 const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
-const uiSelectMode = computed(() => services?.uiService.get<boolean>('uiSelectMode'));
+const stageContainerRect = computed(() => services?.uiService.get<StageRect>('stageContainerRect'));
 const isMultiSelect = computed(() => services?.designerService.get('nodes')?.length > 1);
 const page = computed(() => services?.designerService.get<MPage>('page'));
 const node = computed(() => services?.designerService.get<MNode>('node'));
 const stageWrap = ref<InstanceType<typeof ScrollViewer> | null>(null);
 const menu = ref<InstanceType<typeof ViewerMenu>>();
-const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
 watchEffect(() => {
   if (stage)
     return;
+
   if (!stageContainer.value)
     return;
   if (!(stageOptions?.runtimeUrl || stageOptions?.render) || !root.value)
     return;
-  if (!root.value)
-    return;
-  stage = new StageCore({
-    runtimeUrl: stageOptions?.runtimeUrl,
-    autoScrollIntoView: true,
-    zoom: zoom.value,
-    isContainer: stageOptions.isContainer,
-    containerHighlightClassName: stageOptions.containerHighlightClassName,
-    containerHighlightDuration: stageOptions.containerHighlightDuration,
-    containerHighlightType: stageOptions.containerHighlightType,
-    canSelect: (el, event, stop) => {
-      const elCanSelect = stageOptions.canSelect(el);
-      // 在组件联动过程中不能再往下选择，返回并触发 ui-select
-      if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
-        document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));
-        return stop();
-      }
-      return elCanSelect;
-    },
-    moveableOptions: stageOptions.moveableOptions,
-    updateDragEl: stageOptions.updateDragEl,
-  });
+  stage = useStage(stageOptions!);
   services?.designerService.set('stage', markRaw(stage));
 
-  stage.mount(stageContainer.value);
+  stage?.mount(stageContainer.value);
 
-  stage.mask.setGuides([
-    getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
-    getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
-  ]);
-
-  stage?.on('select', (el: HTMLElement) => {
-    services?.designerService.select(el.id);
-  });
-
-  stage?.on('highlight', (el: HTMLElement) => {
-    services?.designerService.highlight(el.id);
-  });
-
-  stage?.on('multiSelect', (els: HTMLElement[]) => {
-    services?.designerService.multiSelect(els.map(el => el.id));
-  });
-
-  stage?.on('update', (ev: UpdateEventData) => {
-    if (ev.parentEl) {
-      for (const data of ev.data) {
-        services?.designerService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
-      }
-      return;
-    }
-
-    services?.designerService.update(ev.data.map(data => ({ id: data.el.id, style: data.style })));
-  });
-
-  stage?.on('sort', (ev: SortEventData) => {
-    services?.designerService.sort(ev.src, ev.dist);
-  });
-
-  stage?.on('changeGuides', (e) => {
-    services?.uiService.set('showGuides', true);
-
-    if (!root.value || !page.value)
-      return;
-
-    const storageKey = getGuideLineKey(
-      e.type === GuidesType.HORIZONTAL ? H_GUIDE_LINE_STORAGE_KEY : V_GUIDE_LINE_STORAGE_KEY,
-    );
-    if (e.guides.length) {
-      globalThis.localStorage.setItem(storageKey, JSON.stringify(e.guides));
-    }
-    else {
-      globalThis.localStorage.removeItem(storageKey);
-    }
-  });
   if (!node.value?.id)
     return;
   stage.on('runtime-ready', (rt) => {
@@ -211,11 +143,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ScrollViewer ref="stageWrap" class="lc-d-stage" :width="stageRect?.width" :height="stageRect?.height" :zoom="zoom">
+  <ScrollViewer
+    ref="stageWrap"
+    class="lc-d-stage"
+    :width="stageRect?.width"
+    :height="stageRect?.height"
+    :wrap-width="stageContainerRect?.width"
+    :wrap-height="stageContainerRect?.height" :zoom="zoom"
+  >
     <div
       ref="stageContainer"
       class="lc-d-stage-container"
-      :style="`transform: scale(${zoom})`"
+      :style="`transform: scale(${zoom});`"
       @contextmenu="contextmenuHandler"
       @drop="dropHandler"
       @dragover="dragoverHandler"

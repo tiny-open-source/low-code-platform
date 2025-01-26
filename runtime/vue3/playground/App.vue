@@ -61,7 +61,7 @@ window.lowcode?.onRuntimeReady({
       throw new Error('error');
     if (!selectedId.value)
       throw new Error('error');
-    const parent = getNodePath(parentId, [root.value]).pop();
+    const parent = getNodePath(parentId!, [root.value]).pop();
     if (!parent)
       throw new Error('未找到父节点');
     parent.items?.push(config);
@@ -72,7 +72,7 @@ window.lowcode?.onRuntimeReady({
     if (!root.value)
       throw new Error('error');
     const node = getNodePath(config.id, [root.value]).pop();
-    const parent = getNodePath(parentId, [root.value]).pop();
+    const parent = getNodePath(parentId!, [root.value]).pop();
     if (!node)
       throw new Error('未找到目标节点');
     if (!parent)

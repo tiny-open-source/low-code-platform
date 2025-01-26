@@ -264,3 +264,10 @@ export interface PastePosition {
    */
   offsetY?: number;
 }
+
+export interface ScrollViewerEvent {
+  scrollLeft: number;
+  scrollTop: number;
+  scrollHeight: number;
+  scrollWidth: number;
+}
