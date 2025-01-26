@@ -1,5 +1,5 @@
 import type App from '../Core';
-import type { Entry, NpmConfig } from '../types';
+import type { Entry, ModuleMainFilePath, NpmConfig } from '../types';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { exit } from 'node:process';
@@ -21,7 +21,7 @@ interface ParseEntryOption {
   indexPath: string;
 }
 
-export function resolveAppPackages(app: App) {
+export function resolveAppPackages(app: App): ModuleMainFilePath {
   const componentMap: Record<string, string> = {};
   const configMap: Record<string, string> = {};
   const eventMap: Record<string, string> = {};

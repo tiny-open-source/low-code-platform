@@ -1,4 +1,4 @@
-import type { UserConfig } from './types';
+import type { ModuleMainFilePath, UserConfig } from './types';
 
 import path from 'node:path';
 
@@ -10,7 +10,7 @@ export default class Core {
 
   public options: UserConfig;
 
-  public moduleMainFilePath = {
+  public moduleMainFilePath: ModuleMainFilePath = {
     componentMap: {},
     pluginMap: {},
     configMap: {},
@@ -32,9 +32,16 @@ export default class Core {
 
   public async init() {
     this.moduleMainFilePath = resolveAppPackages(this);
+    if (typeof this.options.onInit === 'function') {
+      this.moduleMainFilePath = await this.options.onInit(this);
+    }
   }
 
   public async prepare() {
     await prepareEntryFile(this);
+
+    if (typeof this.options.onPrepare === 'function') {
+      this.options.onPrepare(this);
+    }
   }
 }
