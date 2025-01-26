@@ -200,6 +200,15 @@ class Designer extends BaseService {
       throw new Error('app下不能添加组件');
     }
 
+    if (parent.id !== curNode.id) {
+      const index = parent.items.indexOf(curNode);
+      parent?.items?.splice(index + 1, 0, node);
+    }
+    else {
+      // 新增节点添加到配置中
+      parent?.items?.push(node);
+    }
+
     const layout = await this.getLayout(toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
 
@@ -209,12 +218,10 @@ class Designer extends BaseService {
       parentId: parent.id,
       root: cloneDeep(root),
     });
+
     node.style = fixNodePosition(node, parent, stage);
 
     await stage?.update({ config: cloneDeep(node), parentId: parent.id, root: cloneDeep(root) });
-
-    // 新增节点添加到配置中
-    parent?.items?.push(node);
 
     this.addModifiedNodeId(node.id);
 
