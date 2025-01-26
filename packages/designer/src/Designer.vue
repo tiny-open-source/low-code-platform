@@ -62,10 +62,16 @@ defineEmits(['propsPanelMounted']);
 
 const modelValue = defineModel<MApp>({ required: true });
 
-designerService.on('root-change', () => {
-  const node
-    = designerService.get<MNode | null>('node') || props.defaultSelected;
-  node && designerService.select(node);
+designerService.on('root-change', (value) => {
+  const node = designerService.get<MNode | null>('node');
+  const nodeId = node?.id || props.defaultSelected;
+  if (nodeId && node !== value) {
+    designerService.select(nodeId);
+  }
+  else {
+    designerService.set('nodes', [value]);
+  }
+
   modelValue.value = toRaw(designerService.get('root'));
 });
 
