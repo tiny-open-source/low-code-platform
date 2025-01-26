@@ -27,6 +27,8 @@ import './theme/index.scss';
 
 import '@unocss/reset/tailwind-compat.css';
 
+export { default as ContentMenu } from './components/ContentMenu.vue';
+
 export { default as LowCodeDesigner } from './Designer.vue';
 
 export { default as designerService } from './services/designer.service';
