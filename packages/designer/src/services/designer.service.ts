@@ -584,7 +584,7 @@ class Designer extends BaseService {
     // 更新历史记录
     this.pushHistoryState();
 
-    this.emit('remove');
+    this.emit('remove', nodes);
   }
 
   public async doUpdate(config: MNode): Promise<MNode> {
