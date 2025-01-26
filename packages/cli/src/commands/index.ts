@@ -14,9 +14,12 @@ export function scripts(defaultAppConfig: UserConfig) {
 
     // resolve user config file
     const userConfigPath = [
-      path.resolve(process.cwd(), 'lowcode.config.ts'),
-      path.resolve(process.cwd(), 'lowcode.config.js'),
-      path.resolve(process.cwd(), 'lowcode.config.cjs'),
+      path.resolve(defaultAppConfig.source, 'lowcode.config.ts'),
+      path.resolve(defaultAppConfig.source, 'lowcode.config.js'),
+      path.resolve(defaultAppConfig.source, 'lowcode.config.cjs'),
+      path.resolve(defaultAppConfig.temp, 'config.ts'),
+      path.resolve(defaultAppConfig.temp, 'config.js'),
+      path.resolve(defaultAppConfig.temp, 'config.cjs'),
     ].find(item => fs.pathExistsSync(item));
 
     const userConfig = await loadUserConfig(userConfigPath);
