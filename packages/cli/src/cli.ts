@@ -1,9 +1,9 @@
 import type { UserConfig } from './types';
 import process from 'node:process';
-import { allowTs, info } from '@vuepress/cli';
 import { cac } from 'cac';
 import chalk from 'chalk';
 import { scripts } from './commands';
+import { allowTs } from './utils/allowTs';
 
 /**
  * Wrap raw command to catch errors and exit process
@@ -36,9 +36,6 @@ export function cli(defaultAppConfig: UserConfig): void {
 
   // register `dev` command
   program.command('entry', 'Start development server').action(wrapCommand(scripts(defaultAppConfig)));
-
-  // register `info` command
-  program.command('info', 'Display environment information').action(wrapCommand(info));
 
   program.parse(process.argv);
 }

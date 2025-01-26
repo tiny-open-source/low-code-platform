@@ -56,3 +56,4 @@ export interface UserConfig {
   onInit?: (app: Core) => ModuleMainFilePath | Promise<ModuleMainFilePath>;
   onPrepare?: (app: Core) => void;
 }
+export type UserConfigLoader = (userConfigPath: string) => Promise<UserConfig>;
