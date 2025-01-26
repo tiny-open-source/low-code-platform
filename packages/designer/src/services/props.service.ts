@@ -56,7 +56,7 @@ class Props extends BaseService {
       return await this.getPropsConfig('button');
     }
 
-    return cloneDeep(this.state.propsConfigMap[type] || this.fillConfig([]));
+    return cloneDeep(this.state.propsConfigMap[type] || (await this.fillConfig([])));
   }
 
   public setPropsValues(values: Record<string, MNode>) {
