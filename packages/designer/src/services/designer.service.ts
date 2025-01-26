@@ -274,7 +274,7 @@ class Designer extends BaseService {
 
     this.emit('add', newNodes);
 
-    return newNodes.length > 1 ? newNodes[0] : newNodes;
+    return newNodes.length > 1 ? newNodes : newNodes[0];
   }
 
   /**
