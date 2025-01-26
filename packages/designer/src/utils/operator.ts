@@ -43,7 +43,7 @@ export async function beforePaste(position: PastePosition, config: MNode[]): Pro
         pastePosition.top = configItem.style?.top - referenceTop + pastePosition.top;
       }
 
-      const pasteConfig = await propsService.setNewItemId(configItem, designerService.get('root'));
+      const pasteConfig = await propsService.setNewItemId(configItem);
 
       if (pasteConfig.style) {
         const { left, top } = pasteConfig.style;

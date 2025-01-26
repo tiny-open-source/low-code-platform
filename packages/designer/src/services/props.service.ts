@@ -1,8 +1,7 @@
 import type { FormConfig } from '@lowcode/form';
-import type { Id, MComponent, MNode, MPage } from '@lowcode/schema';
+import type { MComponent, MNode } from '@lowcode/schema';
 import type { PropsState } from '../type';
-import { NodeType } from '@lowcode/schema';
-import { isPop, toLine } from '@lowcode/utils';
+import { toLine } from '@lowcode/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { reactive } from 'vue';
 import { DEFAULT_CONFIG, fillConfig } from '../utils/props';
@@ -109,10 +108,10 @@ class Props extends BaseService {
    * @param digit 位数，默认值8
    * @returns
    */
-  guid(digit = 8): string {
+  private guid(digit = 8): string {
     return 'x'.repeat(digit).replace(/[xy]/g, (c) => {
       const r = (Math.random() * 16) | 0;
-      const v = c == 'x' ? r : (r & 0x3) | 0x8;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }
@@ -126,19 +125,12 @@ class Props extends BaseService {
    * @param {object} config 组件配置
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  public async setNewItemId(config: MNode, parent?: MPage) {
-    const oldId = config.id;
-
+  public async setNewItemId(config: MNode) {
     config.id = await this.createId(config.type || 'component');
-
-    // 只有弹窗在页面下的一级子元素才有效
-    if (isPop(config) && parent?.type === NodeType.PAGE) {
-      updatePopId(oldId, config.id, parent);
-    }
 
     if (config.items && Array.isArray(config.items)) {
       for (const item of config.items) {
-        await this.setNewItemId(item, config as MPage);
+        await this.setNewItemId(item);
       }
     }
 
@@ -167,29 +159,6 @@ class Props extends BaseService {
   }
 }
 
-/**
- * 复制页面时，需要把组件下关联的弹窗id换测复制出来的弹窗的id
- * @param {number} oldId 复制的源弹窗id
- * @param {number} popId 新的弹窗id
- * @param {object} pageConfig 页面配置
- */
-function updatePopId(oldId: Id, popId: Id, pageConfig: MPage) {
-  pageConfig.items?.forEach((config) => {
-    if (config.pop === oldId) {
-      config.pop = popId;
-      return;
-    }
-
-    if (config.popId === oldId) {
-      config.popId = popId;
-      return;
-    }
-
-    if (Array.isArray(config.items)) {
-      updatePopId(oldId, popId, config as MPage);
-    }
-  });
-}
 export type PropsService = Props;
 
 export default new Props();
