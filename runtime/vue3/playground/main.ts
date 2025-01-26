@@ -5,8 +5,10 @@ import App from './App.vue';
 Promise.all([import('../.lowcode/comp-entry'), import('../.lowcode/plugin-entry')]).then(([components, plugins]) => {
   const vm = createApp(App);
 
-  Object.values(components.default).forEach((component: any) => {
-    vm.component(component.name, component);
+  Object.entries(components.default).forEach(([type, component]: [string, any]) => {
+    console.log(`low-code-runtime-ui-${type}`);
+
+    vm.component(`low-code-runtime-ui-${type}`, component);
   });
 
   Object.values(plugins.default).forEach((plugin: any) => {

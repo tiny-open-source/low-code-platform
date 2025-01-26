@@ -5,9 +5,6 @@ import { ref } from 'vue';
 import LowCodeRuntimeUiComponent from '../../Component.vue';
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiOverlay',
-});
 const props = withDefaults(defineProps<{
   config?: Record<string, any>;
   model?: Record<string, any>;

@@ -3,9 +3,6 @@ import type { MComponentInstance, MText, MTextInstance } from '../../type';
 import { computed, getCurrentInstance, inject } from 'vue';
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiText',
-});
 const props = withDefaults(defineProps<{
   config: MText;
   model?: any;

@@ -3,10 +3,6 @@ import type { MButton, MButtonInstance, MText } from '../../type';
 import { computed, getCurrentInstance, reactive } from 'vue';
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiButton',
-});
-
 const props = withDefaults(defineProps<{
   config?: MButton;
   model?: Record<string, any>;

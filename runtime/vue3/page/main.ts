@@ -9,8 +9,8 @@ import App from './App.vue';
 
 const vm = createApp(App);
 
-Object.values(components).forEach((component: any) => {
-  vm.component(component.name, component);
+Object.entries(components.default).forEach(([type, component]: [string, any]) => {
+  vm.component(`low-code-runtime-ui-${type}`, component);
 });
 
 Object.values(plugins).forEach((plugin: any) => {

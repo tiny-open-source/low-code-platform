@@ -6,9 +6,6 @@ import { ref, watch } from 'vue';
 
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiQrcode',
-});
 const props = withDefaults(defineProps<{
   config?: MQrcode;
   model?: Record<string, any>;

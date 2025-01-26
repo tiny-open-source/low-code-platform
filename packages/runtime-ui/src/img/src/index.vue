@@ -3,9 +3,6 @@ import type { MImg } from '../../type';
 import { ref } from 'vue';
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiImg',
-});
 const props = withDefaults(defineProps<{
   config?: MImg;
   model?: Record<string, any>;

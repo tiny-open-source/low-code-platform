@@ -4,9 +4,6 @@ import { computed } from 'vue';
 import LowCodeRuntimeUiComponent from '../../Component.vue';
 import { useApp } from '../../use-app';
 
-defineOptions({
-  name: 'LowCodeRuntimeUiPage',
-});
 const props = defineProps<{
   config: MPage;
 }>();
