@@ -46,6 +46,7 @@ class Designer extends BaseService {
         'sort',
         'copy',
         'paste',
+        'doPaste',
         'duAlignCenter',
         'alignCenter',
         'moveLayer',
@@ -117,20 +118,20 @@ class Designer extends BaseService {
     });
   }
 
-  /**
-   * 从localStorage中获取节点，然后添加到当前容器中
-   * @param position 粘贴的坐标
-   * @returns 添加后的组件节点配置
-   */
   public async paste(position: PastePosition = {}): Promise<MNode | MNode[] | void> {
     const config: MNode[] = await storageService.getItem(COPY_STORAGE_KEY);
 
     if (!Array.isArray(config))
       return;
 
-    const pasteConfigs = await beforePaste(position, config);
+    const pasteConfigs = await this.doPaste(config, position);
 
     return this.add(pasteConfigs);
+  }
+
+  public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
+    const pasteConfigs = await beforePaste(position, cloneDeep(config));
+    return pasteConfigs;
   }
 
   /**
