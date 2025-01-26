@@ -137,7 +137,16 @@ watch(
     immediate: true,
   },
 );
+uiService.initColumnWidth();
 
+onUnmounted(() => {
+  designerService.destroy();
+  historyService.destroy();
+  propsService.destroy();
+  uiService.destroy();
+  componentListService.destroy();
+  storageService.destroy();
+});
 provide<Services>('services', services);
 provide(
   'stageOptions',

@@ -23,6 +23,11 @@ class ComponentList extends BaseService {
   public setList(componentGroupList: ComponentGroup[]) {
     this.state.list = componentGroupList;
   }
+
+  public destroy() {
+    this.state.list = [];
+    this.removeAllListeners();
+  }
 }
 
 export type ComponentListService = ComponentList;

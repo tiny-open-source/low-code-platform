@@ -59,6 +59,12 @@ class Props extends BaseService {
     return cloneDeep(this.state.propsConfigMap[type] || (await this.fillConfig([])));
   }
 
+  public destroy() {
+    this.state.propsConfigMap = {};
+    this.state.propsValueMap = {};
+    this.removeAllListeners();
+  }
+
   public setPropsValues(values: Record<string, MNode>) {
     Object.keys(values).forEach((type: string) => {
       this.setPropsValue(toLine(type), values[type]);

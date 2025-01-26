@@ -41,16 +41,6 @@ class Ui extends BaseService {
         center: 'auto',
       });
     });
-    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
-    if (columnWidthCacheData) {
-      try {
-        const columnWidthCache = JSON.parse(columnWidthCacheData);
-        this.setColumnWidth(columnWidthCache);
-      }
-      catch (e) {
-        console.error(e);
-      }
-    }
   }
 
   public get<T>(name: keyof typeof state): T {
@@ -120,6 +110,23 @@ class Ui extends BaseService {
 
     globalThis.localStorage.setItem(COLUMN_WIDTH_STORAGE_KEY, JSON.stringify(columnWidth));
     state.columnWidth = columnWidth;
+  }
+
+  public initColumnWidth() {
+    const columnWidthCacheData = globalThis.localStorage.getItem(COLUMN_WIDTH_STORAGE_KEY);
+    if (columnWidthCacheData) {
+      try {
+        const columnWidthCache = JSON.parse(columnWidthCacheData);
+        this.setColumnWidth(columnWidthCache);
+      }
+      catch (e) {
+        console.error(e);
+      }
+    }
+  }
+
+  public destroy() {
+    this.removeAllListeners();
   }
 
   public calcZoom() {

@@ -814,6 +814,10 @@ class Designer extends BaseService {
     this.set('nodes', []);
     this.set('page', null);
     this.set('parent', null);
+    this.set('stage', null);
+    this.set('highlightNode', null);
+    this.set('modifiedNodeIds', new Map());
+    this.set('pageLength', new Map());
   }
 }
 export type DesignerService = Designer;
