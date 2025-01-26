@@ -18,8 +18,9 @@ export interface StageCoreConfig {
   zoom?: number;
   canSelect?: CanSelect;
   isContainer: IsContainer;
-  containerHighlightClassName: string;
-  containerHighlightDuration: number;
+  containerHighlightClassName?: string;
+  containerHighlightDuration?: number;
+  containerHighlightType?: ContainerHighlightType;
   moveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
   multiMoveableOptions?: ((core?: StageCore) => MoveableOptions) | MoveableOptions;
 
@@ -28,6 +29,11 @@ export interface StageCoreConfig {
   render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
   autoScrollIntoView?: boolean;
   updateDragEl?: (el: HTMLDivElement, target: HTMLElement) => void;
+}
+
+export enum ContainerHighlightType {
+  DEFAULT = 'default',
+  ALT = 'alt',
 }
 
 export interface StageRenderConfig {

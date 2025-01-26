@@ -3,8 +3,9 @@ import type { EventOption } from '@lowcode/core';
 import type { FormConfig } from '@lowcode/form';
 import type { MApp, MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
+import type { MoveableOptions } from '@lowcode/stage';
 import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from './type';
-import { CONTAINER_HIGHLIGHT_CLASS, type MoveableOptions } from '@lowcode/stage';
+import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@lowcode/stage';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -39,6 +40,7 @@ const props = withDefaults(
     containerHighlightClassName?: string;
     containerHighlightDuration?: number;
     runtimeUrl?: string;
+    containerHighlightType?: ContainerHighlightType;
   }>(),
   {
     defaultSelected: '',
@@ -51,6 +53,7 @@ const props = withDefaults(
     isContainer: (el: HTMLElement) => el.classList.contains('lowcode-ui-container'),
     containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS,
     containerHighlightDuration: 800,
+    containerHighlightType: ContainerHighlightType.DEFAULT,
   },
 );
 
@@ -147,6 +150,7 @@ provide(
     isContainer: props.isContainer,
     containerHighlightClassName: props.containerHighlightClassName,
     containerHighlightDuration: props.containerHighlightDuration,
+    containerHighlightType: props.containerHighlightType,
   }),
 );
 onUnmounted(() => designerService.destroy());

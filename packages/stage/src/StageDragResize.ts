@@ -1,13 +1,15 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import { addClassName, removeClassNameByClassName } from '@lowcode/utils';
+import { removeClassNameByClassName } from '@lowcode/utils';
 
 import { EventEmitter } from 'eventemitter3';
+import KeyController from 'keycon';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
-import { type StageDragResizeConfig, StageDragStatus } from './types';
+import { ContainerHighlightType, type StageDragResizeConfig, StageDragStatus } from './types';
+
 import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './utils';
 
 class StageDragResize extends EventEmitter {
@@ -37,6 +39,9 @@ class StageDragResize extends EventEmitter {
   public dragEl?: HTMLDivElement;
   /** 流式布局下，目标节点的镜像节点 */
   private ghostEl: HTMLElement | undefined;
+
+  private isContainerHighlight: boolean = false;
+
   constructor(config: StageDragResizeConfig) {
     super();
 
@@ -44,6 +49,20 @@ class StageDragResize extends EventEmitter {
     this.container = config.container;
 
     this.mask = config.mask;
+
+    KeyController.global.keydown('alt', (e) => {
+      e.inputEvent.preventDefault();
+      this.isContainerHighlight = true;
+    });
+    KeyController.global.keyup('alt', (e) => {
+      e.inputEvent.preventDefault();
+
+      const doc = this.core.renderer.contentWindow?.document;
+      if (doc && this.canContainerHighlight()) {
+        removeClassNameByClassName(doc, this.core.containerHighlightClassName);
+      }
+      this.isContainerHighlight = false;
+    });
   }
 
   public clearSelectStatus(): void {
@@ -228,20 +247,9 @@ class StageDragResize extends EventEmitter {
           timeout = undefined;
         }
 
-        timeout = globalThis.setTimeout(async () => {
-          const els = this.core.getElementsFromPoint(e.inputEvent);
-          for (const el of els) {
-            if (
-              doc
-              && !el.id.startsWith(GHOST_EL_ID_PREFIX)
-              && el !== this.target
-              && (await this.core.isContainer(el))
-            ) {
-              addClassName(el, doc, this.core.containerHighlightClassName);
-              break;
-            }
-          }
-        }, this.core.containerHighlightDuration);
+        if (this.canContainerHighlight()) {
+          timeout = this.core.getAddContainerHighlightClassNameTimeout(e.inputEvent, [this.target]);
+        }
 
         this.dragStatus = StageDragStatus.ING;
 
@@ -252,7 +260,9 @@ class StageDragResize extends EventEmitter {
         }
 
         this.moveableHelper?.onDrag(e);
-        this.updatePosition(frame.left + e.beforeTranslate[0], frame.top + e.beforeTranslate[1]);
+
+        this.target.style.left = `${frame.left + e.beforeTranslate[0]}px`;
+        this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
       })
       .on('dragEnd', () => {
         if (timeout) {
@@ -262,7 +272,7 @@ class StageDragResize extends EventEmitter {
 
         let parentEl: HTMLElement | null = null;
 
-        if (doc) {
+        if (doc && this.canContainerHighlight()) {
           parentEl = removeClassNameByClassName(doc, this.core.containerHighlightClassName);
         }
 
@@ -497,6 +507,15 @@ class StageDragResize extends EventEmitter {
     }
 
     return frame;
+  }
+
+  private canContainerHighlight() {
+    console.log(this.core.containerHighlightType);
+
+    return (
+      this.core.containerHighlightType === ContainerHighlightType.DEFAULT
+      || (this.core.containerHighlightType === ContainerHighlightType.ALT && this.isContainerHighlight)
+    );
   }
 
   private getOptions(options: MoveableOptions = {}): MoveableOptions {

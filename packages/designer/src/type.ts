@@ -1,7 +1,7 @@
 import type { FormConfig } from '@lowcode/form';
 import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
-import type { MoveableOptions } from '@lowcode/stage';
+import type { ContainerHighlightType, MoveableOptions } from '@lowcode/stage';
 import type { Component } from 'vue';
 import type { ComponentListService } from './services/component-list.service';
 import type { DesignerService } from './services/designer.service';
@@ -27,10 +27,13 @@ export interface StageOptions {
   autoScrollIntoView: boolean;
   containerHighlightClassName: string;
   containerHighlightDuration: number;
+  containerHighlightType: ContainerHighlightType;
+
   render: () => HTMLDivElement;
   moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
   isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
   canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
+
   updateDragEl: (el: HTMLDivElement) => void;
 }
 export interface DesignerNodeInfo {

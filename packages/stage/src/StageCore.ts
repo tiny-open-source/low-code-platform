@@ -1,14 +1,14 @@
 import type { Id } from '@lowcode/schema';
+import type { CanSelect, ContainerHighlightType, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
 import { addClassName } from '@lowcode/utils';
 import { EventEmitter } from 'eventemitter3';
-
-import { DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
+import { CONTAINER_HIGHLIGHT_CLASS, DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';
 import StageHighlight from './StageHighlight';
 import StageMask from './StageMask';
 import StageMultiDragResize from './StageMultiDragResize';
 import StageRenderer from './StageRenderer';
-import { type CanSelect, type GuidesEventData, type IsContainer, type RemoveData, type Runtime, type StageCoreConfig, StageDragStatus, type UpdateData, type UpdateEventData } from './types';
+import { StageDragStatus } from './types';
 import { addSelectedClassName, removeSelectedClassName } from './utils';
 
 class StageCore extends EventEmitter {
@@ -30,6 +30,9 @@ class StageCore extends EventEmitter {
 
   public containerHighlightClassName: string;
   public containerHighlightDuration: number;
+
+  public containerHighlightType?: ContainerHighlightType;
+
   public isContainer: IsContainer;
 
   private canSelect: CanSelect;
@@ -40,8 +43,10 @@ class StageCore extends EventEmitter {
     this.canSelect = config.canSelect || ((el: HTMLElement) => !!el.id);
 
     this.isContainer = config.isContainer;
-    this.containerHighlightClassName = config.containerHighlightClassName;
-    this.containerHighlightDuration = config.containerHighlightDuration;
+
+    this.containerHighlightClassName = config.containerHighlightClassName || CONTAINER_HIGHLIGHT_CLASS;
+    this.containerHighlightDuration = config.containerHighlightDuration || 800;
+    this.containerHighlightType = config.containerHighlightType;
 
     this.renderer = new StageRenderer({ core: this });
     this.mask = new StageMask({ core: this });
