@@ -87,11 +87,11 @@ export function getPositionInContainer(position: PastePosition = {}, id: Id) {
   };
 }
 
-export function getAddParent(addNode: AddMNode | MNode[]) {
+export function getAddParent(node: MNode) {
   const curNode = designerService.get<MContainer>('node');
 
   let parentNode;
-  if (!Array.isArray(addNode) && isPage(addNode as MNode)) {
+  if (isPage(node)) {
     parentNode = designerService.get<MApp>('root');
   }
   else if (curNode.items) {

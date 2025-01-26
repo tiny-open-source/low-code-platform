@@ -229,12 +229,8 @@ class Designer extends BaseService {
   public async add(addNode: AddMNode | MNode[], parent?: MContainer | null): Promise<MNode | MNode[]> {
     const stage = this.get<StageCore | null>('stage');
 
-    const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(addNode);
-    if (!parentNode)
-      throw new Error('未找到父元素');
-
     // 新增多个组件只存在于粘贴多个组件,粘贴的是一个完整的config,所以不再需要getPropsValue
-    const addNodes: MNode[] = [];
+    const addNodes: any[] = [];
     if (!Array.isArray(addNode)) {
       const { type, inputEvent, ...config } = addNode;
 
@@ -247,8 +243,14 @@ class Designer extends BaseService {
       addNodes.push(...addNode);
     }
 
-    const newNodes = await Promise.all(addNodes.map(node => this.doAdd(node, parentNode)));
-
+    const newNodes = await Promise.all(
+      addNodes.map((node) => {
+        const parentNode = parent && typeof parent !== 'function' ? parent : getAddParent(node);
+        if (!parentNode)
+          throw new Error('未找到父元素');
+        return this.doAdd(node, parentNode);
+      }),
+    );
     if (newNodes.length > 1) {
       const newNodeIds = newNodes.map(node => node.id);
       // 触发选中样式
