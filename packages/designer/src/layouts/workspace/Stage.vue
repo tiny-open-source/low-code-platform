@@ -112,8 +112,8 @@ async function dropHandler(e: DragEvent) {
     config.style = {
       ...style,
       position,
-      top,
-      left,
+      top: top / zoom.value,
+      left: left / zoom.value,
     };
 
     config.inputEvent = e;
