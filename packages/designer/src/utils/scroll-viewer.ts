@@ -42,6 +42,12 @@ export class ScrollViewer extends EventEmitter {
     this.resizeObserver.observe(this.container);
   }
 
+  public reset() {
+    this.scrollLeft = 0;
+    this.scrollTop = 0;
+    this.setScrollSize();
+  }
+
   public destroy() {
     this.resizeObserver.disconnect();
     this.container.removeEventListener('wheel', this.wheelHandler, false);

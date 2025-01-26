@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { ScrollViewerEvent } from '../type';
+import type { ScrollViewerEvent, Services } from '../type';
 
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { ScrollViewer } from '../utils/scroll-viewer';
 
 import ScrollBar from './ScrollBar.vue';
@@ -34,12 +34,23 @@ const style = computed(
       `,
 );
 
+const services = inject<Services>('services');
 const scrollWidth = ref(0);
 const scrollHeight = ref(0);
 
 let scrollViewer: ScrollViewer;
 const vOffset = ref(0);
 const hOffset = ref(0);
+const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
+const stageRect = computed(() => services?.uiService.get('stageRect'));
+watch(
+  [zoom, stageRect],
+  () => {
+    nextTick(() => {
+      scrollViewer?.reset();
+    });
+  },
+);
 onMounted(() => {
   if (!container.value || !el.value)
     return;

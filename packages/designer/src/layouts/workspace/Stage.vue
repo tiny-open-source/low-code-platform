@@ -149,7 +149,8 @@ onUnmounted(() => {
     :width="stageRect?.width"
     :height="stageRect?.height"
     :wrap-width="stageContainerRect?.width"
-    :wrap-height="stageContainerRect?.height" :zoom="zoom"
+    :wrap-height="stageContainerRect?.height"
+    :zoom="zoom"
   >
     <div
       ref="stageContainer"

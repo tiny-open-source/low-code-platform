@@ -136,7 +136,7 @@ class Ui extends BaseService {
       return 1;
     }
     // 60/80是为了不要让画布太过去贴住四周（这样好看些）
-    return Math.min((width - 60) / stageWidth || 1, (height - 80) / stageHeight || 1);
+    return Math.min((width - 80) / stageWidth || 1, (height - 80) / stageHeight || 1);
   }
 }
 export type UiService = Ui;
