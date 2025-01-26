@@ -9,3 +9,7 @@
   opacity: .1;
   pointer-events: none;
 }
+
+.lowcode-ui-container.lowcode-layout-relative {
+  min-height: 50px;
+}

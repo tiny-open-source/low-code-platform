@@ -60,8 +60,6 @@ const props = withDefaults(
 
 defineEmits(['propsPanelMounted']);
 
-const propsPanel = ref<InstanceType<typeof PropsPanel> | null>(null);
-
 const modelValue = defineModel<MApp>({ required: true });
 
 designerService.on('root-change', () => {
@@ -219,7 +217,6 @@ defineExpose({
     <template #props-panel>
       <slot name="props-panel">
         <PropsPanel
-          ref="propsPanel"
           @mounted="(instance) => $emit('propsPanelMounted', instance)"
         />
       </slot>

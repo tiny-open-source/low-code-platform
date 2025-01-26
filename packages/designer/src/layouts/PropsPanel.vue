@@ -1,8 +1,9 @@
-<script setup lang="ts">
-import type { FormConfig, FormValue } from '@lowcode/form';
+<script lang="ts" setup>
+import type { FormConfig, FormValue, LForm } from '@lowcode/form';
 import type { MNode } from '@lowcode/schema';
+
+import type StageCore from '@lowcode/stage';
 import type { Services } from '../type';
-import { LForm } from '@lowcode/form';
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 
 defineOptions({
@@ -10,13 +11,38 @@ defineOptions({
 });
 const emit = defineEmits(['mounted']);
 
-const configForm = ref<InstanceType<typeof LForm>>();
-const services = inject<Services>('services');
-const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
 const internalInstance = getCurrentInstance();
 const values = ref<FormValue>({});
+const configForm = ref<InstanceType<typeof LForm>>();
 const curFormConfig = ref<FormConfig>();
+const services = inject<Services>('services');
 const node = computed(() => services?.designerService.get<MNode | null>('node'));
+const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
+const stage = computed(() => services?.designerService.get<StageCore>('stage'));
+
+async function init() {
+  if (!node.value) {
+    curFormConfig.value = [];
+    return;
+  }
+  // 先判断是容器还是纯文本
+  const type = node.value.type || (node.value.items ? 'container' : 'text');
+  curFormConfig.value = (await services?.propsService.getPropsConfig(type)) || [];
+  values.value = node.value;
+}
+
+watchEffect(init);
+services?.propsService.on('props-configs-change', init);
+
+onMounted(() => {
+  emit('mounted', internalInstance);
+});
+
+watchEffect(() => {
+  if (configForm.value && stage.value) {
+    configForm.value.formState.stage = stage.value;
+  }
+});
 
 async function submit() {
   try {
@@ -28,26 +54,7 @@ async function submit() {
   }
 }
 
-async function init() {
-  if (!node.value) {
-    curFormConfig.value = [];
-    return;
-  }
-  // 先判断是容器还是纯文本
-  const type = node.value.type || (node.value.items ? 'container' : 'text');
-
-  curFormConfig.value = (await services?.propsService.getPropsConfig(type)) || [];
-
-  values.value = node.value;
-}
-
-watchEffect(init);
-
-services?.propsService.on('props-configs-change', init);
-
-onMounted(() => {
-  emit('mounted', internalInstance);
-});
+defineExpose({ submit });
 </script>
 
 <template>
@@ -55,9 +62,11 @@ onMounted(() => {
     <slot name="props-panel-header" />
     <LForm
       ref="configForm"
-      :class="propsPanelSize"
-      :config="curFormConfig"
+      :class="`lc-d-props-panel ${propsPanelSize}`"
+      :popper-class="`lc-d-props-panel-popper ${propsPanelSize}`"
+      :size="propsPanelSize"
       :init-values="values"
+      :config="curFormConfig"
       @change="submit"
     />
   </div>

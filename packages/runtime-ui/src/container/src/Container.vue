@@ -26,7 +26,7 @@ const display = computed(() => {
   <div
     v-if="display"
     :id="`${config.id || ''}`"
-    :class="`lowcode-ui-container${config.className ? ` ${config.className}` : ''}`"
+    :class="`lowcode-ui-container lowcode-layout-${config.className ? ` ${config.className}` : ''}`"
     :style="style"
   >
     <slot />

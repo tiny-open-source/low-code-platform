@@ -525,6 +525,7 @@ class StageDragResize extends EventEmitter {
 
     const isAbsolute = this.mode === Mode.ABSOLUTE;
     const isFixed = this.mode === Mode.FIXED;
+    const isSortable = this.mode === Mode.SORTABLE;
 
     let { moveableOptions = {} } = this.core.config;
 
@@ -579,7 +580,7 @@ class StageDragResize extends EventEmitter {
         // 设置0的话无法移动到left为0，所以只能设置为-1
         left: -1,
         right: this.container.clientWidth - 1,
-        bottom: this.container.clientHeight,
+        bottom: isSortable ? undefined : this.container.clientHeight,
         ...(moveableOptions.bounds || {}),
       },
       ...options,

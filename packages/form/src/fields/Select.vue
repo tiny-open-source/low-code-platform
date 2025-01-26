@@ -82,7 +82,7 @@ function changeHandler(value: any) {
     clearable
     placeholder="请选择"
     :size="size"
-    :show-arrow="false"
+    :show-arrow="true"
     @update:value="changeHandler"
   />
 </template>

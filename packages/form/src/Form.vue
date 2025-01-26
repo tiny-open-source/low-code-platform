@@ -87,6 +87,7 @@ watch(
   { immediate: true },
 );
 defineExpose({
+  formState,
   submitForm: async (native?: boolean): Promise<any> => {
     try {
       await formRef.value?.validate();

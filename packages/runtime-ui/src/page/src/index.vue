@@ -16,7 +16,9 @@ const style = computed(() => app?.transformStyle(props.config.style || {}));
 <template>
   <div
     :id="`${config.id || ''}`"
-    :class="`lowcode-ui-page magic-ui-container${config.className ? ` ${config.className}` : ''}`"
+    :class="`lowcode-ui-page lowcode-ui-container lowcode-layout-${config.layout}${
+      config.className ? ` ${config.className}` : ''
+    }`"
     :style="style"
   >
     <slot />
