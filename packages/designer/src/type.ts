@@ -41,15 +41,22 @@ export interface DesignerNodeInfo {
   parent?: MContainer;
   page?: MPage;
 }
-export interface SetColumnWidth {
-  left?: number;
-  center?: number | 'auto';
-  right?: number;
+export enum ColumnLayout {
+  LEFT = 'left',
+  CENTER = 'center',
+  RIGHT = 'right',
 }
+
+export interface SetColumnWidth {
+  [ColumnLayout.LEFT]?: number;
+  [ColumnLayout.CENTER]?: number | 'auto';
+  [ColumnLayout.RIGHT]?: number;
+}
+
 export interface GetColumnWidth {
-  left: number;
-  center: number;
-  right: number;
+  [ColumnLayout.LEFT]: number;
+  [ColumnLayout.CENTER]: number;
+  [ColumnLayout.RIGHT]: number;
 }
 export interface StageRect {
   width: number;
@@ -163,6 +170,7 @@ export interface MenuButton {
   handler?: (data: Services, event: MouseEvent) => Promise<any> | any;
   /** type为dropdown时，下拉的菜单列表， 或者有子菜单时 */
   items?: MenuButton[];
+  className?: string;
 }
 
 export interface MenuComponent {
@@ -174,6 +182,7 @@ export interface MenuComponent {
   /** 组件监听的事件对象，如：{ click: () => { console.log('click'); } } */
   listeners?: Record<string, (...args: any[]) => any>;
   slots?: Record<string, any>;
+  className?: string;
   /** 是否显示，默认为true */
   display?: boolean | ((data?: Services) => Promise<boolean> | boolean);
 }
@@ -197,16 +206,17 @@ export type MenuItem =
   | 'guides'
   | 'rule'
   | MenuButton
-  | MenuComponent;
+  | MenuComponent
+  | string;
 
 /** 工具栏 */
 export interface MenuBarData {
   /** 顶部工具栏左边项 */
-  left?: MenuItem[];
+  [ColumnLayout.LEFT]?: MenuItem[];
   /** 顶部工具栏中间项 */
-  center?: MenuItem[];
+  [ColumnLayout.CENTER]?: MenuItem[];
   /** 顶部工具栏右边项 */
-  right?: MenuItem[];
+  [ColumnLayout.RIGHT]?: MenuItem[];
 }
 
 export interface AddMNode {

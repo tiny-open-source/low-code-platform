@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
-import type { MenuItem, Services } from '../../type';
+import type { MenuButton, MenuComponent, MenuItem, Services } from '../../type';
 import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
 import { CopyOutlined, DeleteOutlined, DownOutlined, UpOutlined } from '@vicons/antd';
@@ -15,7 +15,7 @@ const props = defineProps<{
   isMultiSelect: boolean;
 }>();
 const services = inject<Services>('services');
-const stageContentMenu = inject<MenuItem[]>('stageContentMenu', []);
+const stageContentMenu = inject<(MenuButton | MenuComponent)[]>('stageContentMenu', []);
 const designerService = services?.designerService;
 
 const menu = ref<InstanceType<typeof ContentMenu>>();
@@ -27,7 +27,7 @@ const nodes = computed(() => designerService?.get<MNode[]>('nodes'));
 const stage = computed(() => designerService?.get<StageCore>('stage'));
 
 const parent = computed(() => designerService?.get('parent'));
-const menuData = reactive<MenuItem[]>([
+const menuData = reactive<(MenuButton | MenuComponent)[]>([
   {
     type: 'button',
     text: '水平居中',

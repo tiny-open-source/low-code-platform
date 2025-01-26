@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ComponentGroup, MenuButton, MenuItem, Services } from '../../type';
+import type { ComponentGroup, MenuButton, MenuComponent, MenuItem, Services } from '../../type';
 import { NodeType } from '@lowcode/schema';
 import { CopyOutlined, DeleteOutlined, PlusOutlined } from '@vicons/antd';
 import { computed, inject, markRaw, ref } from 'vue';
@@ -11,7 +11,7 @@ const node = computed(() => services?.designerService.get('node'));
 const isRoot = computed(() => node.value?.type === NodeType.ROOT);
 const isPage = computed(() => node.value?.type === NodeType.PAGE);
 const componentList = computed(() => services?.componentListService.getList() || []);
-const layerContentMenu = inject<MenuItem[]>('layerContentMenu', []);
+const layerContentMenu = inject<(MenuComponent | MenuButton)[]>('layerContentMenu', []);
 
 function createMenuItems(group: ComponentGroup): MenuButton[] {
   return group.items.map(component => ({
@@ -65,7 +65,7 @@ const getSubMenuData = computed<MenuButton[]>(() => {
   return [];
 });
 
-const menuData = computed<MenuItem[]>(() => [
+const menuData = computed<(MenuButton | MenuComponent)[]>(() => [
   {
     type: 'button',
     text: '新增',

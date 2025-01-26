@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { MenuButton, MenuItem } from '../type';
+import type { MenuButton, MenuComponent, MenuItem } from '../type';
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import ToolButton from './ToolButton.vue';
 
 const props = withDefaults(defineProps<{
-  menuData?: MenuItem[];
+  menuData?: (MenuButton | MenuComponent)[];
   isSubMenu?: boolean;
 }>(), {
   isSubMenu: false,
@@ -31,7 +31,7 @@ function hide() {
   emit('hide');
 }
 
-function showSubMenu(item: MenuItem) {
+function showSubMenu(item: MenuButton | MenuComponent) {
   const menuItem = item as MenuButton;
   if (typeof item !== 'object' || !menuItem.items?.length) {
     return;

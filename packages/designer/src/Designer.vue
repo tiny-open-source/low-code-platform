@@ -4,7 +4,7 @@ import type { FormConfig } from '@lowcode/form';
 import type { MApp, MContainer, MNode } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
-import type { ComponentGroup, MenuBarData, Services, SideBarData, StageRect } from './type';
+import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
 import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@lowcode/stage';
 import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
@@ -26,6 +26,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
+    layerContentMenu?: (MenuButton | MenuComponent)[];
     defaultSelected?: number | string;
     moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
     propsConfigs: Record<string, FormConfig>;
