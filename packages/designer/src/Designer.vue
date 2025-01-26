@@ -197,6 +197,9 @@ defineExpose({
     <template #workspace>
       <slot name="workspace">
         <Workspace>
+          <template #stage>
+            <slot name="stage" />
+          </template>
           <template #workspace-content>
             <slot name="workspace-content" />
           </template>

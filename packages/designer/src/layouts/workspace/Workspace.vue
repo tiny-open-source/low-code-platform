@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MNode } from '@lowcode/schema';
+import type { MNode, MPage } from '@lowcode/schema';
 import type { Services } from '../../type';
 import { isPage } from '@lowcode/utils';
 import KeyController from 'keycon';
@@ -126,11 +126,14 @@ onMounted(() => {
       services?.uiService.zoom(-0.1);
     });
 });
+const page = computed(() => services?.designerService.get<MPage>('page'));
 </script>
 
 <template>
   <div ref="workspace" class="lc-d-workspace" tabindex="1">
-    <LowCodeStage />
+    <slot name="stage">
+      <LowCodeStage :key="page?.id" />
+    </slot>
     <slot name="workspace-content" />
   </div>
 </template>
