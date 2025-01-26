@@ -438,7 +438,8 @@ class Designer extends BaseService {
 
       await stage.select(targetId);
 
-      await stage.update({ config: cloneDeep(target), parentId: parent.id, root });
+      const targetParent = this.getParentById(target.id);
+      await stage.update({ config: cloneDeep(target), parentId: targetParent?.id, root });
 
       await this.select(newConfig);
       stage.select(newConfig.id);
