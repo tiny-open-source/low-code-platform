@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ContainerChangeEventData, FormValue } from '@lowcode/form';
+import type { FormValue } from '@lowcode/form';
 
 import type { StyleSchema } from '@lowcode/schema';
 import { LFormContainer } from '@lowcode/form';

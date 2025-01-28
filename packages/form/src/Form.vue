@@ -1,5 +1,5 @@
 <script setup lang="ts" name="LForm">
-import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
+import type { FormConfig, FormState, FormValue } from './schema';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { NConfigProvider, NDialogProvider, NForm, NMessageProvider } from 'naive-ui';
 import { provide, reactive, ref, shallowRef, toRaw, watch } from 'vue';
@@ -65,17 +65,14 @@ const formState: FormState = reactive<FormState>({
     // TODO
   },
 });
-const changeRecords = shallowRef<ChangeRecord[]>([]);
 
-function changeHandler(v: FormValue, eventData: ContainerChangeEventData) {
-  emit('change', values.value, eventData);
+function changeHandler() {
+  emit('change', values.value);
 }
 provide('lForm', formState);
 watch(
   [() => props.config, () => props.initValues],
   ([config], [preConfig]) => {
-    changeRecords.value = [];
-
     if (!isEqual(toRaw(config), toRaw(preConfig))) {
       initialized.value = false;
     }
@@ -91,7 +88,6 @@ watch(
   { immediate: true },
 );
 defineExpose({
-  changeRecords,
   formState,
   submitForm: async (native?: boolean): Promise<any> => {
     try {
@@ -127,6 +123,7 @@ defineExpose({
         <LFormContainer
           v-for="(item, index) in config"
           :key="item[keyProp] ?? index"
+          style="height: 100%;"
           :label-width="labelWidth"
           :config="item"
           :model="values"

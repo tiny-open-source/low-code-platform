@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import type { ContainerChangeEventData } from '@lowcode/form';
 import type { StyleSchema } from '@lowcode/schema';
-import { GroupOutlined } from '@vicons/antd';
 import { NCollapse, NCollapseItem } from 'naive-ui';
-import MIcon from '../../components/Icon.vue';
 import { Background, Border, Font, Layout, Position } from './pro';
 
 defineOptions({

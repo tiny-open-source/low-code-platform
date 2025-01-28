@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ContainerChangeEventData, FormConfig, FormValue, LForm } from '@lowcode/form';
+import type { FormConfig, FormValue, LForm } from '@lowcode/form';
 import type { MNode } from '@lowcode/schema';
 
 import type StageCore from '@lowcode/stage';

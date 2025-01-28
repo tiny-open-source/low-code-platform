@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormState, TabConfig, TabPaneConfig } from '../schema';
-import { NTabPane, NTabs } from 'naive-ui';
+import { NScrollbar, NTabPane, NTabs } from 'naive-ui';
 import { computed, inject, ref } from 'vue';
 import { display as _display, filterFunction } from '../utils/form';
 
@@ -70,10 +70,10 @@ function changeHandler() {
 </script>
 
 <template>
-  <div>
-    <NTabs v-model:value="activeTabName" type="line" animated @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
-      <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
-        <NTabPane v-if="display(tab.display) && tabItems(tab).length" :tab="filter(tab.title)" :name="filter(tab.status) || tabIndex.toString()">
+  <NTabs v-model:value="activeTabName" style="height: 100%;" type="line" animated @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
+    <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
+      <NTabPane v-if="display(tab.display) && tabItems(tab).length" style="height: 100%;" :tab="filter(tab.title)" :name="filter(tab.status) || tabIndex.toString()">
+        <NScrollbar style="height: 100%;">
           <l-form-container
             v-for="item in tabItems(tab)"
             :key="item[lForm?.keyProp || '__key']"
@@ -90,8 +90,8 @@ function changeHandler() {
             :prop="config.dynamic ? `${prop}${prop ? '.' : ''}${String(tabIndex)}` : prop"
             @change="changeHandler"
           />
-        </NTabPane>
-      </template>
-    </NTabs>
-  </div>
+        </NScrollbar>
+      </NTabPane>
+    </template>
+  </NTabs>
 </template>

@@ -1,7 +1,7 @@
 @use "./common/variables";
 .#{variables.$namespace}-props-panel {
   padding: 0 10px;
-
+  height: 100%;
   &.small {
     .el-form-item__label {
       font-size: 12px;

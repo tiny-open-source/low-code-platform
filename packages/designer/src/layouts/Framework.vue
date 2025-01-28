@@ -32,9 +32,7 @@ const root = computed(() => designerService?.get<MApp>('root'));
       </div>
       <Resizer type="right" />
       <div class="lc-d-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
-        <NScrollbar>
-          <slot name="props-panel" />
-        </NScrollbar>
+        <slot name="props-panel" />
       </div>
     </div>
   </div>
