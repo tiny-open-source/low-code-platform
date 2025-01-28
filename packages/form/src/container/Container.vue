@@ -115,17 +115,23 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
   catch (e) {
     console.error(e);
   }
-
-  // field内容下包含field-link时，model===value, 这里避免循环引用
-  if ((name || name === 0) && props.model !== value && (v !== value || props.model[name] !== value)) {
-    // eslint-disable-next-line vue/no-mutating-props
-    props.model[name] = value;
-  }
   // 动态表单类型，根据value和key参数，直接修改model
-  if (key !== undefined && dynamicKey) {
+  if (dynamicKey) {
+    if (key !== undefined) {
     // eslint-disable-next-line vue/no-mutating-props
-    props.model[key] = value;
+      props.model[key] = value;
+    }
   }
+  else if (key !== undefined) {
+    // eslint-disable-next-line vue/no-mutating-props
+    props.model[name][key] = v;
+  }
+  else
+  // field内容下包含field-link时，model===value, 这里避免循环引用
+    if ((name || name === 0) && props.model !== value && (v !== value || props.model[name] !== value)) {
+    // eslint-disable-next-line vue/no-mutating-props
+      props.model[name] = value;
+    }
 
   emit('change', props.model);
 };

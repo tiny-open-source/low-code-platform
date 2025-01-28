@@ -66,3 +66,6 @@ export interface PastePosition {
    */
   offsetY?: number;
 }
+export interface StyleSchema {
+  [key: string]: any;
+}

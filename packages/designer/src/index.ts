@@ -20,8 +20,8 @@ import Editor from './Designer.vue';
 
 import Code from './fields/Code.vue';
 import CodeLink from './fields/CodeLink.vue';
+import StyleSetter from './fields/StyleSetter/index.vue';
 import UISelect from './fields/UISelect.vue';
-
 import CodeEditor from './layouts/CodeEditor.vue';
 import './theme/index.scss';
 
@@ -36,6 +36,7 @@ export { default as designerService } from './services/designer.service';
 export { default as historyService } from './services/history.service';
 export { default as storageService } from './services/storage.service';
 export { default as uiService } from './services/ui.service';
+
 export * from './type';
 
 export type { MoveableOptions } from '@lowcode/stage';
@@ -53,5 +54,6 @@ export default {
     app.component(CodeLink.name!, CodeLink);
     app.component(Code.name!, Code);
     app.component(CodeEditor.name!, CodeEditor);
+    app.component(StyleSetter.name!, StyleSetter);
   },
 };

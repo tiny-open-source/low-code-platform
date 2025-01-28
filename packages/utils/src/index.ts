@@ -2,6 +2,7 @@ import type { MNode } from '@lowcode/schema';
 import { NodeType } from '@lowcode/schema';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { set as objectSet } from 'lodash-es';
 
 dayjs.extend(utc);
 export * from './dom';
@@ -206,4 +207,7 @@ export function isSameDomain(targetUrl = '', source = globalThis.location.host) 
     return true;
 
   return getHost(targetUrl) === source;
+}
+export function setValueByKeyPath(keys: string | number, value: any, data: Record<string | number, any> = {}): any {
+  return objectSet(data, keys, value);
 }

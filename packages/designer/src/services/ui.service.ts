@@ -7,7 +7,7 @@ import designerService from './designer.service';
 const DEFAULT_LEFT_COLUMN_WIDTH = 310;
 const MIN_LEFT_COLUMN_WIDTH = 60;
 const DEFAULT_RIGHT_COLUMN_WIDTH = 480;
-const MIN_RIGHT_COLUMN_WIDTH = 10;
+const MIN_RIGHT_COLUMN_WIDTH = 380;
 
 const COLUMN_WIDTH_STORAGE_KEY = '$MagicEditorColumnWidthData';
 

@@ -1,8 +1,8 @@
 <script setup lang="ts" name="LForm">
-import type { FormConfig, FormState, FormValue } from './schema';
+import type { ChangeRecord, ContainerChangeEventData, FormConfig, FormState, FormValue } from './schema';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { NConfigProvider, NDialogProvider, NForm, NMessageProvider } from 'naive-ui';
-import { provide, reactive, ref, toRaw, watch } from 'vue';
+import { provide, reactive, ref, shallowRef, toRaw, watch } from 'vue';
 import { initValue } from './utils/form';
 
 export interface ValidateError {
@@ -65,13 +65,17 @@ const formState: FormState = reactive<FormState>({
     // TODO
   },
 });
-function changeHandler() {
-  emit('change', values.value);
+const changeRecords = shallowRef<ChangeRecord[]>([]);
+
+function changeHandler(v: FormValue, eventData: ContainerChangeEventData) {
+  emit('change', values.value, eventData);
 }
 provide('lForm', formState);
 watch(
   [() => props.config, () => props.initValues],
   ([config], [preConfig]) => {
+    changeRecords.value = [];
+
     if (!isEqual(toRaw(config), toRaw(preConfig))) {
       initialized.value = false;
     }
@@ -87,6 +91,7 @@ watch(
   { immediate: true },
 );
 defineExpose({
+  changeRecords,
   formState,
   submitForm: async (native?: boolean): Promise<any> => {
     try {

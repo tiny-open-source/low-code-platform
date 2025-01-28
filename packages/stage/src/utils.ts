@@ -15,7 +15,7 @@ function getParents(el: Element, relative: Element) {
 // 将蒙层占位节点覆盖在原节点上方
 export function getTargetElStyle(el: HTMLElement) {
   const offset = getOffset(el);
-  const { transform } = getComputedStyle(el);
+  const { transform, border } = getComputedStyle(el);
   return `
     position: absolute;
     transform: ${transform};
@@ -23,6 +23,8 @@ export function getTargetElStyle(el: HTMLElement) {
     top: ${offset.top}px;
     width: ${el.clientWidth}px;
     height: ${el.clientHeight}px;
+    border: ${border};
+    opacity: 0;
     z-index: ${ZIndex.DRAG_EL};
   `;
 }

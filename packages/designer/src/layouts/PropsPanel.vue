@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import type { FormConfig, FormValue, LForm } from '@lowcode/form';
+import type { ContainerChangeEventData, FormConfig, FormValue, LForm } from '@lowcode/form';
 import type { MNode } from '@lowcode/schema';
 
 import type StageCore from '@lowcode/stage';
 import type { Services } from '../type';
+import { setValueByKeyPath } from '@lowcode/utils';
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 
 defineOptions({
@@ -58,16 +59,13 @@ defineExpose({ submit });
 </script>
 
 <template>
-  <div class="lc-d-props-panel">
-    <slot name="props-panel-header" />
-    <LForm
-      ref="configForm"
-      :class="`lc-d-props-panel ${propsPanelSize}`"
-      :popper-class="`lc-d-props-panel-popper ${propsPanelSize}`"
-      :size="propsPanelSize"
-      :init-values="values"
-      :config="curFormConfig"
-      @change="submit"
-    />
-  </div>
+  <LForm
+    ref="configForm"
+    :class="`lc-d-props-panel ${propsPanelSize}`"
+    :popper-class="`lc-d-props-panel-popper ${propsPanelSize}`"
+    :size="propsPanelSize"
+    :init-values="values"
+    :config="curFormConfig"
+    @change="submit"
+  />
 </template>

@@ -16,14 +16,14 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['change', 'input']);
-const lForm = inject<FormState | undefined>('lForm');
+// const lForm = inject<FormState | undefined>('lForm');
 const modelName = computed(() => props.name || props.config.name || '');
 function changeHandler(value: string | [string, string]) {
   emit('change', value);
 }
 function inputHandler(value: string | [string, string]) {
   emit('input', modelName, value);
-  lForm?.$emit('fieldInput', props.prop, value);
+  // lForm?.$emit('fieldInput', props.prop, value);
 }
 </script>
 
