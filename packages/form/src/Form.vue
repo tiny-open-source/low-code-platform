@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<{
   config?: FormConfig;
 
   labelWidth?: string;
+  labelIcon?: string;
   disabled?: boolean;
 
   height?: string;
@@ -127,6 +128,7 @@ defineExpose({
           :label-width="labelWidth"
           :config="item"
           :model="values"
+          :label-icon="labelIcon"
           :size
           @change="changeHandler"
         />

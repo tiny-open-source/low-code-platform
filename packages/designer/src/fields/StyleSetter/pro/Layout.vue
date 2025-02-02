@@ -2,14 +2,28 @@
 import type { FormState } from '@lowcode/form';
 import type { StyleSchema } from '@lowcode/schema';
 import { LFormContainer } from '@lowcode/form';
-import { PicLeftOutlined } from '@vicons/antd';
 import { markRaw } from 'vue';
 import Box from '../components/Box.vue';
+import { DisplayBlock, DisplayFlex, DisplayInline, DisplayInlineBlock, DisplayNone } from '../icons/display';
+import {
+  FlexDirectionColumn,
+  FlexDirectionColumnReverse,
+  FlexDirectionRow,
+  FlexDirectionRowReverse,
+} from '../icons/flex-direction';
+import {
+  JustifyContentCenter,
+  JustifyContentFlexEnd,
+  JustifyContentFlexStart,
+  JustifyContentSpaceAround,
+  JustifyContentSpaceBetween,
+} from '../icons/justify-content';
 
 defineProps<{
   values: Partial<StyleSchema>;
 }>();
 const emit = defineEmits(['change']);
+
 const config = {
   type: '',
   items: [
@@ -20,11 +34,11 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'inline', icon: markRaw(PicLeftOutlined), tooltip: '内联布局 inline' },
-        { value: 'flex', icon: markRaw(PicLeftOutlined), tooltip: '弹性布局 flex' },
-        { value: 'block', icon: markRaw(PicLeftOutlined), tooltip: '块级布局 block' },
-        { value: 'inline-block', icon: markRaw(PicLeftOutlined), tooltip: '内联块布局 inline-block' },
-        { value: 'none', icon: markRaw(PicLeftOutlined), tooltip: '隐藏 none' },
+        { value: 'inline', icon: markRaw(DisplayInline), tooltip: '内联布局 inline' },
+        { value: 'flex', icon: markRaw(DisplayFlex), tooltip: '弹性布局 flex' },
+        { value: 'block', icon: markRaw(DisplayBlock), tooltip: '块级布局 block' },
+        { value: 'inline-block', icon: markRaw(DisplayInlineBlock), tooltip: '内联块布局 inline-block' },
+        { value: 'none', icon: markRaw(DisplayNone), tooltip: '隐藏 none' },
       ],
     },
     {
@@ -34,12 +48,12 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'row', icon: markRaw(PicLeftOutlined), tooltip: '水平方向 起点在左侧 row' },
-        { value: 'row-reverse', icon: markRaw(PicLeftOutlined), tooltip: '水平方向 起点在右侧 row-reverse' },
-        { value: 'column', icon: markRaw(PicLeftOutlined), tooltip: '垂直方向 起点在上沿 column' },
+        { value: 'row', icon: markRaw(FlexDirectionRow), tooltip: '水平方向 起点在左侧 row' },
+        { value: 'row-reverse', icon: markRaw(FlexDirectionRowReverse), tooltip: '水平方向 起点在右侧 row-reverse' },
+        { value: 'column', icon: markRaw(FlexDirectionColumn), tooltip: '垂直方向 起点在上沿 column' },
         {
           value: 'column-reverse',
-          icon: markRaw(PicLeftOutlined),
+          icon: markRaw(FlexDirectionColumnReverse),
           tooltip: '垂直方向 起点在下沿 column-reverse',
         },
       ],
@@ -52,11 +66,11 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'flex-start', icon: markRaw(PicLeftOutlined), tooltip: '左对齐 flex-start' },
-        { value: 'flex-end', icon: markRaw(PicLeftOutlined), tooltip: '右对齐 flex-end' },
-        { value: 'center', icon: markRaw(PicLeftOutlined), tooltip: '居中 center' },
-        { value: 'space-between', icon: markRaw(PicLeftOutlined), tooltip: '两端对齐 space-between' },
-        { value: 'space-around', icon: markRaw(PicLeftOutlined), tooltip: '横向平分 space-around' },
+        { value: 'flex-start', icon: markRaw(JustifyContentFlexStart), tooltip: '左对齐 flex-start' },
+        { value: 'flex-end', icon: markRaw(JustifyContentFlexEnd), tooltip: '右对齐 flex-end' },
+        { value: 'center', icon: markRaw(JustifyContentCenter), tooltip: '居中 center' },
+        { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
+        { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
       ],
       display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },
@@ -67,11 +81,11 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'flex-start', icon: markRaw(PicLeftOutlined), tooltip: '左对齐 flex-start' },
-        { value: 'flex-end', icon: markRaw(PicLeftOutlined), tooltip: '右对齐 flex-end' },
-        { value: 'center', icon: markRaw(PicLeftOutlined), tooltip: '居中 center' },
-        { value: 'space-between', icon: markRaw(PicLeftOutlined), tooltip: '两端对齐 space-between' },
-        { value: 'space-around', icon: markRaw(PicLeftOutlined), tooltip: '横向平分 space-around' },
+        { value: 'flex-start', icon: markRaw(JustifyContentFlexStart), tooltip: '左对齐 flex-start' },
+        { value: 'flex-end', icon: markRaw(JustifyContentFlexEnd), tooltip: '右对齐 flex-end' },
+        { value: 'center', icon: markRaw(JustifyContentCenter), tooltip: '居中 center' },
+        { value: 'space-between', icon: markRaw(JustifyContentSpaceBetween), tooltip: '两端对齐 space-between' },
+        { value: 'space-around', icon: markRaw(JustifyContentSpaceAround), tooltip: '横向平分 space-around' },
       ],
       display: (mForm: FormState, { model }: { model: Record<any, any> }) => model.display === 'flex',
     },

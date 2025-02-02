@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { StyleSchema } from '@lowcode/schema';
 import { LFormContainer } from '@lowcode/form';
-import { PicLeftOutlined } from '@vicons/antd';
 import { markRaw } from 'vue';
+import { AlignCenter, AlignLeft, AlignRight } from '../icons/text-align';
 
 defineProps<{
   values: Partial<StyleSchema>;
@@ -57,9 +57,9 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'left', icon: markRaw(PicLeftOutlined), tooltip: '左对齐 row' },
-        { value: 'center', icon: markRaw(PicLeftOutlined), tooltip: '居中对齐 center' },
-        { value: 'right', icon: markRaw(PicLeftOutlined), tooltip: '右对齐 right' },
+        { value: 'left', icon: markRaw(AlignLeft), tooltip: '左对齐 row' },
+        { value: 'center', icon: markRaw(AlignCenter), tooltip: '居中对齐 center' },
+        { value: 'right', icon: markRaw(AlignRight), tooltip: '右对齐 right' },
       ],
     },
   ],

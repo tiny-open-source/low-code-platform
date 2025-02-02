@@ -10,7 +10,6 @@ const props = defineProps({
   labelWidth: String,
   expandMore: Boolean,
   span: Number,
-
   model: {
     type: Object,
     default: () => ({}),

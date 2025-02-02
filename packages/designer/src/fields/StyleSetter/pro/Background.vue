@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { StyleSchema } from '@lowcode/schema';
 import { LFormContainer } from '@lowcode/form';
-import { PicLeftOutlined } from '@vicons/antd';
 import { markRaw } from 'vue';
+import { BackgroundNoRepeat, BackgroundRepeat, BackgroundRepeatX, BackgroundRepeatY } from '../icons/background-repeat';
 
 defineProps<{
   values: Partial<StyleSchema>;
@@ -42,10 +42,10 @@ const config = {
       childType: 'button',
       labelWidth: '68px',
       options: [
-        { value: 'repeat', icon: markRaw(PicLeftOutlined), tooltip: '垂直和水平方向重复 repeat' },
-        { value: 'repeat-x', icon: markRaw(PicLeftOutlined), tooltip: '水平方向重复 repeat-x' },
-        { value: 'repeat-y', icon: markRaw(PicLeftOutlined), tooltip: '垂直方向重复 repeat-y' },
-        { value: 'no-repeat', icon: markRaw(PicLeftOutlined), tooltip: '不重复 no-repeat' },
+        { value: 'repeat', icon: markRaw(BackgroundRepeat), tooltip: '垂直和水平方向重复 repeat' },
+        { value: 'repeat-x', icon: markRaw(BackgroundRepeatX), tooltip: '水平方向重复 repeat-x' },
+        { value: 'repeat-y', icon: markRaw(BackgroundRepeatY), tooltip: '垂直方向重复 repeat-y' },
+        { value: 'no-repeat', icon: markRaw(BackgroundNoRepeat), tooltip: '不重复 no-repeat' },
       ],
     },
   ],

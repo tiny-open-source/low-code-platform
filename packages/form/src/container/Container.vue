@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ChildConfig, ContainerCommonConfig, FormState, FormValue } from '../schema';
-import { NButton, NFormItem, NTooltip } from 'naive-ui';
+import { NButton, NFormItem, NIcon, NTooltip } from 'naive-ui';
 import { computed, inject, ref, resolveComponent } from 'vue';
 import { display as displayFunction, filterFunction } from '../utils/form';
 
@@ -22,6 +22,7 @@ const emit = defineEmits(['change']);
 const lForm = inject<FormState | undefined>('lForm');
 const expand = ref(false);
 const name = computed(() => props.config.name || '');
+const labelIcon = computed(() => props.config.labelIcon);
 const itemProp = computed(() => {
   let n: string | number = '';
   const { names } = props.config as any;
@@ -174,7 +175,12 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
         :colon="false"
       >
         <template #label>
-          <span v-show="!(itemLabelWidth === '0' || !config.text)" v-html="type === 'checkbox' ? '' : config.text" />
+          <NIcon v-if="labelIcon" size="24">
+            <component :is="labelIcon" />
+          </NIcon>
+          <span v-else v-show="!(itemLabelWidth === '0' || !config.text)" class="label-wrapper">
+            <span v-html="type === 'checkbox' ? '' : config.text" />
+          </span>
         </template>
         <NTooltip v-if="tooltip">
           <component
@@ -243,5 +249,15 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
 <style scoped>
 .lc-f-container ::v-deep(.n-form-item-blank){
   flex-wrap: wrap !important;
+}
+
+.label-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.label-icon {
+  font-size: 12px;
 }
 </style>
