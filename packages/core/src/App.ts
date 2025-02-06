@@ -235,9 +235,9 @@ class App extends EventEmitter {
       return triggerCommonMethod(methodName, toNode);
     }
 
-    if (toNode.instance) {
-      if (typeof toNode.instance[methodName] === 'function') {
-        toNode.instance[methodName](fromCpt, ...args);
+    if (toNode.instance && toNode.instance.exposed) {
+      if (typeof toNode.instance.exposed[methodName] === 'function') {
+        toNode.instance.exposed[methodName](fromCpt, ...args);
       }
     }
     else {
