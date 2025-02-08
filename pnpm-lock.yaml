@@ -379,6 +379,9 @@ importers:
       '@lowcode/designer':
         specifier: workspace:^
         version: link:../packages/designer
+      '@lowcode/dsl-resolver':
+        specifier: workspace:1.1.0-alpha.1
+        version: link:../packages/dsl-resolver
       '@lowcode/form':
         specifier: workspace:^
         version: link:../packages/form

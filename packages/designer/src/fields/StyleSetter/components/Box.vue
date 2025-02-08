@@ -13,35 +13,43 @@ const emit = defineEmits(['change']);
 const list = [
   {
     name: 'marginTop',
+    type: 'number',
     class: 'outer-top-border',
   },
   {
     name: 'marginRight',
+    type: 'number',
     class: 'outer-right-border',
   },
   {
     name: 'marginBottom',
+    type: 'number',
     text: 'MARGIN',
     class: 'outer-bottom-border',
   },
   {
+    type: 'number',
     name: 'marginLeft',
     class: 'outer-left-border',
   },
   {
+    type: 'number',
     name: 'paddingTop',
     class: 'inner-top-border',
   },
   {
+    type: 'number',
     name: 'paddingRight',
     class: 'inner-right-border',
   },
   {
+    type: 'number',
     name: 'paddingBottom',
     text: 'PADDING',
     class: 'inner-bottom-border',
   },
   {
+    type: 'number',
     name: 'paddingLeft',
     class: 'inner-left-border',
   },

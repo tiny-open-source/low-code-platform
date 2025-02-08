@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { LowCodeDesigner, MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type StageCore from '@lowcode/stage';
+// import { mockDSL } from './configs/dsl';
+import { FigmaParser } from '@lowcode/dsl-resolver';
 import { type Id, NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
-import { CodeOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
+import { CodeOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
@@ -11,11 +13,13 @@ import DeviceGroup from './components/DeviceGroup.vue';
 import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
+import { mockFigmaJson } from './figma-json';
 
+const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
-const value = ref(mockDSL);
+const value = ref(figmaParser.parse(mockFigmaJson));
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
@@ -83,6 +87,13 @@ const menu: MenuBarData = {
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
   right: [
     '/',
+    {
+      type: 'button',
+      text: '导入',
+      icon: ImportOutlined,
+      handler: async (services) => {
+      },
+    },
     {
       type: 'button',
       text: '预览',

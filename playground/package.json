@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@lowcode/designer": "workspace:^",
+    "@lowcode/dsl-resolver": "workspace:1.1.0-alpha.1",
     "@lowcode/form": "workspace:^",
     "@lowcode/schema": "workspace:^",
     "@lowcode/stage": "workspace:^",

@@ -15,25 +15,23 @@ const props = defineProps({
     required: true,
   },
 });
+
 const emit = defineEmits(['change', 'input']);
-// const lForm = inject<FormState | undefined>('lForm');
+const lForm = inject<FormState | undefined>('lForm');
 const modelName = computed(() => props.name || props.config.name || '');
 function changeHandler(value: number | null) {
   emit('change', value);
 }
 function inputHandler(value: number | null) {
   emit('input', modelName, value);
-  // lForm?.$emit('fieldInput', props.prop, value);
+  lForm?.$emit('fieldInput', props.prop, value);
 }
 </script>
 
 <template>
   <NInputNumber
-    v-model:value="model[modelName]" clearable :disabled="disabled" @update:value="changeHandler"
+    v-model:value="model[modelName]"
+    :show-button="false" clearable :disabled="disabled" @update:value="changeHandler"
     @input="inputHandler"
-  >
-    <template #suffix>
-      px
-    </template>
-  </NInputNumber>
+  />
 </template>

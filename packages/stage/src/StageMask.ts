@@ -144,7 +144,7 @@ export default class StageMask extends Rule {
         }
       });
 
-      this.pageResizeObserver.observe(page);
+      page && this.pageResizeObserver.observe(page);
 
       this.wrapperResizeObserver = new ResizeObserver((entries) => {
         const [entry] = entries;
@@ -154,7 +154,7 @@ export default class StageMask extends Rule {
         this.setMaxScrollLeft();
         this.setMaxScrollTop();
       });
-      this.wrapperResizeObserver.observe(this.wrapper);
+      this.wrapper && this.wrapperResizeObserver.observe(this.wrapper);
     }
   }
 

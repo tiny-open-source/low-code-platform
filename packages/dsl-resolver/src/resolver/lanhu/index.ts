@@ -1,38 +1,146 @@
 import type { MNode } from '@lowcode/schema';
 import { type FigmaJson, type FigmaLayersNode, type FigmaPageNode, mockFigmaJson } from './figma-json';
 
-export function sum(a: number, b: number) {
-  return a + b;
+// 基础样式接口
+interface BaseStyle {
+  position: 'absolute';
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+  [key: string]: any;
 }
 
+// 添加节点位置接口
+interface NodePosition {
+  relativeX: number; // 相对于页面根节点的绝对位置
+  relativeY: number;
+}
+
+// 基础节点访问者
 abstract class NodeVisitor {
-  abstract visit(node: any): MNode;
-  protected parseStyles(styles: any[]): object {
-    return styles.reduce((acc, style) => ({
-      ...acc,
-      ...this.parseStyle(style),
-    }), {});
+  abstract visit(node: any, parentPosition?: NodePosition): MNode;
+
+  protected calculateRelativePosition(frame: any, parentPosition?: NodePosition): { top: number; left: number } {
+    if (!parentPosition) {
+      return {
+        top: frame.top,
+        left: frame.left,
+      };
+    }
+
+    // 计算相对于最近绝对定位父元素的位置
+    return {
+      top: parentPosition.relativeY,
+      left: parentPosition.relativeX,
+    };
   }
 
-  protected parseStyle(style: any): object {
-    const result: Record<string, any> = {};
+  protected createBaseStyle(frame: any, parentPosition?: NodePosition): BaseStyle {
+    const { top, left } = this.calculateRelativePosition(frame, parentPosition);
 
-    if (style.font) {
-      result.fontFamily = style.font.name;
-      result.fontSize = style.font.size;
-      result.textAlign = style.font.align;
+    return {
+      position: 'absolute',
+      width: +frame.width,
+      height: +frame.height,
+      top: +top,
+      left: +left,
+      right: undefined,
+      bottom: undefined,
+      // 背景相关
+      backgroundImage: '',
+      backgroundColor: 'transparent',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: '100% 100%',
+      backgroundPosition: '',
+
+      // 文字相关
+      color: '',
+      fontSize: '',
+      fontWeight: '',
+      lineHeight: '',
+      textAlign: '',
+
+      // 布局相关
+      display: '',
+      flexDirection: '',
+      justifyContent: '',
+      alignItems: '',
+      flexWrap: '',
+
+      // 间距相关
+      marginTop: '',
+      marginRight: '',
+      marginBottom: '',
+      marginLeft: '',
+      paddingTop: '',
+      paddingRight: '',
+      paddingBottom: '',
+      paddingLeft: '',
+
+      // 其他
+      opacity: 1,
+      overflow: 'initial',
+      zIndex: '',
+
+      // 变换
+      transform: {
+        rotate: '',
+        scale: '',
+      },
+
+      // 边框相关
+      borderTopLeftRadius: '',
+      borderTopRightRadius: '',
+      borderBottomRightRadius: '',
+      borderBottomLeftRadius: '',
+      borderTopWidth: '',
+      borderTopStyle: '',
+      borderTopColor: '',
+      borderRightWidth: '',
+      borderRightStyle: '',
+      borderRightColor: '',
+      borderBottomWidth: '',
+      borderBottomStyle: '',
+      borderBottomColor: '',
+      borderLeftWidth: '',
+      borderLeftStyle: '',
+      borderLeftColor: '',
+      borderWidth: '',
+      borderStyle: '',
+      borderColor: '',
+    };
+  }
+
+  protected parseStyle(node: any, parentPosition?: NodePosition): object {
+    const baseStyle = this.createBaseStyle(node.frame, parentPosition);
+
+    // 处理背景色
+    if (node.style?.fills?.[0]?.color?.value) {
+      baseStyle.backgroundColor = node.style.fills[0].color.value;
     }
 
-    if (style.color) {
-      result.color = style.color.value;
+    // 处理透明度
+    if (node.opacity) {
+      baseStyle.opacity = node.opacity;
     }
 
-    return result;
+    // 处理边框圆角
+    if (node.paths?.[0]?.radius) {
+      const radius = node.paths[0].radius;
+      baseStyle.borderTopLeftRadius = radius.topLeft;
+      baseStyle.borderTopRightRadius = radius.topRight;
+      baseStyle.borderBottomRightRadius = radius.bottomRight;
+      baseStyle.borderBottomLeftRadius = radius.bottomLeft;
+    }
+
+    return baseStyle;
   }
 }
 
+// 页面节点访问者
 class PageNodeVisitor extends NodeVisitor {
-  visit(node: FigmaPageNode): MNode {
+  visit(node: FigmaPageNode, parentPosition?: NodePosition): MNode {
     return {
       type: 'page',
       id: `page_${node.id}`,
@@ -40,91 +148,26 @@ class PageNodeVisitor extends NodeVisitor {
       title: '',
       layout: 'absolute',
       style: {
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        right: '',
-        bottom: '',
-        width: node.frame.width,
-        height: node.frame.height,
-        backgroundImage: '',
-        backgroundColor: node.style.fills[0].color.value,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%',
-        color: '',
-        fontSize: '',
-        fontWeight: '',
+        ...this.parseStyle(node, parentPosition),
+        ...{
+          top: 0,
+          left: 0,
+        },
       },
       items: node.layers ?? [],
     };
   }
 }
 
+// 其他访问者类同样优化
 class ArtBoardNodeVisitor extends NodeVisitor {
-  visit(node: FigmaLayersNode): MNode {
+  visit(node: any, parentPosition?: NodePosition): MNode {
     return {
       id: `component_${node.id}`,
       type: 'container',
       name: node.name,
       layout: 'absolute',
-      style: {
-        position: 'absolute',
-        width: node.frame.width,
-        height: node.frame.height,
-        top: node.frame.top,
-        left: node.frame.left,
-        right: '',
-        bottom: '',
-        backgroundImage: '',
-        backgroundColor: node.style?.fills?.[0]?.color?.value,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%',
-        color: '',
-        fontSize: '',
-        opacity: node.opacity,
-        fontWeight: '',
-        transform: {
-          rotate: '',
-          scale: '',
-        },
-        display: '',
-        flexDirection: '',
-        justifyContent: '',
-        alignItems: '',
-        flexWrap: '',
-        marginTop: '',
-        marginRight: '',
-        marginBottom: '',
-        marginLeft: '',
-        paddingTop: '',
-        paddingRight: '',
-        paddingBottom: '',
-        paddingLeft: '',
-        overflow: '',
-        lineHeight: '',
-        textAlign: '',
-        backgroundPosition: '',
-        zIndex: '',
-        borderTopLeftRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderTopRightRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderBottomRightRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderBottomLeftRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderTopWidth: '',
-        borderTopStyle: '',
-        borderTopColor: '',
-        borderRightColor: '',
-        borderRightWidth: '',
-        borderRightStyle: '',
-        borderBottomWidth: '',
-        borderBottomStyle: '',
-        borderBottomColor: '',
-        borderLeftStyle: '',
-        borderLeftWidth: '',
-        borderLeftColor: '',
-        borderWidth: '',
-        borderStyle: '',
-        borderColor: '',
-      },
+      style: this.parseStyle(node, parentPosition),
       events: [],
       created: '',
       items: node.layers ?? [],
@@ -133,70 +176,13 @@ class ArtBoardNodeVisitor extends NodeVisitor {
 }
 
 class ShapeLayerNodeVisitor extends NodeVisitor {
-  visit(node: FigmaLayersNode): MNode {
+  visit(node: any, parentPosition?: NodePosition): MNode {
     return {
       id: `component_${node.id}`,
       type: 'container',
       name: node.name,
       layout: 'absolute',
-      style: {
-        position: 'absolute',
-        width: node.frame.width,
-        height: node.frame.height,
-        top: node.frame.top,
-        left: node.frame.left,
-        right: '',
-        bottom: '',
-        backgroundImage: '',
-        backgroundColor: node.style?.fills?.[0]?.color?.value,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%',
-        color: '',
-        fontSize: '',
-        opacity: node.opacity,
-        fontWeight: '',
-        transform: {
-          rotate: '',
-          scale: '',
-        },
-        display: '',
-        flexDirection: '',
-        justifyContent: '',
-        alignItems: '',
-        flexWrap: '',
-        marginTop: '',
-        marginRight: '',
-        marginBottom: '',
-        marginLeft: '',
-        paddingTop: '',
-        paddingRight: '',
-        paddingBottom: '',
-        paddingLeft: '',
-        overflow: '',
-        lineHeight: '',
-        textAlign: '',
-        backgroundPosition: '',
-        zIndex: '',
-        borderTopLeftRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderTopRightRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderBottomRightRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderBottomLeftRadius: node.paths[0]?.radius?.topLeft ?? '',
-        borderTopWidth: '',
-        borderTopStyle: '',
-        borderTopColor: '',
-        borderRightColor: '',
-        borderRightWidth: '',
-        borderRightStyle: '',
-        borderBottomWidth: '',
-        borderBottomStyle: '',
-        borderBottomColor: '',
-        borderLeftStyle: '',
-        borderLeftWidth: '',
-        borderLeftColor: '',
-        borderWidth: '',
-        borderStyle: '',
-        borderColor: '',
-      },
+      style: this.parseStyle(node, parentPosition),
       events: [],
       created: '',
       items: [],
@@ -205,151 +191,57 @@ class ShapeLayerNodeVisitor extends NodeVisitor {
 }
 
 class GroupLayerNodeVisitor extends NodeVisitor {
-  visit(node: FigmaLayersNode): MNode {
+  visit(node: FigmaLayersNode, parentPosition?: NodePosition): MNode {
     return {
       id: `component_${node.id}`,
       type: 'container',
       name: node.name,
       layout: 'absolute',
-      style: {
-        position: 'absolute',
-        width: node.frame.width,
-        height: node.frame.height,
-        top: node.frame.top,
-        left: node.frame.left,
-        right: '',
-        bottom: '',
-        backgroundImage: '',
-        backgroundColor: node.style?.fills?.[0]?.color?.value,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%',
-        color: '',
-        fontSize: '',
-        opacity: node.opacity,
-        fontWeight: '',
-        transform: {
-          rotate: '',
-          scale: '',
-        },
-        display: '',
-        flexDirection: '',
-        justifyContent: '',
-        alignItems: '',
-        flexWrap: '',
-        marginTop: '',
-        marginRight: '',
-        marginBottom: '',
-        marginLeft: '',
-        paddingTop: '',
-        paddingRight: '',
-        paddingBottom: '',
-        paddingLeft: '',
-        overflow: '',
-        lineHeight: '',
-        textAlign: '',
-        backgroundPosition: '',
-        zIndex: '',
-        borderTopLeftRadius: '',
-        borderTopRightRadius: '',
-        borderBottomRightRadius: '',
-        borderBottomLeftRadius: '',
-        borderTopWidth: '',
-        borderTopStyle: '',
-        borderTopColor: '',
-        borderRightColor: '',
-        borderRightWidth: '',
-        borderRightStyle: '',
-        borderBottomWidth: '',
-        borderBottomStyle: '',
-        borderBottomColor: '',
-        borderLeftStyle: '',
-        borderLeftWidth: '',
-        borderLeftColor: '',
-        borderWidth: '',
-        borderStyle: '',
-        borderColor: '',
-      },
+      style: this.parseStyle(node, parentPosition),
       events: [],
       created: '',
       items: node.layers ?? [],
     };
   }
 }
+function calcLineHeight(t: any, e: any) {
+  return typeof t === 'object' && t ? (t == null ? void 0 : t.unit.toUpperCase()) === 'PERCENT' ? t.value * e / 100 : (t == null ? void 0 : t.unit.toUpperCase()) === 'AUTO' ? 1.171875 * e : t == null ? void 0 : t.value : t;
+}
 class TextLayerNodeVisitor extends NodeVisitor {
-  visit(node: FigmaLayersNode): MNode {
+  visit(node: FigmaLayersNode, parentPosition?: NodePosition): MNode {
     return {
       id: `component_${node.id}`,
       type: 'text',
       name: node.name,
       text: node.text?.value,
       style: {
-        position: 'absolute',
-        width: node.frame.width,
-        height: node.frame.height,
-        top: node.frame.top,
-        left: node.frame.left,
-        right: '',
-        bottom: '',
-        backgroundImage: '',
+        ...this.parseStyle(node, parentPosition),
         backgroundColor: '',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% 100%',
         color: node.style.fills[0].color.value,
         fontSize: node.text?.style.font.size,
-        opacity: node.opacity,
         fontWeight: node.text?.style.font.fontWeight,
-        transform: {
-          rotate: '',
-          scale: '',
-        },
-        display: '',
-        flexDirection: '',
-        justifyContent: '',
-        alignItems: '',
-        flexWrap: '',
-        marginTop: '',
-        marginRight: '',
-        marginBottom: '',
-        marginLeft: '',
-        paddingTop: '',
-        paddingRight: '',
-        paddingBottom: '',
-        paddingLeft: '',
-        overflow: '',
-        lineHeight: '',
-        textAlign: '',
-        backgroundPosition: '',
-        zIndex: '',
-        borderTopLeftRadius: '',
-        borderTopRightRadius: '',
-        borderBottomRightRadius: '',
-        borderBottomLeftRadius: '',
-        borderTopWidth: '',
-        borderTopStyle: '',
-        borderTopColor: '',
-        borderRightColor: '',
-        borderRightWidth: '',
-        borderRightStyle: '',
-        borderBottomWidth: '',
-        borderBottomStyle: '',
-        borderBottomColor: '',
-        borderLeftStyle: '',
-        borderLeftWidth: '',
-        borderLeftColor: '',
-        borderWidth: '',
-        borderStyle: '',
-        borderColor: '',
+        lineHeight: calcLineHeight(node.text?.style.font.lineHeight, node.text?.style.font.size),
       },
       events: [],
       created: '',
     };
   }
 }
+
 class NodeParser {
   private visitors: Map<string, NodeVisitor>;
-  constructor() {
+  private static instance: NodeParser;
+
+  private constructor() {
     this.visitors = new Map();
     this.registerDefaultVisitors();
+  }
+
+  static getInstance(): NodeParser {
+    if (!NodeParser.instance) {
+      NodeParser.instance = new NodeParser();
+    }
+    return NodeParser.instance;
   }
 
   private registerDefaultVisitors() {
@@ -360,44 +252,75 @@ class NodeParser {
     this.visitors.set('textLayer', new TextLayerNodeVisitor());
   }
 
-  parse(node: any, type?: string): MNode {
+  parse(node: any, type?: string, parentPosition?: NodePosition): MNode {
     const visitor = this.visitors.get(type ?? node.type);
     if (!visitor) {
-      throw new Error(`未知节点类型: ${node.type}`);
+      throw new Error(`Unsupported node type: ${type ?? node.type}`);
     }
-    return visitor.visit(node);
+    try {
+      return visitor.visit(node, parentPosition);
+    }
+    catch (error: any) {
+      throw new Error(`Parse error: ${error.message}`);
+    }
   }
 }
+
 export class FigmaParser {
   private nodeParser: NodeParser;
 
   constructor() {
-    this.nodeParser = new NodeParser();
+    this.nodeParser = NodeParser.getInstance();
   }
 
   parse(figmaJson: FigmaJson): MNode {
-    const page = figmaJson.artboard;
-    return this.parsePage(page);
+    try {
+      const { artboard, meta } = figmaJson;
+      return {
+        type: 'app',
+        name: meta.device,
+        id: meta.id,
+        items: [this.parsePage(artboard)],
+      };
+    }
+    catch (error: any) {
+      throw new Error(`Figma parse error: ${error.message}`);
+    }
   }
 
-  private parsePage(figmaPage: FigmaPageNode): MNode {
-    const result = this.nodeParser.parse(figmaPage, 'page');
-    result.items = result.items.map((child: FigmaLayersNode) => this.parseNode(child));
+  private parsePage(node: FigmaPageNode): MNode {
+    // 页面是第一个绝对定位元素
+    const pagePosition: NodePosition = {
+      relativeX: 0,
+      relativeY: 0,
+    };
+
+    const result = this.nodeParser.parse(node, 'page');
+    result.items = Array.isArray(result.items)
+      ? result.items.map(child => this.parseNode(child, [pagePosition]))
+      : [];
     return result;
   }
 
-  private parseNode(node: FigmaLayersNode): MNode {
-    const parsedNode = this.nodeParser.parse(node);
+  private parseNode(node: FigmaLayersNode, parentPosition: NodePosition[]): MNode {
+    // 计算当前节点的绝对位置
+    const currentPosition: NodePosition = {
+      relativeX: (node.frame?.left || 0) - parentPosition.reduce((acc, cur) => acc + cur.relativeX, 0),
+      relativeY: (node.frame?.top || 0) - parentPosition.reduce((acc, cur) => acc + cur.relativeY, 0),
+    };
 
-    if (parsedNode.items?.length) {
-      parsedNode.items = parsedNode.items.map(
-        (child: FigmaLayersNode) => this.parseNode(child),
+    const parsedNode = this.nodeParser.parse(node, node.type, currentPosition);
+
+    if (Array.isArray(parsedNode.items)) {
+      parsedNode.items = parsedNode.items.map(child =>
+        this.parseNode(child, parentPosition.concat(currentPosition)),
       );
     }
 
     return parsedNode;
   }
 }
+
 const parser = new FigmaParser();
 const dsl = parser.parse(mockFigmaJson);
-console.dir(dsl, { depth: 10 });
+console.dir(dsl, { depth: 1 });

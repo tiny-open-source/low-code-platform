@@ -35,7 +35,7 @@ const text = computed(() => {
 });
 const style = app?.transformStyle(props.config.style || {});
 
-const classname = computed(() => props.config?.multiple ? 'magic-ui-text' : 'magic-ui-text magic-ui-text--single-line');
+const classname = computed(() => props.config?.multiple ? 'lowcode-ui-text' : 'lowcode-ui-text lowcode-ui-text--single-line');
 </script>
 
 <template>
@@ -50,3 +50,9 @@ const classname = computed(() => props.config?.multiple ? 'magic-ui-text' : 'mag
     </span>
   </div>
 </template>
+
+<style>
+.lowcode-ui-text--single-line {
+  white-space: nowrap;
+}
+</style>

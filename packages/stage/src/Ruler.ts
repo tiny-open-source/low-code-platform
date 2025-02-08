@@ -27,7 +27,7 @@ export default class Rule extends EventEmitter {
       this.vGuides.resize();
     });
 
-    this.containerResizeObserver.observe(this.container);
+    this.container && this.containerResizeObserver.observe(this.container);
   }
 
   /**

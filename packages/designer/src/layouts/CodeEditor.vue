@@ -118,7 +118,7 @@ function init() {
     });
   }
 
-  resizeObserver.observe(codeEditor.value);
+  codeEditor.value && resizeObserver.observe(codeEditor.value);
 }
 watch(
   () => props.initValues,

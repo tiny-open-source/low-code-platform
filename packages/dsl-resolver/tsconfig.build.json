@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {},
+    "types": ["vitest", "vitest/globals"],
     "declaration": true,
     "declarationDir": "types",
     "forceConsistentCasingInFileNames": true

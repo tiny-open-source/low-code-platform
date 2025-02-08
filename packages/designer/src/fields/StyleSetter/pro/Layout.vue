@@ -108,11 +108,13 @@ const config = {
         {
           name: 'width',
           text: '宽度',
+          type: 'number',
           labelWidth: '68px',
         },
         {
           name: 'height',
           text: '高度',
+          type: 'number',
           labelWidth: '68px',
         },
       ],

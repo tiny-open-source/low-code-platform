@@ -27,12 +27,12 @@ const config = {
         {
           name: 'left',
           text: 'left',
-          type: 'text',
+          type: 'number',
         },
         {
           name: 'top',
           text: 'top',
-          type: 'text',
+          type: 'number',
         },
       ],
     },
@@ -44,12 +44,12 @@ const config = {
         {
           name: 'right',
           text: 'right',
-          type: 'text',
+          type: 'number',
         },
         {
           name: 'bottom',
           text: 'bottom',
-          type: 'text',
+          type: 'number',
         },
       ],
     },
@@ -57,7 +57,7 @@ const config = {
       labelWidth: '68px',
       name: 'zIndex',
       text: 'zIndex',
-      type: 'text',
+      type: 'number',
     },
   ],
 };

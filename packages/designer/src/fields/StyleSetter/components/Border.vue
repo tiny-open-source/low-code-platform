@@ -22,6 +22,7 @@ const config = computed(() => ({
     {
       name: `border${direction.value}Width`,
       text: '边框宽度',
+      type: 'number',
       labelWidth: '68px',
     },
     {

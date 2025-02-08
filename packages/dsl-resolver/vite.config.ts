@@ -21,8 +21,8 @@ export default defineConfig({
     target: 'esnext',
     lib: {
       entry: 'src/index.ts',
-      name: 'LowCodeCore',
-      fileName: 'lowcode-core',
+      name: 'LowCodeDSLResolver',
+      fileName: 'lowcode-dsl-resolver',
     },
 
     rollupOptions: {
