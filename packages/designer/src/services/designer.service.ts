@@ -530,7 +530,7 @@ class Designer extends BaseService {
     if (!root)
       throw new Error('没有root');
 
-    const { parent, node: curNode } = this.getNodeInfo(node.id);
+    const { parent, node: curNode } = this.getNodeInfo(node.id, false);
 
     if (!parent || !curNode)
       throw new Error('找不要删除的节点');
