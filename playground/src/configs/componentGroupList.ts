@@ -1,3 +1,4 @@
+import type { ComponentGroup } from '@lowcode/designer';
 import { BorderOuterOutlined, FileImageOutlined, FileTextOutlined, GroupOutlined, PoweroffOutlined, QrcodeOutlined } from '@vicons/antd';
 import { markRaw } from 'vue';
 
@@ -81,4 +82,4 @@ export default [
       },
     ],
   },
-];
+] as ComponentGroup[];

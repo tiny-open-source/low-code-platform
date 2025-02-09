@@ -43,6 +43,9 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    proxy: {},
+  },
   server: {
     port: 10001,
     open: '/low-code-platform/playground/',
