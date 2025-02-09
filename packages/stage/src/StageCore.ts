@@ -294,9 +294,10 @@ class StageCore extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    const { renderer } = this;
+    const { mask, renderer } = this;
 
-    renderer.destroy();
+    renderer?.destroy();
+    mask?.destroy();
 
     this.removeAllListeners();
 

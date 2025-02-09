@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { ScrollViewerEvent, Services } from '../type';
 
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { ScrollViewer } from '../utils/scroll-viewer';
 
 import ScrollBar from './ScrollBar.vue';
@@ -68,7 +68,7 @@ onMounted(() => {
   });
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   scrollViewer.destroy();
 });
 

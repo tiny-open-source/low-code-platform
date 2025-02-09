@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GetColumnWidth, Services } from '../type';
 import Gesto from 'gesto';
-import { inject, onMounted, onUnmounted, ref, toRaw } from 'vue';
+import { inject, onBeforeUnmount, onMounted, ref, toRaw } from 'vue';
 
 defineOptions({
   name: 'Resizer',
@@ -42,7 +42,7 @@ onMounted(() => {
     });
   });
 });
-onUnmounted(() => {
+onBeforeUnmount(() => {
   getso?.unset();
 });
 </script>

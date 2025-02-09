@@ -5,7 +5,7 @@ import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
 import JsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import serialize from 'serialize-javascript';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 defineOptions({
   name: 'low-code-editor',
@@ -134,7 +134,7 @@ watch(
 );
 
 onMounted(init);
-onUnmounted(() => {
+onBeforeUnmount(() => {
   resizeObserver.disconnect();
 });
 defineExpose({

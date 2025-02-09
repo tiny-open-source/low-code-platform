@@ -1,5 +1,5 @@
 import type Core from '@lowcode/core';
-import { getCurrentInstance, inject, onMounted, onUnmounted } from 'vue';
+import { getCurrentInstance, inject, onBeforeUnmount, onMounted } from 'vue';
 
 export function useApp(props: any) {
   const app: Core | undefined = inject('app');
@@ -13,7 +13,7 @@ export function useApp(props: any) {
     node?.emit('mounted', vm);
   });
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     node?.emit('destroy', vm);
   });
 

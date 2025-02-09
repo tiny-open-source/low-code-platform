@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Gesto from 'gesto';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const props = defineProps<{
   size: number;
@@ -44,7 +44,7 @@ onMounted(() => {
   bar.value?.addEventListener('wheel', wheelHandler, false);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (gesto)
     gesto.off();
   bar.value?.removeEventListener('wheel', wheelHandler, false);

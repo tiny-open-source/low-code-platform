@@ -1,5 +1,6 @@
-import type { MNode } from '@lowcode/schema';
-import { type FigmaJson, type FigmaLayersNode, type FigmaPageNode, mockFigmaJson } from './figma-json';
+import type { MApp, MNode, MPage } from '@lowcode/schema';
+import type { FigmaJson, FigmaLayersNode, FigmaPageNode } from './figma-json';
+import { NodeType } from '@lowcode/schema';
 
 // 基础样式接口
 interface BaseStyle {
@@ -273,11 +274,11 @@ export class FigmaParser {
     this.nodeParser = NodeParser.getInstance();
   }
 
-  parse(figmaJson: FigmaJson): MNode {
+  parse(figmaJson: FigmaJson): MApp {
     try {
       const { artboard, meta } = figmaJson;
       return {
-        type: 'app',
+        type: NodeType.ROOT,
         name: meta.device,
         id: meta.id,
         items: [this.parsePage(artboard)],
@@ -288,7 +289,7 @@ export class FigmaParser {
     }
   }
 
-  private parsePage(node: FigmaPageNode): MNode {
+  private parsePage(node: FigmaPageNode): MPage {
     // 页面是第一个绝对定位元素
     const pagePosition: NodePosition = {
       relativeX: 0,
@@ -299,7 +300,7 @@ export class FigmaParser {
     result.items = Array.isArray(result.items)
       ? result.items.map(child => this.parseNode(child, [pagePosition]))
       : [];
-    return result;
+    return result as MPage;
   }
 
   private parseNode(node: FigmaLayersNode, parentPosition: NodePosition[]): MNode {
@@ -321,6 +322,6 @@ export class FigmaParser {
   }
 }
 
-const parser = new FigmaParser();
-const dsl = parser.parse(mockFigmaJson);
-console.dir(dsl, { depth: 1 });
+// const parser = new FigmaParser();
+// const dsl = parser.parse(mockFigmaJson);
+// console.dir(dsl, { depth: 1 });

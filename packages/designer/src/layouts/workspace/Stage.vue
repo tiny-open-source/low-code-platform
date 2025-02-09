@@ -2,11 +2,12 @@
 import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
 import type { Runtime } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
+import type { Services, StageOptions, StageRect } from '../../type';
 import { calcValueByFontsize, getOffset } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
-import { computed, inject, markRaw, onMounted, onUnmounted, ref, toRaw, watch, watchEffect } from 'vue';
+import { computed, inject, markRaw, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
 import ScrollViewer from '../../components/ScrollViewer.vue';
-import { Layout, type Services, type StageOptions, type StageRect } from '../../type';
+import { Layout } from '../../type';
 import { useStage } from '../../utils';
 import ViewerMenu from './ViewerMenu.vue';
 
@@ -135,7 +136,7 @@ function contextmenuHandler(e: MouseEvent) {
 onMounted(() => {
   stageWrap.value?.container && resizeObserver.observe(stageWrap.value.container);
 });
-onUnmounted(() => {
+onBeforeUnmount(() => {
   stage?.destroy();
   resizeObserver.disconnect();
   services?.designerService.set('stage', null);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MenuButton, MenuComponent, MenuItem } from '../type';
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import ToolButton from './ToolButton.vue';
 
 const props = withDefaults(defineProps<{
@@ -64,7 +64,7 @@ onMounted(() => {
   globalThis.addEventListener('mousedown', hideHandler, true);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (props.isSubMenu)
     return;
 

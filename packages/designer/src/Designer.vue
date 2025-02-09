@@ -6,7 +6,7 @@ import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
 import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
 import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@lowcode/stage';
-import { onUnmounted, provide, reactive, ref, toRaw, watch } from 'vue';
+import { onBeforeUnmount, provide, reactive, ref, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
@@ -61,7 +61,6 @@ const props = withDefaults(
 defineEmits(['propsPanelMounted']);
 
 const modelValue = defineModel<MApp>({ required: true });
-
 designerService.on('root-change', (value) => {
   const node = designerService.get<MNode | null>('node');
   const nodeId = node?.id || props.defaultSelected;
@@ -71,7 +70,6 @@ designerService.on('root-change', (value) => {
   else {
     designerService.set('nodes', [value]);
   }
-
   modelValue.value = toRaw(designerService.get('root'));
 });
 
@@ -143,7 +141,7 @@ watch(
 );
 uiService.initColumnWidth();
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   designerService.destroy();
   historyService.destroy();
   propsService.destroy();
@@ -167,7 +165,6 @@ provide(
     containerHighlightType: props.containerHighlightType,
   }),
 );
-onUnmounted(() => designerService.destroy());
 designerService.usePlugin({
   beforeDoAdd: (config: MNode, parent?: MContainer | null) => {
     if (config.type === 'overlay') {

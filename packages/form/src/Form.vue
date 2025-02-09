@@ -1,8 +1,8 @@
 <script setup lang="ts" name="LForm">
 import type { FormConfig, FormState, FormValue } from './schema';
 import { cloneDeep, isEqual } from 'lodash-es';
-import { NConfigProvider, NDialogProvider, NForm, NMessageProvider } from 'naive-ui';
-import { provide, reactive, ref, shallowRef, toRaw, watch } from 'vue';
+import { NForm } from 'naive-ui';
+import { provide, reactive, ref, toRaw, watch } from 'vue';
 import { initValue } from './utils/form';
 
 export interface ValidateError {
