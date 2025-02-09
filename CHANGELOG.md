@@ -1,5 +1,29 @@
 # CHANGELOG
 
+# [1.1.0](https://github.com/tiny-open-source/low-code-platform/compare/v1.1.0-alpha.1...v1.1.0) (2025-02-09)
+
+
+### Bug Fixes
+
+* **core:** 修复方法调用的实例引用问题 ([f2ceb24](https://github.com/tiny-open-source/low-code-platform/commit/f2ceb242af1c93de3e8b057973f4b348e797fe66))
+* **designer&stage:** 解决热更新问题 ([dc01cff](https://github.com/tiny-open-source/low-code-platform/commit/dc01cff6869309211b7f028a01bcf9b4a8290929))
+* **designer:** 修复删除节点时界面未触发响应式更新的问题 ([a1874f0](https://github.com/tiny-open-source/low-code-platform/commit/a1874f0fbc1622bcf56e3daf4d6eb3a31ada334d))
+* error import ([f218b62](https://github.com/tiny-open-source/low-code-platform/commit/f218b620473e26930feac7ef7a913c5f3eb4f823))
+* **playground:** type ([d335c7d](https://github.com/tiny-open-source/low-code-platform/commit/d335c7d66139bbb46fccb3371d70c932abe08766))
+
+
+### Features
+
+* add figma json 解析 ([937d84e](https://github.com/tiny-open-source/low-code-platform/commit/937d84e8f5248af4061dfddfc00031e22f5b4368))
+* **deps:** update deps ([f43ff1b](https://github.com/tiny-open-source/low-code-platform/commit/f43ff1bb1e1ba0ca075e2e9fc2b98dec2d14a95f))
+* **dsl-resolver:** 初始化 dsl-resolver 包并添加基本功能 ([65af9d4](https://github.com/tiny-open-source/low-code-platform/commit/65af9d4e8cae25882d968ff7d08d516a7b89b60a))
+* **dsl-resolver:** 导出 FigmaParser 并更新依赖版本 ([418c0df](https://github.com/tiny-open-source/low-code-platform/commit/418c0df2c54201d0d5fe40b203f67e8e4c39e0a4))
+* **dsl-resolver:** figma json parse ([87c30a2](https://github.com/tiny-open-source/low-code-platform/commit/87c30a225f179e1b7930381b995cfd45e6edd2c3))
+* **playground:** 添加路由配置 ([3d5768f](https://github.com/tiny-open-source/low-code-platform/commit/3d5768fdcd7f8904e567e617b86a55b27c79058c))
+* **playground:** 新增从蓝湖一键导入dsl的功能 ([6011aec](https://github.com/tiny-open-source/low-code-platform/commit/6011aecf130ae223c7ec70384eda9cf5c1451407))
+
+
+
 # [1.1.0-alpha.1](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.4...v1.1.0-alpha.1) (2025-02-02)
 
 
