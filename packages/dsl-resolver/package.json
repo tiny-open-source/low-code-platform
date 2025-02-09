@@ -36,9 +36,9 @@
     "@lowcode/schema": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "^20.17.14",
+    "@types/node": "^20.17.17",
     "rimraf": "^6.0.1",
-    "vite": "^6.0.7",
-    "vitest": "^2.1.8"
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
   }
 }
