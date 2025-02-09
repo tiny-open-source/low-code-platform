@@ -6,8 +6,6 @@ Promise.all([import('../.lowcode/comp-entry'), import('../.lowcode/plugin-entry'
   const vm = createApp(App);
 
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
-    console.log(`low-code-runtime-ui-${type}`);
-
     vm.component(`low-code-runtime-ui-${type}`, component);
   });
 

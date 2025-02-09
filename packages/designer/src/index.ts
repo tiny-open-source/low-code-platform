@@ -28,10 +28,11 @@ import './theme/index.scss';
 import '@unocss/reset/tailwind-compat.css';
 
 export { default as ContentMenu } from './components/ContentMenu.vue';
-
 export { default as Icon } from './components/Icon.vue';
 
 export { default as LowCodeDesigner } from './Designer.vue';
+
+export { default as CodeEditor } from './layouts/CodeEditor.vue';
 export { default as designerService } from './services/designer.service';
 export { default as historyService } from './services/history.service';
 export { default as storageService } from './services/storage.service';

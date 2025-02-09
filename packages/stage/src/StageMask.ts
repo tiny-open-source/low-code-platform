@@ -150,7 +150,6 @@ export default class StageMask extends Rule {
         }
       });
 
-      console.log('🚀 ~ StageMask ~ observe ~ page:', page);
       page && this.pageResizeObserver.observe(page);
 
       this.wrapperResizeObserver = new ResizeObserver((entries) => {

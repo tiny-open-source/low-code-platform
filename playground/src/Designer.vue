@@ -3,7 +3,6 @@ import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type { Id } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import { LowCodeDesigner } from '@lowcode/designer';
-// import { mockDSL } from './configs/dsl';
 import { FigmaParser } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
@@ -16,12 +15,13 @@ import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
 import { mockFigmaJson } from './figma-json';
-
+import ImportDSL  from './components/Import'
 const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
+const importDialogVisible = ref(false)
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
-const value = ref(figmaParser.parse(mockFigmaJson));
+const value = ref(mockDSL);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
@@ -47,6 +47,9 @@ asyncLoadJs(
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
+function parse(dsl: string) {
+  value.value = figmaParser.parse(typeof dsl === 'string' ? JSON.parse(dsl) : dsl);
+}
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
   const id = core?.dr?.target?.id;
@@ -94,6 +97,7 @@ const menu: MenuBarData = {
       text: '导入',
       icon: ImportOutlined,
       handler: async () => {
+        importDialogVisible.value = true
       },
     },
     {
@@ -160,6 +164,7 @@ const menu: MenuBarData = {
         </template>
       </LowCodeDesigner>
       <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
+      <ImportDSL v-model:show="importDialogVisible" @save="parse"></ImportDSL>
     </NDialogProvider>
   </NConfigProvider>
 </template>

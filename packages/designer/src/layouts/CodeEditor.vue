@@ -4,6 +4,7 @@ import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
 import JsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import serialize from 'serialize-javascript';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
@@ -31,6 +32,8 @@ globalThis.MonacoEnvironment = {
       case 'typescript':
       case 'javascript':
         return new JsWorker();
+        case 'json':
+        return new JsonWorker();
       default:
         return new EditorWorker();
     }
