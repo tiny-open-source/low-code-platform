@@ -21,7 +21,7 @@ const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const importDialogVisible = ref(false)
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
-const value = ref(mockDSL);
+const value = ref(mockDSL as any);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
@@ -48,7 +48,7 @@ asyncLoadJs(
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
 function parse(dsl: string) {
-  value.value = figmaParser.parse(typeof dsl === 'string' ? JSON.parse(dsl) : dsl);
+  value.value = figmaParser.parse(typeof dsl === 'string' ? JSON.parse(dsl) : dsl) as any;
 }
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
