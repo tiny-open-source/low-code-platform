@@ -11,15 +11,16 @@ import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
 import DeviceGroup from './components/DeviceGroup.vue';
+import ImportDSL from './components/Import';
 import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
 import { mockFigmaJson } from './figma-json';
-import ImportDSL  from './components/Import'
+
 const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
-const importDialogVisible = ref(false)
+const importDialogVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const value = ref(mockDSL as any);
 const propsValues = ref<Record<string, any>>({});
@@ -97,7 +98,7 @@ const menu: MenuBarData = {
       text: '导入',
       icon: ImportOutlined,
       handler: async () => {
-        importDialogVisible.value = true
+        importDialogVisible.value = true;
       },
     },
     {
@@ -164,7 +165,7 @@ const menu: MenuBarData = {
         </template>
       </LowCodeDesigner>
       <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
-      <ImportDSL v-model:show="importDialogVisible" @save="parse"></ImportDSL>
+      <ImportDSL v-model:show="importDialogVisible" @save="parse" />
     </NDialogProvider>
   </NConfigProvider>
 </template>

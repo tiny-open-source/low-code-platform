@@ -61,14 +61,22 @@ const props = withDefaults(
 defineEmits(['propsPanelMounted']);
 
 const modelValue = defineModel<MApp>({ required: true });
-designerService.on('root-change', (value) => {
-  const node = designerService.get<MNode | null>('node');
-  const nodeId = node?.id || props.defaultSelected;
-  if (nodeId && node !== value) {
-    designerService.select(nodeId);
+designerService.on('root-change', async (value) => {
+  const nodeId = designerService.get('node')?.id || props.defaultSelected;
+  let node;
+  if (nodeId) {
+    node = designerService.getNodeById(nodeId);
   }
-  else {
+  if (node && node !== value) {
+    await designerService.select(node.id);
+  }
+  else if (value.items?.length) {
+    await designerService.select(value.items[0]);
+  }
+  else if (value.id) {
     designerService.set('nodes', [value]);
+    designerService.set('parent', null);
+    designerService.set('page', null);
   }
   modelValue.value = toRaw(designerService.get('root'));
 });
