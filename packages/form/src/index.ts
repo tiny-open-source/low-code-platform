@@ -18,6 +18,7 @@ import LFieldRadioGroup from './fields/RadioGroup.vue';
 import LFieldsSelect from './fields/Select.vue';
 import LFieldsSwitch from './fields/Switch.vue';
 import LFieldsText from './fields/Text.vue';
+import LFieldsTreeSelect from './fields/TreeSelect.vue';
 import LForm from './Form.vue';
 import './theme/index.scss';
 
@@ -39,6 +40,7 @@ export { default as LFieldRadioGroup } from './fields/RadioGroup.vue';
 export { default as LFieldsSelect } from './fields/Select.vue';
 export { default as LFieldsSwitch } from './fields/Switch.vue';
 export { default as LFieldsText } from './fields/Text.vue';
+export { default as LFieldsTreeSelect } from './fields/TreeSelect.vue';
 export { default as LForm } from './Form.vue';
 export * from './schema';
 
@@ -69,6 +71,7 @@ function install(app: App, options: any) {
   app.component(LForm.name!, LForm);
   app.component(LFieldRadioGroup.name!, LFieldRadioGroup);
   app.component(LFormCol.name!, LFormCol);
+  app.component(LFieldsTreeSelect.name!, LFieldsTreeSelect);
   app.component('l-fields-img-upload', LFieldsText);
 }
 

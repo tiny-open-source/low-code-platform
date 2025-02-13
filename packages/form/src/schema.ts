@@ -364,7 +364,33 @@ export interface CheckboxGroupConfig extends FormItem {
     text: string;
   }[];
 }
-
+export interface TreeSelectConfig extends FormItem, Input {
+  type: 'tree-select';
+  options: SelectOption[] | SelectGroupOption[] | SelectOptionFunction;
+  remote: true;
+  separator: 'string';
+  showPath: boolean;
+  option: {
+    url: string;
+    initUrl?: string | ((lForm: FormState | undefined, data: { model: any; formValue: any }) => string);
+    method?: 'jsonp' | string;
+    cache?: boolean;
+    timeout?: number;
+    mode?: string;
+    headers?: {
+      [key: string]: string;
+    };
+    json?: false | boolean;
+    body?: Record<string, any> | RemoteSelectOptionBodyFunction;
+    jsonpCallback?: 'callback' | string;
+    afterRequest?: RemoteSelectOptionRequestFunction;
+    beforeRequest?: (lForm: FormState | undefined, postOptions: Record<string, any>, data: any) => Record<string, any>;
+    root: string;
+    item?: RemoteSelectOptionItemFunction;
+    value: string | SelectOptionValueFunction;
+    text: string | SelectOptionTextFunction;
+  };
+}
 /**
  * 下拉选择器
  */
