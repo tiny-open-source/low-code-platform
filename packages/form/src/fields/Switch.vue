@@ -41,11 +41,15 @@ const inactiveValue = computed(() => {
 
   return false;
 });
-function changeHandler(v: boolean | number | string) {
-  emit('change', v);
-};
+
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
-  <NSwitch v-model:value="model[modelName]" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" @update:value="changeHandler" />
+  <NSwitch v-model:value="modelValue" :checked-value="activeValue" :un-checked-value="inactiveValue" :disabled="disabled" />
 </template>

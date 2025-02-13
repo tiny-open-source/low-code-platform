@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { PropType } from 'vue';
 import type { HiddenConfig } from '../schema';
-import { computed, type PropType } from 'vue';
+import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({

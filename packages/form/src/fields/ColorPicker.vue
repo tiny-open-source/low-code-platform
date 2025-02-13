@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { PropType } from 'vue';
 import type { HiddenConfig } from '../schema';
 import { NColorPicker } from 'naive-ui';
-import { computed, type PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({
@@ -15,12 +16,16 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['change']);
-const name = computed(() => props.name || props.config.name || '');
-function handleColor(value: string) {
-  emit('change', value);
-}
+const modelName = computed(() => props.name || props.config.name || '');
+
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
-  <NColorPicker v-if="model" v-model:value="model[name]" @update:value="handleColor" />
+  <NColorPicker v-if="model" v-model:value="modelValue" />
 </template>

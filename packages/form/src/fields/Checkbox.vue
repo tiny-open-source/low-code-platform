@@ -41,18 +41,21 @@ const inactiveValue = computed(() => {
 
   return false;
 });
-function changeHandler(value: any) {
-  emit('change', value);
-};
+
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
   <NCheckbox
-    v-model:checked="model[modelName]"
+    v-model:checked="modelValue"
     :checked-value="activeValue"
     :unchecked-value="inactiveValue"
     :disabled="disabled"
-    @update:checked="changeHandler"
   >
     {{ config.text }}
   </NCheckbox>

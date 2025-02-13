@@ -66,15 +66,19 @@ else if (props.config.option) {
 function getInitOption() {
   return Promise.resolve([]);
 }
-function changeHandler(value: any) {
-  emit('change', value);
-}
+
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
   <NSelect
     v-if="model"
-    v-model:value="model[modelName]"
+    v-model:value="modelValue"
     :options="options"
     label-field="text"
     value-field="value"
@@ -83,6 +87,5 @@ function changeHandler(value: any) {
     placeholder="请选择"
     :size="size"
     :show-arrow="true"
-    @update:value="changeHandler"
   />
 </template>

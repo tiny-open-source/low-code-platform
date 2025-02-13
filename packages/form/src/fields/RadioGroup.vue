@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import { NButton, NIcon, NRadioButton, NRadioGroup } from 'naive-ui';
+import { NButton, NIcon, NRadioButton, NRadioGroup, NTooltip } from 'naive-ui';
+import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 import { useAddField } from '../utils/useAddField';
 
@@ -21,26 +22,49 @@ const props = defineProps({
 const emit = defineEmits(['change', 'input']);
 useAddField(props.prop);
 
-function changeHandler(v: string | number | boolean) {
-  emit('change', v);
-}
+const modelName = computed(() => props.name || props.config.name || '');
+
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
-  <NRadioGroup v-if="model" v-model:value="model[name]" :size="size" name="radiobuttongroup1" @update:value="changeHandler">
-    <NRadioButton
+  <NRadioGroup v-if="model" v-model:value="modelValue" class="radio-group" :size="size" name="radiobuttongroup1">
+    <NTooltip
       v-for="option in config.options"
       :key="option.value"
-      :value="option.value"
-      :label="option.text"
-      @change.stop
+      trigger="hover"
+      placement="top"
     >
-      <NIcon v-if="option.icon">
-        <component :is="option.icon" />
-      </NIcon>
-      <span>{{ option.text }}</span>
-    </NRadioButton>
+      <template #trigger>
+        <NRadioButton
+          :key="option.value"
+          :value="option.value"
+          :label="option.text"
+          style="line-height: 34px;"
+          @change.stop
+        >
+          <NIcon v-if="option.icon">
+            <component :is="option.icon" />
+          </NIcon>
+          <span>{{ option.text }}</span>
+        </NRadioButton>
+      </template>
+      {{ option?.tooltip }}
+    </NTooltip>
   </NRadioGroup>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.radio-group {
+  & ::v-deep(.n-radio-button--checked) {
+    background: var(--n-button-text-color-active);
+    color: var(--n-button-color-active);
+    border-color: var(--n-button-border-color-active);
+  }
+}
+</style>

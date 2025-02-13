@@ -100,7 +100,6 @@ function changeHandler(v: any[]) {
     emit('change', value);
   }
 }
-console.log(value);
 </script>
 
 <template>

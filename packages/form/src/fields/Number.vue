@@ -19,19 +19,25 @@ const props = defineProps({
 const emit = defineEmits(['change', 'input']);
 const lForm = inject<FormState | undefined>('lForm');
 const modelName = computed(() => props.name || props.config.name || '');
-function changeHandler(value: number | null) {
-  emit('change', value);
-}
+
 function inputHandler(value: number | null) {
   emit('input', modelName, value);
   lForm?.$emit('fieldInput', props.prop, value);
 }
+const modelValue = computed({
+  get: () => props.model[modelName.value],
+  set: (value) => {
+    emit('change', value);
+  },
+});
 </script>
 
 <template>
   <NInputNumber
-    v-model:value="model[modelName]"
-    :show-button="false" clearable :disabled="disabled" @update:value="changeHandler"
+    v-model:value="modelValue"
+    :show-button="false"
+    clearable
+    :disabled="disabled"
     @input="inputHandler"
   />
 </template>
