@@ -6,7 +6,7 @@ import { LowCodeDesigner } from '@lowcode/designer';
 import { FigmaParser } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
-import { CodeOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
+import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
@@ -15,7 +15,6 @@ import ImportDSL from './components/Import';
 import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { mockDSL } from './configs/dsl';
-import { mockFigmaJson } from './figma-json';
 
 const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
@@ -92,6 +91,15 @@ const menu: MenuBarData = {
   ],
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
   right: [
+    '/',
+    {
+      type: 'button',
+      text: '使用AI优化',
+      icon: FireOutlined,
+      handler: async () => {
+        importDialogVisible.value = true;
+      },
+    },
     '/',
     {
       type: 'button',
