@@ -11,17 +11,18 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-core.js",
-      "require": "./dist/lowcode-core.umd.cjs"
+      "import": "./dist/lowcode-dsl-resolver.js",
+      "require": "./dist/lowcode-dsl-resolver.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     },
+    "./dist/*": "./dist/*",
     "./*": "./*"
   },
-  "main": "dist/lowcode-core.umd.cjs",
-  "module": "dist/lowcode-core.js",
+  "main": "dist/lowcode-dsl-resolver.umd.cjs",
+  "module": "dist/lowcode-dsl-resolver.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=18"

@@ -113,12 +113,40 @@ abstract class NodeVisitor {
     };
   }
 
+  protected parseFills(styleObject: any, fills: any[]): object {
+    if (!fills.length)
+      return styleObject;
+    fills.forEach((fill) => {
+      if (fill.type === 'gradient') {
+        const gradient = fill.gradient;
+        if (gradient.type === 0) { // 线性渐变
+          const stops = gradient.stops.map((stop: any) => {
+            const color = stop.color.value;
+            const position = stop.position * 100;
+            return `${color} ${position}%`;
+          }).join(', ');
+
+          // 计算渐变角度
+          const from = gradient.from;
+          const to = gradient.to;
+          const angle = calcDeg(from, to);
+
+          styleObject.backgroundImage = `linear-gradient(${angle}deg, ${stops})`;
+        }
+      }
+      else if (fill.type === 'color') {
+        styleObject.backgroundColor = fill.color.value;
+      }
+    });
+
+    return styleObject;
+  }
+
   protected parseStyle(node: any, parentPosition?: NodePosition): object {
     const baseStyle = this.createBaseStyle(node.frame, parentPosition);
 
-    // 处理背景色
-    if (node.style?.fills?.[0]?.color?.value) {
-      baseStyle.backgroundColor = node.style.fills[0].color.value;
+    if (node.style?.fills) {
+      this.parseFills(baseStyle, node.style.fills);
     }
 
     // 处理透明度
@@ -205,9 +233,7 @@ class GroupLayerNodeVisitor extends NodeVisitor {
     };
   }
 }
-function calcLineHeight(t: any, e: any) {
-  return typeof t === 'object' && t ? (t == null ? void 0 : t.unit.toUpperCase()) === 'PERCENT' ? t.value * e / 100 : (t == null ? void 0 : t.unit.toUpperCase()) === 'AUTO' ? 1.171875 * e : t == null ? void 0 : t.value : t;
-}
+
 class TextLayerNodeVisitor extends NodeVisitor {
   visit(node: FigmaLayersNode, parentPosition?: NodePosition): MNode {
     return {
@@ -321,7 +347,20 @@ export class FigmaParser {
     return parsedNode;
   }
 }
-
+function calcLineHeight(t: any, e: any) {
+  return typeof t === 'object' && t ? (t == null ? void 0 : t.unit.toUpperCase()) === 'PERCENT' ? t.value * e / 100 : (t == null ? void 0 : t.unit.toUpperCase()) === 'AUTO' ? 1.171875 * e : t == null ? void 0 : t.value : t;
+}
+function calcDeg(from: { x: number; y: number }, to: { x: number; y: number }) {
+  const i = from;
+  const o = to;
+  const a = o.x - i.x;
+  const r = o.y - i.y;
+  let n = 180 * Math.atan2(r, a) / Math.PI + 90;
+  if (n < 0) {
+    n += 360;
+  }
+  return n;
+}
 // const parser = new FigmaParser();
 // const dsl = parser.parse(mockFigmaJson);
 // console.dir(dsl, { depth: 1 });
