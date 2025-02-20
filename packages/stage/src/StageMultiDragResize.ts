@@ -1,12 +1,13 @@
 import type { MoveableOptions, OnDragStart, OnResizeStart } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import { EventEmitter } from 'eventemitter3';
+import type { StageDragResizeConfig } from './types';
 
+import { EventEmitter } from 'eventemitter3';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, PAGE_CLASS } from './const';
-import { type StageDragResizeConfig, StageDragStatus } from './types';
+import { StageDragStatus } from './types';
 import { calcValueByFontsize, getMode, getTargetElStyle } from './utils';
 
 export default class StageMultiDragResize extends EventEmitter {

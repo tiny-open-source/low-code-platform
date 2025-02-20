@@ -1,6 +1,9 @@
-@use "./common/variables";
+@use './common/variables';
 
 .#{variables.$namespace}-stage {
+  div {
+    box-sizing: content-box;
+  }
   position: relative;
   width: 100%;
   height: calc(100% - variables.$page-bar-height);

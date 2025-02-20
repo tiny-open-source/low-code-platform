@@ -10,6 +10,7 @@ import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOut
 import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
+import Ai from './components/Ai';
 import DeviceGroup from './components/DeviceGroup.vue';
 import ImportDSL from './components/Import';
 import Preview from './components/Preview';
@@ -20,6 +21,7 @@ const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const importDialogVisible = ref(false);
+const aiPanelVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const value = ref(mockDSL as any);
 const propsValues = ref<Record<string, any>>({});
@@ -97,7 +99,7 @@ const menu: MenuBarData = {
       text: '使用AI优化',
       icon: FireOutlined,
       handler: async () => {
-        importDialogVisible.value = true;
+        aiPanelVisible.value = true;
       },
     },
     '/',
@@ -172,6 +174,7 @@ const menu: MenuBarData = {
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
+      <Ai v-model:show="aiPanelVisible" />
       <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
       <ImportDSL v-model:show="importDialogVisible" @save="parse" />
     </NDialogProvider>

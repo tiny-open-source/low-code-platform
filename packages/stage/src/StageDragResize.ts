@@ -1,14 +1,15 @@
 import type { MoveableOptions } from 'moveable';
 import type StageCore from './StageCore';
 import type StageMask from './StageMask';
-import { removeClassNameByClassName } from '@lowcode/utils';
+import type { StageDragResizeConfig } from './types';
 
+import { removeClassNameByClassName } from '@lowcode/utils';
 import { EventEmitter } from 'eventemitter3';
 import KeyController from 'keycon';
 import Moveable from 'moveable';
 import MoveableHelper from 'moveable-helper';
 import { DRAG_EL_ID_PREFIX, GHOST_EL_ID_PREFIX, GuidesType, Mode, ZIndex } from './const';
-import { ContainerHighlightType, type StageDragResizeConfig, StageDragStatus } from './types';
+import { ContainerHighlightType, StageDragStatus } from './types';
 
 import { calcValueByFontsize, down, getAbsolutePosition, getMode, getOffset, getTargetElStyle, up } from './utils';
 

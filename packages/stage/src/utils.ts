@@ -219,3 +219,40 @@ export function up(deltaTop: number, target: HTMLElement | SVGElement): SortEven
     dist: upEls.length && swapIndex > -1 ? upEls[swapIndex].id : target.id,
   };
 }
+export function getBorderWidth(el: Element) {
+  if (!el) {
+    return {
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      borderTopWidth: 0,
+      borderBottomWidth: 0,
+    };
+  }
+
+  const { borderLeftWidth, borderRightWidth, borderTopWidth, borderBottomWidth } = getComputedStyle(el);
+
+  return {
+    borderLeftWidth: Number.parseFloat(borderLeftWidth) || 0,
+    borderRightWidth: Number.parseFloat(borderRightWidth) || 0,
+    borderTopWidth: Number.parseFloat(borderTopWidth) || 0,
+    borderBottomWidth: Number.parseFloat(borderBottomWidth) || 0,
+  };
+}
+export function getMarginValue(el: Element) {
+  if (!el) {
+    return {
+      marginLeft: 0,
+      marginTop: 0,
+    };
+  }
+
+  const { marginLeft, marginTop } = getComputedStyle(el);
+
+  const marginLeftValue = Number.parseFloat(marginLeft) || 0;
+  const marginTopValue = Number.parseFloat(marginTop) || 0;
+
+  return {
+    marginLeft: marginLeftValue,
+    marginTop: marginTopValue,
+  };
+}

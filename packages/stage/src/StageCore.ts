@@ -247,6 +247,7 @@ class StageCore extends EventEmitter {
           this.selectedDom = el;
           // 更新了组件的布局，需要重新设置mask是否可以滚动
           this.mask.setLayout(el);
+
           this.dr.updateMoveable(el);
         }
       }, 0);
