@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     DeviceGroup: typeof import('./src/components/DeviceGroup.vue')['default']
+    Magic: typeof import('./src/components/icons/magic.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
