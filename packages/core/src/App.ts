@@ -8,133 +8,146 @@ import { fillBackgroundImage, isNumber, style2Obj } from './utils';
 interface AppOptionsConfig {
   ua?: string;
   config?: MApp;
-  platform?: 'designer' | 'device';
+  platform?: PlatformType;
   jsEngine?: 'browser';
   curPage?: Id;
   transformStyle?: (style: Record<string, any>) => Record<string, any>;
 }
 
+type PlatformType = 'designer' | 'device' | 'browser';
+
 interface EventCache {
   eventConfig: EventItemConfig;
-  fromCpt: any;
-  args: any[];
+  fromCpt: unknown;
+  args: unknown[];
 }
+
+interface ZoomRatio {
+  x: number;
+  y: number;
+}
+
 class App extends EventEmitter {
-  public env;
+  private readonly env: Env;
+  private readonly pages: Map<Id, Page> = new Map();
+  private readonly components: Map<string, unknown> = new Map();
 
-  public pages = new Map<Id, Page>();
-
-  public page: Page | undefined;
-
-  public platform = 'device';
+  public platform: PlatformType = 'device';
   public jsEngine = 'browser';
-
-  public rootFontSize = document.documentElement.style.fontSize;
-  public zoomRatio = {
-    x: 1,
-    y: 1,
-  };
-
-  public components = new Map();
-
+  public rootFontSize: string;
+  public page?: Page;
+  public zoomRatio: ZoomRatio = { x: 1, y: 1 };
   public eventQueueMap: Record<string, EventCache[]> = {};
 
   constructor(options: AppOptionsConfig) {
     super();
     this.env = new Env();
+    this.rootFontSize = document.documentElement.style.fontSize;
 
-    options.platform && (this.platform = options.platform);
-    options.jsEngine && (this.jsEngine = options.jsEngine);
+    this.initializeApp(options);
+  }
 
-    // 根据屏幕大小计算出跟节点的font-size，用于rem样式的适配
+  private initializeApp(options: AppOptionsConfig): void {
+    const { platform, jsEngine, transformStyle, config, curPage } = options;
+
+    if (platform)
+      this.platform = platform;
+    if (jsEngine)
+      this.jsEngine = jsEngine;
+
     if (this.platform === 'device' || this.platform === 'browser') {
-      const calcFontsize = () => {
-        let { width } = document.documentElement.getBoundingClientRect();
-        width = Math.max(600, width);
-        const fontSize = width / 10.24;
-        this.rootFontSize = document.documentElement.style.fontSize = `${fontSize}px`;
-      };
-
-      calcFontsize();
-
-      document.body.style.fontSize = '14px';
-
-      globalThis.addEventListener('resize', calcFontsize);
+      this.initializeFontSize();
     }
 
-    if (options.transformStyle) {
-      this.transformStyle = options.transformStyle;
+    if (transformStyle) {
+      this.transformStyle = transformStyle;
     }
 
-    options.config && this.setConfig(options.config, options.curPage);
+    if (config) {
+      this.setConfig(config, curPage);
+    }
 
     bindCommonEventListener(this);
   }
 
-  /**
-   * 将dsl中的style配置转换成css，主要是将数子转成rem为单位的样式值，例如100将被转换成1rem
-   * @param style Object
-   * @returns Object
-   */
-  public transformStyle(style: Record<string, any>) {
-    if (!style) {
+  private initializeFontSize(): void {
+    const calcFontsize = (): void => {
+      let { width } = document.documentElement.getBoundingClientRect();
+      width = Math.max(600, width);
+      const fontSize = width / 10.24;
+      this.rootFontSize = document.documentElement.style.fontSize = `${fontSize}px`;
+    };
+
+    calcFontsize();
+    document.body.style.fontSize = '14px';
+    globalThis.addEventListener('resize', calcFontsize);
+  }
+
+  public transformStyle(style: Record<string, any>): Record<string, any> {
+    if (!style)
       return {};
-    }
 
-    let styleObj: Record<string, any> = {};
+    const styleObj = typeof style === 'string' ? style2Obj(style) : { ...style };
+    return this.processStyleProperties(styleObj);
+  }
 
+  private processStyleProperties(styleObj: Record<string, any>): Record<string, any> {
     const results: Record<string, any> = {};
-
-    if (typeof style === 'string') {
-      styleObj = style2Obj(style);
-    }
-    else {
-      styleObj = { ...style };
-    }
-
     const whiteList = ['zIndex', 'opacity', 'fontWeight'];
 
     Object.entries(styleObj).forEach(([key, value]) => {
-      if (key === 'backgroundImage') {
-        value && (results[key] = fillBackgroundImage(value));
-      }
-      else if (key === 'transform' && typeof value !== 'string') {
-        const values = Object.entries(value as Record<string, string>)
-          .map(([transformKey, transformValue]) => {
-            if (!transformValue.trim())
-              return '';
-            if (transformKey === 'rotate' && isNumber(transformValue)) {
-              transformValue = `${transformValue}deg`;
-            }
-            return `${transformKey}(${transformValue})`;
-          })
-          .join(' ');
-        results[key] = !values.trim() ? 'none' : values;
-      }
-      else if (!whiteList.includes(key) && value && /^-?\d*(?:\.\d*)?$/.test(value)) {
-        let radio = 1;
-        if (key === 'height' || key === 'top') {
-          radio = this.zoomRatio.y;
-        }
-        else {
-          radio = this.zoomRatio.x;
-        }
-        results[key] = `${value * radio}px`;
-      }
-      else {
-        results[key] = value;
-      }
+      results[key] = this.processStyleProperty(key, value, whiteList);
     });
+
     return results;
   }
 
-  /**
-   * 设置dsl
-   * @param config dsl跟节点
-   * @param curPage 当前页面id
-   */
-  public setConfig(config: MApp, curPage?: Id) {
-    this.pages = new Map();
+  private processStyleProperty(key: string, value: any, whiteList: string[]): any {
+    if (!value)
+      return value;
+
+    if (key === 'backgroundImage') {
+      return fillBackgroundImage(value);
+    }
+
+    if (key === 'transform' && typeof value !== 'string') {
+      return this.processTransform(value);
+    }
+
+    if (!whiteList.includes(key) && /^-?\d*(?:\.\d*)?$/.test(value)) {
+      return this.convertToPx(key, value);
+    }
+
+    return value;
+  }
+
+  private processTransform(value: Record<string, string>): string {
+    const values = Object.entries(value)
+      .map(([transformKey, transformValue]) => {
+        if (!transformValue.trim())
+          return '';
+        if (transformKey === 'rotate' && isNumber(transformValue)) {
+          transformValue = `${transformValue}deg`;
+        }
+        return `${transformKey}(${transformValue})`;
+      })
+      .join(' ');
+    return values.trim() ? 'none' : values;
+  }
+
+  private convertToPx(key: string, value: any): string {
+    let radio = 1;
+    if (key === 'height' || key === 'top') {
+      radio = this.zoomRatio.y;
+    }
+    else {
+      radio = this.zoomRatio.x;
+    }
+    return `${value * radio}px`;
+  }
+
+  public setConfig(config: MApp, curPage?: Id): void {
+    this.pages.clear();
 
     config.items?.forEach((page) => {
       this.pages.set(
@@ -149,7 +162,7 @@ class App extends EventEmitter {
     this.setPage(curPage || this.page?.data?.id);
   }
 
-  public setPage(id?: Id) {
+  public setPage(id?: Id): void {
     let page;
 
     if (id) {
@@ -168,7 +181,7 @@ class App extends EventEmitter {
     this.calcZoomRatio(page);
   }
 
-  public calcZoomRatio(page?: Page) {
+  public calcZoomRatio(page?: Page): void {
     if (!page)
       return;
     if (this.platform !== 'device')
@@ -178,7 +191,7 @@ class App extends EventEmitter {
     const templateHeight = Number(page.data.style!.height);
     if (!templateWidth || !templateHeight)
       throw new Error('模板页面宽高不明确');
-    const { width: screenWidth, height: screenHeight } = document.documentElement.getBoundingClientRect(); ;
+    const { width: screenWidth, height: screenHeight } = document.documentElement.getBoundingClientRect();
 
     this.zoomRatio = {
       x: screenWidth / templateWidth,
@@ -186,19 +199,19 @@ class App extends EventEmitter {
     };
   }
 
-  public registerComponent(type: string, Component: any) {
+  public registerComponent(type: string, Component: any): void {
     this.components.set(type, Component);
   }
 
-  public unregisterComponent(type: string) {
+  public unregisterComponent(type: string): void {
     this.components.delete(type);
   }
 
-  public resolveComponent(type: string) {
+  public resolveComponent(type: string): any {
     return this.components.get(type);
   }
 
-  public bindEvents() {
+  public bindEvents(): void {
     if (!this.page)
       return;
 
@@ -209,10 +222,9 @@ class App extends EventEmitter {
     }
   }
 
-  public bindEvent(event: EventItemConfig, id: string) {
+  public bindEvent(event: EventItemConfig, id: string): void {
     let { name: eventName } = event;
     if (DEFAULT_EVENTS.findIndex(defaultEvent => defaultEvent.value === eventName) > -1) {
-      // common 事件名通过 node id 避免重复触发
       eventName = getCommonEventName(eventName, id);
     }
 
@@ -221,40 +233,43 @@ class App extends EventEmitter {
     });
   }
 
-  public eventHandler(eventConfig: EventItemConfig, fromCpt: any, args: any[]) {
-    if (!this.page)
-      throw new Error('当前没有页面');
+  public async eventHandler(eventConfig: EventItemConfig, fromCpt: unknown, args: unknown[]): Promise<void> {
+    if (!this.page) {
+      throw new Error('No active page found');
+    }
 
     const { method: methodName, to } = eventConfig;
-
     const toNode = this.page.getNode(to);
-    if (!toNode)
-      throw new Error(`ID为${to}的组件不存在`);
 
-    if (isCommonMethod(methodName)) {
-      return triggerCommonMethod(methodName, toNode);
+    if (!toNode) {
+      throw new Error(`Component with ID ${to} does not exist`);
     }
 
-    if (toNode.instance && toNode.instance.exposed) {
-      if (typeof toNode.instance.exposed[methodName] === 'function') {
-        toNode.instance.exposed[methodName](fromCpt, ...args);
+    try {
+      if (isCommonMethod(methodName)) {
+        await triggerCommonMethod(methodName, toNode);
+        return;
       }
+
+      if (toNode.instance?.exposed?.[methodName]) {
+        await toNode.instance.exposed[methodName](fromCpt, ...args);
+        return;
+      }
+
+      this.addEventToMap({ eventConfig, fromCpt, args });
     }
-    else {
-      this.addEventToMap({
-        eventConfig,
-        fromCpt,
-        args,
-      });
+    catch (error) {
+      console.error(`Error handling event ${methodName}:`, error);
+      throw error;
     }
   }
 
-  public destroy() {
+  public destroy(): void {
     this.removeAllListeners();
     this.pages.clear();
   }
 
-  private addEventToMap(event: EventCache) {
+  private addEventToMap(event: EventCache): void {
     if (this.eventQueueMap[event.eventConfig.to]) {
       this.eventQueueMap[event.eventConfig.to].push(event);
     }

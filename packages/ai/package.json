@@ -16,14 +16,15 @@
     "node": ">=14"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:type && vite build",
     "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
     "clear:type": "rimraf ./types"
   },
   "dependencies": {
     "@langchain/core": "^0.3.40",
     "@lowcode/schema": "workspace:^",
-    "langchain": "^0.3.19"
+    "langchain": "^0.3.19",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
     "@types/node": "^20.17.17",

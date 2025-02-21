@@ -26,6 +26,9 @@ importers:
       nbump:
         specifier: ^2.0.7
         version: 2.0.7(conventional-commits-filter@5.0.0)
+      npm-run-all2:
+        specifier: ^7.0.2
+        version: 7.0.2
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
@@ -53,6 +56,9 @@ importers:
       langchain:
         specifier: ^0.3.19
         version: 0.3.19(@langchain/core@0.3.40(openai@4.85.2(ws@8.18.0)(zod@3.24.2)))(axios@1.7.9)(handlebars@4.7.8)(openai@4.85.2(ws@8.18.0)(zod@3.24.2))(ws@8.18.0)
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13(typescript@5.7.2)
     devDependencies:
       '@types/node':
         specifier: ^20.17.17
@@ -401,6 +407,9 @@ importers:
 
   playground:
     dependencies:
+      '@lowcode/ai':
+        specifier: workspace:1.1.0-alpha.1
+        version: link:../packages/ai
       '@lowcode/designer':
         specifier: workspace:^
         version: link:../packages/designer

@@ -1,6 +1,6 @@
 import { useDialog } from 'naive-ui';
 import { defineComponent } from 'vue';
-import DeviceGroup from './DeviceGroup.vue';
+import DeviceGroup from './DeviceGroup';
 
 export default defineComponent({
   name: 'Preview',

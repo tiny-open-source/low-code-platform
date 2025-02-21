@@ -1,201 +1,337 @@
-import type { BaseLanguageModelCallOptions } from '@langchain/core/language_models/base';
-import type { StringWithAutocomplete } from '@langchain/core/utils/types';
-import { IterableReadableStream } from '@langchain/core/utils/stream';
+/* eslint-disable prefer-const */
+/* eslint-disable unused-imports/no-unused-vars */
+import { SystemMessage } from '@langchain/core/messages';
+import { ref } from 'vue';
+import { generateID } from './db';
+import { cleanUrl } from './libs/clean-url';
+import { mergeReasoningContent } from './libs/reasoning';
+import { pageAssistModel } from './models';
+import { getAllDefaultModelSettings } from './service/model-settings';
+import { getOllamaURL } from './service/ollama';
+import { generateHistory } from './utils/generate-history';
+import { humanMessageFormatter } from './utils/human-message';
 
-export interface OllamaInput {
-  embeddingOnly?: boolean;
-  f16KV?: boolean;
-  frequencyPenalty?: number;
-  headers?: Record<string, string>;
-  keepAlive?: any;
-  logitsAll?: boolean;
-  lowVram?: boolean;
-  mainGpu?: number;
-  model?: string;
-  baseUrl?: string;
-  mirostat?: number;
-  mirostatEta?: number;
-  mirostatTau?: number;
-  numBatch?: number;
-  numCtx?: number;
-  numGpu?: number;
-  numGqa?: number;
-  numKeep?: number;
-  numPredict?: number;
-  numThread?: number;
-  penalizeNewline?: boolean;
-  presencePenalty?: number;
-  repeatLastN?: number;
-  repeatPenalty?: number;
-  ropeFrequencyBase?: number;
-  ropeFrequencyScale?: number;
-  temperature?: number;
-  stop?: string[];
-  tfsZ?: number;
-  topK?: number;
-  topP?: number;
-  minP?: number;
-  typicalP?: number;
-  useMLock?: boolean;
-  useMMap?: boolean;
-  vocabOnly?: boolean;
-  useMlock?: boolean;
-  seed?: number;
-  format?: StringWithAutocomplete<'json'>;
+export interface Message {
+  isBot: boolean;
+  name: string;
+  message: string;
+  sources: any[];
+  reasoning_time_taken?: number;
+  id?: string;
+  messageType?: string;
 }
-export interface OllamaRequestParams {
-  model: string;
-  format?: StringWithAutocomplete<'json'>;
-  images?: string[];
-  options: {
-    embedding_only?: boolean;
-    f16_kv?: boolean;
-    frequency_penalty?: number;
-    logits_all?: boolean;
-    low_vram?: boolean;
-    main_gpu?: number;
-    mirostat?: number;
-    mirostat_eta?: number;
-    mirostat_tau?: number;
-    num_batch?: number;
-    num_ctx?: number;
-    num_gpu?: number;
-    num_gqa?: number;
-    num_keep?: number;
-    num_thread?: number;
-    num_predict?: number;
-    penalize_newline?: boolean;
-    presence_penalty?: number;
-    repeat_last_n?: number;
-    repeat_penalty?: number;
-    rope_frequency_base?: number;
-    rope_frequency_scale?: number;
-    temperature?: number;
-    stop?: string[];
-    tfs_z?: number;
-    top_k?: number;
-    top_p?: number;
-    typical_p?: number;
-    use_mlock?: boolean;
-    use_mmap?: boolean;
-    vocab_only?: boolean;
-  };
-}
-export interface OllamaMessage {
-  role: StringWithAutocomplete<'user' | 'assistant' | 'system'>;
+
+export type ChatHistory = {
+  role: 'user' | 'assistant' | 'system';
   content: string;
-  images?: string[];
-}
-export interface OllamaGenerateRequestParams extends OllamaRequestParams {
-  prompt: string;
-}
-export interface OllamaChatRequestParams extends OllamaRequestParams {
-  messages: OllamaMessage[];
-}
-export interface BaseOllamaGenerationChunk {
-  model: string;
-  created_at: string;
-  done: boolean;
-  total_duration?: number;
-  load_duration?: number;
-  prompt_eval_count?: number;
-  prompt_eval_duration?: number;
-  eval_count?: number;
-  eval_duration?: number;
-}
-export type OllamaGenerationChunk = BaseOllamaGenerationChunk & {
-  response: string;
-};
-export type OllamaChatGenerationChunk = BaseOllamaGenerationChunk & {
-  message: OllamaMessage;
-};
-export type OllamaCallOptions = BaseLanguageModelCallOptions & {
-  headers?: Record<string, string>;
-};
+  image?: string;
+  messageType?: string;
+}[];
+export { isOllamaRunning } from './service/ollama';
+export function useMessageOption() {
+  const streaming = ref(false);
+  const setStreaming = (value: boolean) => {
+    streaming.value = value;
+  };
+  const messages = ref<Message[]>([]);
+  const setMessages = (message: Message[]) => {
+    messages.value = message;
+  };
+  let abortController: AbortController | undefined;
+  const history: ChatHistory = [];
+  const normalChatMode = async (message: string, isRegenerate: boolean, messages: Message[], history: ChatHistory, signal: AbortSignal,
+  ) => {
+    const url = await getOllamaURL();
+    const userDefaultModelSettings = await getAllDefaultModelSettings();
+    const ollama = await pageAssistModel({
+      model: 'deepseek-r1:14b',
+      baseUrl: cleanUrl(url),
+      keepAlive: '',
+      temperature:
+         userDefaultModelSettings?.temperature,
+      topK: userDefaultModelSettings?.topK,
+      topP: userDefaultModelSettings?.topP,
+      numCtx:
+        userDefaultModelSettings?.numCtx,
+      seed: undefined,
+      numGpu:
+         userDefaultModelSettings?.numGpu,
+      numPredict:
+        userDefaultModelSettings?.numPredict,
+      useMMap:
+        userDefaultModelSettings?.useMMap,
+      minP: userDefaultModelSettings?.minP,
+      repeatLastN:
+       userDefaultModelSettings?.repeatLastN,
+      repeatPenalty:
+       userDefaultModelSettings?.repeatPenalty,
+      tfsZ: userDefaultModelSettings?.tfsZ,
+      numKeep: userDefaultModelSettings?.numKeep,
+      numThread:
+        userDefaultModelSettings?.numThread,
+      useMlock:
+       userDefaultModelSettings?.useMlock,
+    });
 
-async function* createOllamaStream(
-  url: string,
-  params: OllamaRequestParams,
-  options: OllamaCallOptions,
-) {
-  let formattedUrl = url;
-  if (formattedUrl.startsWith('http://localhost:')) {
-    // Node 18 has issues with resolving "localhost"
-    // See https://github.com/node-fetch/node-fetch/issues/1624
-    formattedUrl = formattedUrl.replace(
-      'http://localhost:',
-      'http://127.0.0.1:',
-    );
-  }
+    let newMessage: Message[] = [];
+    const generateMessageId = generateID();
 
-  const response = await fetch(formattedUrl, {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    signal: options.signal,
-  });
-  if (!response.ok) {
-    let error;
-    const responseText = await response.text();
+    if (!isRegenerate) {
+      newMessage = [
+        ...messages,
+        {
+          isBot: false,
+          name: 'You',
+          message,
+          sources: [],
+        },
+        {
+          isBot: true,
+          name: 'deepseek-r1:14b',
+          message: '▋',
+          sources: [],
+          id: generateMessageId,
+        },
+      ];
+    }
+    else {
+      newMessage = [
+        ...messages,
+        {
+          isBot: true,
+          name: 'deepseek-r1:14b',
+          message: '▋',
+          sources: [],
+          id: generateMessageId,
+        },
+      ];
+    }
+    setMessages(newMessage);
+
+    let fullText = '';
+    let contentToSave = '';
+    let timetaken = 0;
+
     try {
-      const json = JSON.parse(responseText);
-      error = new Error(
-        `Ollama call failed with status code ${response.status}: ${json.error}`,
+      const prompt = '';
+      const selectedPrompt = '';
+
+      const humanMessage = await humanMessageFormatter({
+        content: [
+          {
+            text: message,
+            type: 'text',
+          },
+        ],
+        model: 'deepseek-r1:14b',
+      });
+
+      const applicationChatHistory = generateHistory(history, 'deepseek-r1:14b');
+
+      if (prompt && !selectedPrompt) {
+        applicationChatHistory.unshift(
+          new SystemMessage({
+            content: prompt,
+          }),
+        );
+      }
+
+      applicationChatHistory.unshift(
+        new SystemMessage({
+          content: '你好',
+        }),
       );
-    }
-    catch {
-      error = new Error(
-        `Ollama call failed with status code ${response.status}: ${responseText}`,
+
+      let generationInfo: any | undefined;
+
+      const chunks = await ollama.stream(
+        [...applicationChatHistory, humanMessage],
+        {
+          signal,
+          callbacks: [
+            {
+              handleLLMEnd(output: any): any {
+                try {
+                  generationInfo = output?.generations?.[0][0]?.generationInfo;
+                }
+                catch (e) {
+                  console.error('handleLLMEnd error', e);
+                }
+              },
+            },
+          ],
+        },
       );
+
+      let count = 0;
+      let reasoningStartTime: Date | null = null;
+      let reasoningEndTime: Date | null = null;
+      let apiReasoning: boolean = false;
+
+      for await (const chunk of chunks) {
+        if (chunk?.additional_kwargs?.reasoning_content) {
+          const reasoningContent = mergeReasoningContent(
+            fullText,
+            chunk?.additional_kwargs?.reasoning_content as string || '',
+          );
+          contentToSave = reasoningContent;
+          fullText = reasoningContent;
+          apiReasoning = true;
+        }
+        else {
+          if (apiReasoning) {
+            fullText += '</think>';
+            contentToSave += '</think>';
+            apiReasoning = false;
+          }
+        }
+
+        contentToSave += chunk?.content;
+        fullText += chunk?.content;
+        console.log(fullText);
+
+        // if (isReasoningStarted(fullText) && !reasoningStartTime) {
+        //   reasoningStartTime = new Date();
+        // }
+
+        // if (
+        //   reasoningStartTime
+        //   && !reasoningEndTime
+        //   && isReasoningEnded(fullText)
+        // ) {
+        //   reasoningEndTime = new Date();
+        //   const reasoningTime
+        //     = reasoningEndTime.getTime() - reasoningStartTime.getTime();
+        //   timetaken = reasoningTime;
+        // }
+
+        // if (count === 0) {
+        //   setIsProcessing(true);
+        // }
+        // const msg1 = messages.map((message) => {
+        //   if (message.id === generateMessageId) {
+        //     return {
+        //       ...message,
+        //       message: `${fullText}▋`,
+        //       reasoning_time_taken: timetaken,
+        //     };
+        //   }
+        //   return message;
+        // });
+        // setMessages(msg1);
+        // count++;
+      }
+
+      // setMessages((prev) => {
+      //   return prev.map((message) => {
+      //     if (message.id === generateMessageId) {
+      //       return {
+      //         ...message,
+      //         message: fullText,
+      //         generationInfo,
+      //         reasoning_time_taken: timetaken,
+      //       };
+      //     }
+      //     return message;
+      //   });
+      // });
+
+      // setHistory([
+      //   ...history,
+      //   {
+      //     role: 'user',
+      //     content: message,
+      //     image,
+      //   },
+      //   {
+      //     role: 'assistant',
+      //     content: fullText,
+      //   },
+      // ]);
+
+      // await saveMessageOnSuccess({
+      //   historyId,
+      //   setHistoryId,
+      //   isRegenerate,
+      //   selectedModel,
+      //   message,
+      //   image,
+      //   fullText,
+      //   source: [],
+      //   generationInfo,
+      //   prompt_content: promptContent,
+      //   prompt_id: promptId,
+      //   reasoning_time_taken: timetaken,
+      // });
+
+      // setIsProcessing(false);
+      // setStreaming(false);
+      // setIsProcessing(false);
+      // setStreaming(false);
     }
-    ;(error as any).response = response;
-    throw error;
-  }
-  if (!response.body) {
-    throw new Error(
-      'Could not begin Ollama stream. Please check the given URL and try again.',
+    catch (e) {
+      // const errorSave = await saveMessageOnError({
+      //   e,
+      //   botMessage: fullText,
+      //   history,
+      //   historyId,
+      //   image,
+      //   selectedModel,
+      //   setHistory,
+      //   setHistoryId,
+      //   userMessage: message,
+      //   isRegenerating: isRegenerate,
+      //   prompt_content: promptContent,
+      //   prompt_id: promptId,
+      // });
+
+      // if (!errorSave) {
+      //   notification.error({
+      //     message: t('error'),
+      //     description: e?.message || t('somethingWentWrong'),
+      //   });
+      // }
+      // setIsProcessing(false);
+      // setStreaming(false);
+    }
+    finally {
+      // setAbortController(null);
+    }
+  };
+  const onSubmit = async ({
+    message,
+    isRegenerate = false,
+    messages: chatHistory,
+    memory,
+    controller,
+  }: {
+    message: string;
+    isRegenerate?: boolean;
+    messages?: Message[];
+    memory?: ChatHistory;
+    controller?: AbortController;
+  }) => {
+    setStreaming(true);
+    let signal: AbortSignal;
+    if (!controller) {
+      abortController = new AbortController();
+      signal = abortController.signal;
+    }
+    else {
+      abortController = controller;
+      signal = controller.signal;
+    }
+
+    await normalChatMode(
+      message,
+      isRegenerate,
+      chatHistory || messages.value,
+      memory || history,
+      signal,
     );
-  }
+  };
 
-  const stream = IterableReadableStream.fromReadableStream(response.body);
-
-  const decoder = new TextDecoder();
-  let extra = '';
-  for await (const chunk of stream) {
-    const decoded = extra + decoder.decode(chunk);
-    const lines = decoded.split('\n');
-    extra = lines.pop() || '';
-    for (const line of lines) {
-      try {
-        yield JSON.parse(line);
-      }
-      catch {
-        console.warn(`Received a non-JSON parseable chunk: ${line}`);
-      }
-    }
-  }
-}
-export async function* createOllamaGenerateStream(
-  baseUrl: string,
-  params: OllamaGenerateRequestParams,
-  options: OllamaCallOptions,
-): AsyncGenerator<OllamaGenerationChunk> {
-  yield * createOllamaStream(`${baseUrl}/api/generate`, params, options);
-}
-export async function* createOllamaChatStream(
-  baseUrl: string,
-  params: OllamaChatRequestParams,
-  options: OllamaCallOptions,
-): AsyncGenerator<OllamaChatGenerationChunk> {
-  yield * createOllamaStream(`${baseUrl}/api/chat`, params, options);
-}
-
-export function parseKeepAlive(keepAlive: any) {
-  if (keepAlive === '-1') {
-    return -1;
-  }
-  return keepAlive;
+  return {
+    onSubmit,
+  };
 }

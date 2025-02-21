@@ -93,6 +93,7 @@ function init() {
     value: values.value,
     language: props.language,
     theme: 'vs-dark',
+    renderSideBySide: true, // 左右分屏diff
     ...props.options,
   };
   if (props.type === 'diff') {

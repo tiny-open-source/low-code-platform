@@ -13,6 +13,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@lowcode/ai": "workspace:1.1.0-alpha.1",
     "@lowcode/designer": "workspace:^",
     "@lowcode/dsl-resolver": "workspace:1.1.0-alpha.1",
     "@lowcode/form": "workspace:^",

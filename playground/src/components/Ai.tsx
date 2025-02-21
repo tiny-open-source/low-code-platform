@@ -1,7 +1,9 @@
+import { isOllamaRunning, useMessageOption } from '@lowcode/ai';
 import { CodeEditor } from '@lowcode/designer';
-import { SendOutlined } from '@vicons/antd';
+import { EnterOutlined } from '@vicons/antd';
 import { NButton, NDrawer, NDrawerContent, NIcon, NScrollbar } from 'naive-ui';
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import mockJSONDiff from './mock-diff.json?raw';
 import mockJSON from './mock.json?raw';
 
 function useDynamicTextareaSize(
@@ -10,18 +12,14 @@ function useDynamicTextareaSize(
   // optional maximum height after which textarea becomes scrollable
   maxHeight?: number,
 ): void {
-  watchEffect(() => {
-    console.log(textContent.value);
-
+  watch(textContent, () => {
     const currentTextarea = textareaRef.value;
-    console.log('🚀 ~ watchEffect ~ currentTextarea:', currentTextarea);
     if (currentTextarea) {
       // Temporarily collapse the textarea to calculate the required height
       currentTextarea.style.height = '0px';
       const contentHeight = currentTextarea.scrollHeight;
 
       if (maxHeight) {
-        console.log('🚀 ~ watchEffect ~ maxHeight:', maxHeight);
         // Set max-height and adjust overflow behavior if maxHeight is provided
         currentTextarea.style.maxHeight = `${maxHeight}px`;
         currentTextarea.style.overflowY
@@ -53,34 +51,72 @@ export default defineComponent({
   },
   emit: ['update:show'],
   setup(props, { emit }) {
-    const codeStr = ref('');
+    const codeStr = ref(mockJSONDiff);
 
     const textareaRef = ref<HTMLTextAreaElement>();
-
+    const form = ref<HTMLFormElement>();
     const message = ref('');
     useDynamicTextareaSize(textareaRef, message, 150);
 
+    const textAreaFocus = () => {
+      textareaRef.value?.focus();
+    };
+    onMounted(() => {
+      textAreaFocus();
+      isOllamaRunning();
+    });
+    watchEffect(() => {
+      props.show && textAreaFocus();
+    });
+
+    const { onSubmit } = useMessageOption();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Process' || e.key === '229')
+        return;
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const message = (e.target as HTMLTextAreaElement).value;
+        if (!message || message.trim().length === 0) {
+          return;
+        }
+
+        form.value?.reset();
+
+        textAreaFocus();
+
+        onSubmit({
+          message: message.trim(),
+        });
+      }
+    };
     return () => {
       return (
-        <NDrawer show={props.show} onUpdateShow={show => emit('update:show', show)} width="50vw" placement="right">
+        <NDrawer
+          show={props.show}
+          onUpdateShow={(show) => {
+            emit('update:show', show);
+          }}
+          width="60vw"
+          placement="right"
+        >
           <NDrawerContent
             closable
             title="使用AI优化"
             v-slots={{
               header: () => (
                 <div class="flex justify-between items-center px-4 text-nowrap">
-                  <h3>AI调用</h3>
                   <div class="text-sm flex items-center gap-2">
                     <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                     <p class="dark:text-gray-400 text-gray-900">
-                      Ollama is running 🦙
+                      Ollama正在运行 🦙
                     </p>
                   </div>
                 </div>
               ),
             }}
           >
-            <div class="h-full flex flex-col">
+            <div class="h-full flex flex-col relative">
               <div class="code-block">
                 <CodeEditor
                   style="height: 50vh; width: 100%;"
@@ -117,9 +153,28 @@ export default defineComponent({
                 <div class="flex w-full flex-col items-center p-2 pt-1  pb-4">
                   <div class="relative z-10 flex w-full flex-col items-center justify-center gap-2 text-base">
                     <div class="relative flex w-full flex-row justify-center gap-2 lg:w-4/5">
-                      <div class="bg-neutral-50  relative w-full max-w-[48rem] p-1 backdrop-blur-lg duration-100 border border-gray-300 rounded-xl">
-                        <div class="flex  bg-transparent">
-                          <form class="shrink-0 flex-grow  flex flex-col items-center ">
+                      <div class="bg-neutral-50  relative w-full max-w-[48rem] p-1 backdrop-blur-lg duration-100 border border-gray-300 border-solid rounded-xl">
+                        <div class="flex bg-transparent">
+                          <form
+                            ref={form}
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              const message = textareaRef.value?.value;
+                              if (
+                                !message || message.trim().length === 0
+                              ) {
+                                return;
+                              }
+
+                              form.value?.reset();
+                              textAreaFocus();
+
+                              await onSubmit({
+                                message: message.trim(),
+                              });
+                            }}
+                            class="shrink-0 flex-grow  flex flex-col items-center "
+                          >
                             <input
                               id="file-upload"
                               name="file-upload"
@@ -133,8 +188,9 @@ export default defineComponent({
                                 class="px-2 py-2 w-full resize-none bg-transparent focus-within:outline-none focus:ring-0 focus-visible:ring-0 ring-0 dark:ring-0 border-0 dark:text-gray-100"
                                 rows="1"
                                 tabindex="0"
-                                placeholder="Type a message..."
+                                placeholder="来吧，提出你的要求，哥帮你解决"
                                 style={{ minHeight: '30px' }}
+                                onKeydown={e => handleKeyDown(e)}
                                 v-model={message.value}
                               />
 
@@ -143,17 +199,18 @@ export default defineComponent({
                                 <div class="flex !justify-end gap-3">
                                   <div class="ant-space-compact css-dev-only-do-not-override-xjks6i ant-space-compact-block ant-dropdown-button !justify-end !w-auto">
                                     <NButton
+                                      attr-type="submit"
                                       size="small"
                                       type="primary"
                                       v-slots={{
                                         icon: () => (
-                                          <NIcon>
-                                            <SendOutlined />
+                                          <NIcon size="small">
+                                            <EnterOutlined />
                                           </NIcon>
                                         ),
                                       }}
                                     >
-                                      Submit
+                                      提交
                                     </NButton>
                                   </div>
                                 </div>

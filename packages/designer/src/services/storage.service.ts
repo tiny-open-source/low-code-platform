@@ -20,7 +20,7 @@ export enum Protocol {
  */
 export class WebStorage extends BaseService {
   private storage: Storage = globalThis.localStorage;
-  private namespace = 'tmagic';
+  private namespace = 'lowcode';
 
   constructor() {
     super(['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem']);

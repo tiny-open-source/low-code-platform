@@ -1,11 +1,11 @@
 import type { CallbackManagerForLLMRun } from '@langchain/core/callbacks/manager';
 import type { BaseLanguageModelCallOptions } from '@langchain/core/language_models/base';
-import type { BaseChatModelParams } from '@langchain/core/language_models/chat_models';
+import type { BaseChatModelParams, LangSmithParams } from '@langchain/core/language_models/chat_models';
 import type {
   BaseMessage,
 } from '@langchain/core/messages';
 import type { StringWithAutocomplete } from '@langchain/core/utils/types';
-import type { OllamaInput, OllamaMessage } from './utils';
+import type { OllamaInput, OllamaMessage } from './utils/ollama';
 import {
   SimpleChatModel,
 
@@ -21,7 +21,7 @@ import {
   createOllamaGenerateStream,
   parseKeepAlive,
 
-} from './utils';
+} from './utils/ollama';
 
 export interface ChatOllamaInput extends OllamaInput { }
 
@@ -161,7 +161,7 @@ export class ChatOllama
     this.seed = fields.seed;
   }
 
-  protected getLsParams(options: this['ParsedCallOptions']) {
+  public getLsParams(options: this['ParsedCallOptions']): LangSmithParams {
     const params = this.invocationParams(options);
     return {
       ls_provider: 'ollama',
