@@ -115,7 +115,7 @@ class App extends EventEmitter {
     }
 
     if (!whiteList.includes(key) && /^-?\d*(?:\.\d*)?$/.test(value)) {
-      return this.convertToPx(key, value);
+      return this.convertToPx(key, Number(value));
     }
 
     return value;
@@ -197,6 +197,7 @@ class App extends EventEmitter {
       x: screenWidth / templateWidth,
       y: screenHeight / templateHeight,
     };
+    console.log('🚀 ~ App ~ calcZoomRatio ~ this.zoomRatio:', this.zoomRatio);
   }
 
   public registerComponent(type: string, Component: any): void {

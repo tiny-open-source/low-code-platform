@@ -23,7 +23,7 @@ const previewVisible = ref(false);
 const importDialogVisible = ref(false);
 const aiPanelVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
-const value = ref(mockDSL as any);
+const value = ref(mockDSL);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
@@ -52,6 +52,8 @@ asyncLoadJs(
 function parse(dsl: string) {
   value.value = figmaParser.parse(typeof dsl === 'string' ? JSON.parse(dsl) : dsl) as any;
 }
+const llmOutputDSL = ref('');
+
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
   const id = core?.dr?.target?.id;
@@ -72,7 +74,16 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 
   return options;
 }
+const dslSerialized = computed(() => {
+  return serialize(toRaw(value.value), {
+    space: 2,
+    unsafe: true,
+  }).replace(/"(\w+)":\s/g, '$1: ');
+});
 
+const dslEvaled = computed(() => {
+  return eval(`(${dslSerialized.value})`);
+});
 function save() {
   localStorage.setItem(
     'lowcodeDSL',
@@ -173,7 +184,9 @@ const menu: MenuBarData = {
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <Ai v-model:show="aiPanelVisible" />
+      <Ai v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
+        value = dslEvaled;
+      }" />
       <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
       <ImportDSL v-model:show="importDialogVisible" @save="parse" />
     </NDialogProvider>

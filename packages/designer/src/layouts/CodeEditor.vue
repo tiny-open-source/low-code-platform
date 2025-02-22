@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { throttle } from 'lodash-es';
+import { debounce, throttle } from 'lodash-es';
 import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
@@ -67,24 +67,64 @@ const resizeObserver = new globalThis.ResizeObserver(
     vsDiffEditor?.layout();
   }, 300),
 );
+
+// 存储模型引用
+let originalModel: monaco.editor.ITextModel | null = null;
+let modifiedModel: monaco.editor.ITextModel | null = null;
+
+// 优化后的setEditorValue函数
+function setEditorValue(v: string | any, m: string | any) {
+  const newOriginalValue = toString(v, props.language);
+  const newModifiedValue = toString(m, props.language);
+
+  if (props.type === 'diff') {
+    if (!vsDiffEditor)
+      return;
+    if (!originalModel || !modifiedModel) {
+      // 首次创建模型
+      originalModel = monaco.editor.createModel(newOriginalValue, 'text/javascript');
+      modifiedModel = monaco.editor.createModel(newModifiedValue, 'text/javascript');
+      vsDiffEditor?.setModel({
+        original: originalModel,
+        modified: modifiedModel,
+      });
+    }
+    else {
+      // 更新现有模型内容
+      originalModel.setValue(newOriginalValue);
+      modifiedModel.setValue(newModifiedValue);
+    }
+    return;
+  }
+
+  // 非diff模式的处理
+  values.value = newOriginalValue;
+  vsEditor?.setValue(values.value);
+}
+
+// 添加防抖的更新函数
+const throttledUpdate = throttle((newValue: any) => {
+  if (props.type === 'diff' && modifiedModel) {
+    modifiedModel.setValue(toString(newValue, props.language));
+  }
+}, 300);
+
+// 监听modifiedValues的变化
+watch(
+  () => props.modifiedValues,
+  (newVal) => {
+    if (props.type === 'diff') {
+      throttledUpdate(newVal);
+    }
+  },
+  { deep: true },
+);
+
 function getEditorValue() {
   return props.type === 'diff' ? vsDiffEditor?.getModifiedEditor().getValue() : vsEditor?.getValue();
 }
-function setEditorValue(v: string | any, m: string | any) {
-  values.value = toString(v, props.language);
 
-  if (props.type === 'diff') {
-    const originalModel = monaco.editor.createModel(values.value, 'text/javascript');
-    const modifiedModel = monaco.editor.createModel(toString(m, props.language), 'text/javascript');
-
-    return vsDiffEditor?.setModel({
-      original: originalModel,
-      modified: modifiedModel,
-    });
-  }
-
-  return vsEditor?.setValue(values.value);
-}
+// 优化初始化函数
 function init() {
   if (!codeEditor.value)
     return;
@@ -94,6 +134,7 @@ function init() {
     language: props.language,
     theme: 'vs-dark',
     renderSideBySide: true, // 左右分屏diff
+    readOnly: false,
     ...props.options,
   };
   if (props.type === 'diff') {
@@ -140,6 +181,15 @@ watch(
 onMounted(init);
 onBeforeUnmount(() => {
   resizeObserver.disconnect();
+  throttledUpdate.cancel();
+  // 清理模型
+  modifiedModel?.dispose();
+  originalModel?.dispose();
+  modifiedModel = null;
+  originalModel = null;
+
+  vsEditor?.dispose();
+  vsDiffEditor?.dispose();
 });
 defineExpose({
   getEditor() {

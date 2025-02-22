@@ -11,7 +11,8 @@ export async function getOllamaURL() {
 export async function isOllamaRunning() {
   try {
     const baseUrl = await getOllamaURL();
-    const response = await fetch(`${cleanUrl(baseUrl)}`);
+    const response = await fetch(`${cleanUrl(baseUrl)}`, {
+    });
     if (!response.ok) {
       throw new Error(response.statusText);
     }

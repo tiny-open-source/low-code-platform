@@ -1,13 +1,12 @@
-/* eslint-disable prefer-const */
-/* eslint-disable unused-imports/no-unused-vars */
+import type { Ref } from 'vue';
 import { SystemMessage } from '@langchain/core/messages';
 import { ref } from 'vue';
 import { generateID } from './db';
 import { cleanUrl } from './libs/clean-url';
-import { mergeReasoningContent } from './libs/reasoning';
+import { isReasoningEnded, isReasoningStarted, mergeReasoningContent } from './libs/reasoning';
 import { pageAssistModel } from './models';
 import { getAllDefaultModelSettings } from './service/model-settings';
-import { getOllamaURL } from './service/ollama';
+import { getOllamaURL, isOllamaRunning } from './service/ollama';
 import { generateHistory } from './utils/generate-history';
 import { humanMessageFormatter } from './utils/human-message';
 
@@ -27,37 +26,62 @@ export type ChatHistory = {
   image?: string;
   messageType?: string;
 }[];
+export { parseReasoning } from './libs/reasoning';
 export { isOllamaRunning } from './service/ollama';
-export function useMessageOption() {
+export function useOllamaStatus() {
+  const status = ref<'success' | 'pending' | 'error'>('pending');
+  const reCheck = async () => {
+    const isRunning = await isOllamaRunning();
+    status.value = isRunning ? 'success' : 'error';
+  };
+  reCheck();
+  return {
+    status,
+    reCheck,
+  };
+}
+export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
   const streaming = ref(false);
   const setStreaming = (value: boolean) => {
     streaming.value = value;
+  };
+  const isProcessing = ref(false);
+  const setIsProcessing = (value: boolean) => {
+    isProcessing.value = value;
   };
   const messages = ref<Message[]>([]);
   const setMessages = (message: Message[]) => {
     messages.value = message;
   };
   let abortController: AbortController | undefined;
-  const history: ChatHistory = [];
-  const normalChatMode = async (message: string, isRegenerate: boolean, messages: Message[], history: ChatHistory, signal: AbortSignal,
+  const history = ref<ChatHistory>([]);
+  const setHistory = (value: ChatHistory) => {
+    history.value = value;
+  };
+
+  const stopStreamingRequest = () => {
+    if (abortController) {
+      abortController.abort();
+      abortController = undefined;
+    }
+  };
+  const normalChatMode = async (message: string, isRegenerate: boolean, messages: Ref<Message[]>, history: Ref<ChatHistory>, signal: AbortSignal,
   ) => {
     const url = await getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
     const ollama = await pageAssistModel({
       model: 'deepseek-r1:14b',
       baseUrl: cleanUrl(url),
-      keepAlive: '',
+      keepAlive: undefined,
       temperature:
          userDefaultModelSettings?.temperature,
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
-      numCtx:
-        userDefaultModelSettings?.numCtx,
+      numCtx: 10240,
       seed: undefined,
       numGpu:
          userDefaultModelSettings?.numGpu,
-      numPredict:
-        userDefaultModelSettings?.numPredict,
+      numPredict: 10240,
       useMMap:
         userDefaultModelSettings?.useMMap,
       minP: userDefaultModelSettings?.minP,
@@ -78,7 +102,7 @@ export function useMessageOption() {
 
     if (!isRegenerate) {
       newMessage = [
-        ...messages,
+        ...messages.value,
         {
           isBot: false,
           name: 'You',
@@ -96,7 +120,7 @@ export function useMessageOption() {
     }
     else {
       newMessage = [
-        ...messages,
+        ...messages.value,
         {
           isBot: true,
           name: 'deepseek-r1:14b',
@@ -107,15 +131,10 @@ export function useMessageOption() {
       ];
     }
     setMessages(newMessage);
-
     let fullText = '';
-    let contentToSave = '';
     let timetaken = 0;
 
     try {
-      const prompt = '';
-      const selectedPrompt = '';
-
       const humanMessage = await humanMessageFormatter({
         content: [
           {
@@ -126,21 +145,15 @@ export function useMessageOption() {
         model: 'deepseek-r1:14b',
       });
 
-      const applicationChatHistory = generateHistory(history, 'deepseek-r1:14b');
+      const applicationChatHistory = generateHistory(history.value, 'deepseek-r1:14b');
 
-      if (prompt && !selectedPrompt) {
+      if (prompt?.value) {
         applicationChatHistory.unshift(
           new SystemMessage({
-            content: prompt,
+            content: prompt?.value,
           }),
         );
       }
-
-      applicationChatHistory.unshift(
-        new SystemMessage({
-          content: '你好',
-        }),
-      );
 
       let generationInfo: any | undefined;
 
@@ -174,140 +187,95 @@ export function useMessageOption() {
             fullText,
             chunk?.additional_kwargs?.reasoning_content as string || '',
           );
-          contentToSave = reasoningContent;
           fullText = reasoningContent;
           apiReasoning = true;
         }
         else {
           if (apiReasoning) {
             fullText += '</think>';
-            contentToSave += '</think>';
             apiReasoning = false;
           }
         }
 
-        contentToSave += chunk?.content;
         fullText += chunk?.content;
-        console.log(fullText);
 
-        // if (isReasoningStarted(fullText) && !reasoningStartTime) {
-        //   reasoningStartTime = new Date();
-        // }
+        if (isReasoningStarted(fullText) && !reasoningStartTime) {
+          reasoningStartTime = new Date();
+        }
 
-        // if (
-        //   reasoningStartTime
-        //   && !reasoningEndTime
-        //   && isReasoningEnded(fullText)
-        // ) {
-        //   reasoningEndTime = new Date();
-        //   const reasoningTime
-        //     = reasoningEndTime.getTime() - reasoningStartTime.getTime();
-        //   timetaken = reasoningTime;
-        // }
+        if (
+          reasoningStartTime
+          && !reasoningEndTime
+          && isReasoningEnded(fullText)
+        ) {
+          reasoningEndTime = new Date();
+          const reasoningTime
+            = reasoningEndTime.getTime() - reasoningStartTime.getTime();
+          timetaken = reasoningTime;
+        }
 
-        // if (count === 0) {
-        //   setIsProcessing(true);
-        // }
-        // const msg1 = messages.map((message) => {
-        //   if (message.id === generateMessageId) {
-        //     return {
-        //       ...message,
-        //       message: `${fullText}▋`,
-        //       reasoning_time_taken: timetaken,
-        //     };
-        //   }
-        //   return message;
-        // });
-        // setMessages(msg1);
-        // count++;
+        if (count === 0) {
+          setIsProcessing(true);
+        }
+        setMessages(messages.value.map((message) => {
+          if (message.id === generateMessageId) {
+            return {
+              ...message,
+              message: `${fullText}▋`,
+              reasoning_time_taken: timetaken,
+            };
+          }
+          return message;
+        }));
+        count++;
       }
 
-      // setMessages((prev) => {
-      //   return prev.map((message) => {
-      //     if (message.id === generateMessageId) {
-      //       return {
-      //         ...message,
-      //         message: fullText,
-      //         generationInfo,
-      //         reasoning_time_taken: timetaken,
-      //       };
-      //     }
-      //     return message;
-      //   });
-      // });
+      setMessages(messages.value.map((message) => {
+        if (message.id === generateMessageId) {
+          return {
+            ...message,
+            message: fullText,
+            generationInfo,
+            reasoning_time_taken: timetaken,
+          };
+        }
+        return message;
+      }));
 
-      // setHistory([
-      //   ...history,
-      //   {
-      //     role: 'user',
-      //     content: message,
-      //     image,
-      //   },
-      //   {
-      //     role: 'assistant',
-      //     content: fullText,
-      //   },
-      // ]);
+      setHistory([
+        ...history.value,
+        {
+          role: 'user',
+          content: message,
+        },
+        {
+          role: 'assistant',
+          content: fullText,
+        },
+      ]);
 
-      // await saveMessageOnSuccess({
-      //   historyId,
-      //   setHistoryId,
-      //   isRegenerate,
-      //   selectedModel,
-      //   message,
-      //   image,
-      //   fullText,
-      //   source: [],
-      //   generationInfo,
-      //   prompt_content: promptContent,
-      //   prompt_id: promptId,
-      //   reasoning_time_taken: timetaken,
-      // });
-
-      // setIsProcessing(false);
-      // setStreaming(false);
-      // setIsProcessing(false);
-      // setStreaming(false);
+      setIsProcessing(false);
+      setStreaming(false);
+      setIsProcessing(false);
+      setStreaming(false);
     }
     catch (e) {
-      // const errorSave = await saveMessageOnError({
-      //   e,
-      //   botMessage: fullText,
-      //   history,
-      //   historyId,
-      //   image,
-      //   selectedModel,
-      //   setHistory,
-      //   setHistoryId,
-      //   userMessage: message,
-      //   isRegenerating: isRegenerate,
-      //   prompt_content: promptContent,
-      //   prompt_id: promptId,
-      // });
-
-      // if (!errorSave) {
-      //   notification.error({
-      //     message: t('error'),
-      //     description: e?.message || t('somethingWentWrong'),
-      //   });
-      // }
-      // setIsProcessing(false);
-      // setStreaming(false);
+      console.error(e);
+      setIsProcessing(false);
+      setStreaming(false);
     }
     finally {
-      // setAbortController(null);
+      abortController = undefined;
     }
   };
   const onSubmit = async ({
     message,
     isRegenerate = false,
-    messages: chatHistory,
-    memory,
     controller,
   }: {
     message: string;
     isRegenerate?: boolean;
-    messages?: Message[];
+    messages?: Ref<Message[]>;
     memory?: ChatHistory;
     controller?: AbortController;
   }) => {
@@ -325,13 +293,18 @@ export function useMessageOption() {
     await normalChatMode(
       message,
       isRegenerate,
-      chatHistory || messages.value,
-      memory || history,
+      messages,
+      history,
       signal,
     );
   };
 
   return {
     onSubmit,
+    stopStreamingRequest,
+    streaming,
+    isProcessing,
+    messages,
+    history,
   };
 }
