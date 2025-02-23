@@ -95,7 +95,7 @@ export default defineComponent({
     const resetFormState = () => {
       message.value = '';
     };
-    const { reCheck, status: ollamaStatus } = useOllamaStatus();
+    const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
     const prompt = computed(() => {
       return `
       ${props.code}
@@ -120,7 +120,6 @@ export default defineComponent({
       if (latestMessage && latestMessage.isBot) {
         parseReasoning(latestMessage.message).forEach((e) => {
           if (e.type !== 'reasoning') {
-            // 收集更新指令而不是立即应用
             codeStr.value = e.content;
             emit('update:code', e.content);
           }
@@ -129,7 +128,7 @@ export default defineComponent({
     });
 
     watchEffect(() => {
-      props.show && reCheck();
+      props.show && checkOllamaStatus();
       props.show && textAreaFocus();
     });
     const sendMessage = async ({ message }: { message: string }) => {
@@ -309,6 +308,7 @@ export default defineComponent({
                                             attr-type="submit"
                                             size="small"
                                             type="primary"
+                                            disabled={ollamaStatus.value !== 'success'}
                                             v-slots={{
                                               icon: () => (
                                                 <NIcon size="small">

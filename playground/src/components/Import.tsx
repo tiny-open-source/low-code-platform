@@ -1,7 +1,7 @@
 import { CodeEditor } from '@lowcode/designer';
 import { useDialog } from 'naive-ui';
 import { defineComponent } from 'vue';
-import mockJSON from './mock.json?raw';
+import { mockFigmaJson } from './figma-json';
 
 export default defineComponent({
   name: 'Preview',
@@ -14,7 +14,7 @@ export default defineComponent({
   emit: ['update:show'],
   setup(props, { emit }) {
     const dialog = useDialog();
-    const values = ref(mockJSON as any);
+    const values = ref(mockFigmaJson as any);
     function save(value: string) {
       values.value = value;
     }

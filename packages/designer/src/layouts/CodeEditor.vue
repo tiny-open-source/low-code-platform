@@ -182,14 +182,8 @@ onMounted(init);
 onBeforeUnmount(() => {
   resizeObserver.disconnect();
   throttledUpdate.cancel();
-  // 清理模型
-  modifiedModel?.dispose();
-  originalModel?.dispose();
   modifiedModel = null;
   originalModel = null;
-
-  vsEditor?.dispose();
-  vsDiffEditor?.dispose();
 });
 defineExpose({
   getEditor() {

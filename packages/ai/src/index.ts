@@ -30,14 +30,13 @@ export { parseReasoning } from './libs/reasoning';
 export { isOllamaRunning } from './service/ollama';
 export function useOllamaStatus() {
   const status = ref<'success' | 'pending' | 'error'>('pending');
-  const reCheck = async () => {
+  const check = async () => {
     const isRunning = await isOllamaRunning();
     status.value = isRunning ? 'success' : 'error';
   };
-  reCheck();
   return {
     status,
-    reCheck,
+    check,
   };
 }
 export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
