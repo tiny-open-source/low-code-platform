@@ -1,7 +1,7 @@
 {
   "name": "@lowcode/ai",
   "type": "module",
-  "version": "1.1.0-alpha.1",
+  "version": "1.1.2",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",

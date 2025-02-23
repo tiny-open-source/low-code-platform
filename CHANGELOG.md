@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## [1.1.2](https://github.com/tiny-open-source/low-code-platform/compare/v1.1.1...v1.1.2) (2025-02-23)
+
+
+### Bug Fixes
+
+* 修复类型定义，将mockDSL强制转换为any类型 ([f559b5d](https://github.com/tiny-open-source/low-code-platform/commit/f559b5dcb0140de0cfbba3e0df09310772fc63cc))
+
+
+### Features
+
+* 添加AI模块功能，更新依赖，优化组件结构，清理无用代码 ([fbf6a8f](https://github.com/tiny-open-source/low-code-platform/commit/fbf6a8fa0d3afffe3e56c7d39ae347fb183dc0ed))
+* 优化代码编辑器功能，添加防抖处理，更新模型管理，清理无用代码 ([0ec63e0](https://github.com/tiny-open-source/low-code-platform/commit/0ec63e070a4f4e67357f3828dcb132cfa3bf7c46))
+* 优化样式重置，更新组件布局，添加AI面板功能 ([8fafd8f](https://github.com/tiny-open-source/low-code-platform/commit/8fafd8f4a50e191e7413409fbc61000e8b2f95cc))
+* **ai:** 添加AI模块及相关配置，包含构建脚本和类型定义 ([17b6a55](https://github.com/tiny-open-source/low-code-platform/commit/17b6a559ad1c5c14ac2199a08cc6173f35186d71))
+* **dsl-resolver:** 更新解析逻辑以支持渐变和颜色填充，重构样式处理 ([6f262fa](https://github.com/tiny-open-source/low-code-platform/commit/6f262faea2ea1b2796d675491440d5f5b164066a))
+* **playground:** 更新页面标题并添加图标组件 ([2b255f9](https://github.com/tiny-open-source/low-code-platform/commit/2b255f92af19a4c70fa126e555317529b8a02087))
+
+
+
 ## [1.1.1](https://github.com/tiny-open-source/low-code-platform/compare/v1.1.0...v1.1.1) (2025-02-13)
 
 
@@ -38,7 +57,7 @@
 
 
 
-# [1.1.0-alpha.1](https://github.com/tiny-open-source/low-code-platform/compare/v1.1.0-alpha.0...v1.1.0-alpha.1) (2025-02-02)
+# [1.1.0-alpha.1](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.4...v1.1.0-alpha.1) (2025-02-02)
 
 
 ### Bug Fixes
@@ -52,6 +71,7 @@
 * **designer:** 删除节点后，标记父节点为修改状态 ([3cbb097](https://github.com/tiny-open-source/low-code-platform/commit/3cbb0977ca353e4c5231c0c8eb47cce2c0c0429e))
 * **designer:** 上移一层通知runtime更新参数出错 ([9282fae](https://github.com/tiny-open-source/low-code-platform/commit/9282fae62feef721f80db720193e0b10e2bca591))
 * **designer:** 水平居中添加了两个历史堆栈 ([3a8ee64](https://github.com/tiny-open-source/low-code-platform/commit/3a8ee64cbc9a7843d76d54feaa6874b0400bd599))
+* **designer:** 添加组件粘贴操作支持偏移量 ([befbdf1](https://github.com/tiny-open-source/low-code-platform/commit/befbdf13adc85d9ee45f9d813d0bfbade9225b7c))
 * **designer:** 添加remove事件时的参数 ([1f8d172](https://github.com/tiny-open-source/low-code-platform/commit/1f8d172c70059405dee15c894540436169496100))
 * **designer:** 拖拽改变父容器时错乱现象 ([3ba272e](https://github.com/tiny-open-source/low-code-platform/commit/3ba272e00cbabe4e3cad3b9af6d8153e0cf7a5bf))
 * **designer:** 修复切换分辨率滚动条还存在的问题 ([dade59d](https://github.com/tiny-open-source/low-code-platform/commit/dade59d354461b4a13ce716dfc53cbf4f99ec28d))
@@ -59,7 +79,9 @@
 * **designer:** 修复Add返回数组还是对象的逻辑 ([05f4b7c](https://github.com/tiny-open-source/low-code-platform/commit/05f4b7c87719bb788943866bb5878ccaef0bb59a))
 * **designer:** 组件属性表单配置默认值 ([c14e1a0](https://github.com/tiny-open-source/low-code-platform/commit/c14e1a039f0fe0bfc71c8171fb0c8349af4b38a0))
 * **designer:** icon 图片模式样式修改 ([5bee64e](https://github.com/tiny-open-source/low-code-platform/commit/5bee64e086b3de9b2263820f157d04086903874a))
+* **designer:** id可能重复 ([6fef441](https://github.com/tiny-open-source/low-code-platform/commit/6fef4417d5873c89465cea1953dc507075e897d1))
 * **playground,runtime:** 拖动添加弹窗时初始位置不对 ([1ea6204](https://github.com/tiny-open-source/low-code-platform/commit/1ea62042ee450a06efc98edfce9a0ddfbc07a8f5))
+* **stage:** 单选后，粘贴多个组件，原来的单选状态没有取消 ([3e107a1](https://github.com/tiny-open-source/low-code-platform/commit/3e107a15b6cea6d555f1dfd77f1f95e1d9d5295b))
 * **stage:** 多选时禁止拖出边界 ([042de36](https://github.com/tiny-open-source/low-code-platform/commit/042de369e1c8548a7e9b1e8b05bb2fe3e8861c4b))
 * **stage:** 流式布局resize从上或者左边调整，选中框出现错位 ([f8824a2](https://github.com/tiny-open-source/low-code-platform/commit/f8824a24bfeed3bdfe1d876eb8de2558e1f3199e))
 * **stage:** 修复多选组件处于拖拽状态时画布组件命中高亮的问题，优化多选拖拽体验 ([e725cb2](https://github.com/tiny-open-source/low-code-platform/commit/e725cb2da6362ae678b6dd861d75ac0e404e7b47))
@@ -70,8 +92,12 @@
 
 ### Features
 
+* **cli, runtime:** 优化入口配置文件生成 ([6bf68fa](https://github.com/tiny-open-source/low-code-platform/commit/6bf68facfe3b88fb23b6879cb0b13de1b2ceced1))
+* **cli:** 生成的entry文件不再在window挂对象，通过构建自动挂载 ([0c135eb](https://github.com/tiny-open-source/low-code-platform/commit/0c135eb45a71f46d4301c12f70c79c31194e7bed))
 * **cli:** 添加onInit/onPrepare配置 ([da2c7ad](https://github.com/tiny-open-source/low-code-platform/commit/da2c7adb0c8fe5f30b64aaa3d502f730f56ae5bd))
 * **cli:** 添加onInit/onPrepare配置 ([bb9e6b2](https://github.com/tiny-open-source/low-code-platform/commit/bb9e6b23a69afcef4e4323e693cf77654a614870))
+* **cli:** 新增lowcode-cli,用于runtime 入口配置文件生成 ([6c8e414](https://github.com/tiny-open-source/low-code-platform/commit/6c8e414eb395226d58917d0660fc7d8ca68bd464))
+* **cli:** 支持配置temp文件夹，默认.lowcode ([46d2d7f](https://github.com/tiny-open-source/low-code-platform/commit/46d2d7f747140eed24c7a1762a19a202d240121c))
 * **cli:** 支持temp下的config.ts配置文件，该模式下的配置文件会默认被删掉 ([9c80815](https://github.com/tiny-open-source/low-code-platform/commit/9c80815e6f2fe4a480fc59c385e665b6647bb7c1))
 * **cli:** 自动install组件包，支持pnpm,npm,yarn ([478f062](https://github.com/tiny-open-source/low-code-platform/commit/478f062579b709b18f452d1b10ef6f1a6cf8883c))
 * **core:** 新增store ([331c67c](https://github.com/tiny-open-source/low-code-platform/commit/331c67c78bc83c9b7864986c5dc494930c124f3f))
@@ -80,46 +106,27 @@
 * **designer,stage:** runtime-api中的add/update/remove中的参数加上parentId ([a4d65c1](https://github.com/tiny-open-source/low-code-platform/commit/a4d65c107674642c9c7575610a1d669be9e83205))
 * **designer:** 编辑器销毁后销毁services ([7112205](https://github.com/tiny-open-source/low-code-platform/commit/7112205e20790a6869389f0f6901e36dbc215a3c))
 * **designer:** 创建新组件时的顺序 ([9af67f4](https://github.com/tiny-open-source/low-code-platform/commit/9af67f48e94725aa08f9330e22483cf9d6eb96da))
+* **designer:** 多选菜单支持复制粘贴删除 ([6ca1497](https://github.com/tiny-open-source/low-code-platform/commit/6ca1497bd5fd55efb1543510f5b7fc2385c5f012))
+* **designer:** 多选粘贴后同步选中粘贴的多个元素,并支持拖拽,粘贴删除支持多个元素同时撤销到上一步 ([a1c199d](https://github.com/tiny-open-source/low-code-platform/commit/a1c199dcb7717153ec7449a80e50b8953f3583ee))
 * **designer:** 画布添加滚动条 ([52d4b03](https://github.com/tiny-open-source/low-code-platform/commit/52d4b03887e51a592fa4a306405ba1a147332b93))
 * **designer:** 去掉画布根据视窗大小自动调整缩放比例，加上缩放到实际大小/缩放以适应菜单按钮 ([8409cd9](https://github.com/tiny-open-source/low-code-platform/commit/8409cd9580e7b28e63f344a3c5b62ca266900497))
 * **designer:** 添加stage slot ([1ffdf20](https://github.com/tiny-open-source/low-code-platform/commit/1ffdf204650f4ce40348c8695fee6b66568f6ad5))
+* **designer:** 添加storageService服务 ([8c8213f](https://github.com/tiny-open-source/low-code-platform/commit/8c8213fc3c7fca6296ffb54c33c77c4f14652a69))
+* **designer:** 完善storageService功能 ([d9d68a7](https://github.com/tiny-open-source/low-code-platform/commit/d9d68a72255c79006e77c946343dda4d8ca774bc))
 * **designer:** 样式表单优化 ([090dbb5](https://github.com/tiny-open-source/low-code-platform/commit/090dbb50d70ed88d7971f7d8a5e91ffa780641ef))
 * **designer:** designerService.add支持添加多个组件 ([dda568e](https://github.com/tiny-open-source/low-code-platform/commit/dda568e095928b377423aaedaceb54f13459f808))
 * **designer:** propsService添加fillConfig方法，支持扩展 ([4fd4fdb](https://github.com/tiny-open-source/low-code-platform/commit/4fd4fdb010d3eb8d31984a90cdc297ba9643118a))
 * **designer:** runtime add api中parent参数加回去 ([a4a1bc8](https://github.com/tiny-open-source/low-code-platform/commit/a4a1bc8ac3c6bbca0f349bc1b676697c2f302303))
 * **form:** add daterange field ([8a3701d](https://github.com/tiny-open-source/low-code-platform/commit/8a3701d1f4a6d3796f662004294665fe48852f39))
+* release script ([6903c61](https://github.com/tiny-open-source/low-code-platform/commit/6903c6156a9dab3ef68d9a7ac6440affe54a3994))
+* **runtime,playground:** vue3使用lowcode-cli生成组件依赖入口 ([79ac6f5](https://github.com/tiny-open-source/low-code-platform/commit/79ac6f5c98dbd1ee02c4d3a74835b9c02e4bf13d))
 * **sidebar:** 已选组件增加右键快捷菜单 ([7805a3a](https://github.com/tiny-open-source/low-code-platform/commit/7805a3a79ea73ba8aee73a4f4efdd130534d8c59))
 * **stage,designer:** 拖入指定容器支持配置成按住alt才开启 ([3ab3ed9](https://github.com/tiny-open-source/low-code-platform/commit/3ab3ed980c2eb001cdb61a007522094e4467ad17))
+* **stage,runtime:** 去掉runtime getSnapElements 定义 ([3397903](https://github.com/tiny-open-source/low-code-platform/commit/33979039cd1cfc5ea8da2c81f43abded097383ab))
+* **stage:** 多选快捷键改成ctrl/cmd ([81c990a](https://github.com/tiny-open-source/low-code-platform/commit/81c990a08d276d65bc31ac6d5be60c4ba02f6ed0))
 * **stage:** 多选支持resize ([29fdd0a](https://github.com/tiny-open-source/low-code-platform/commit/29fdd0a111a442d929afa8f451314bc266adba6d))
 * **stage:** 暂时禁用多选resizable ([6915d5d](https://github.com/tiny-open-source/low-code-platform/commit/6915d5dcb51e97754d171e26b4696114d497dba9))
 * **utils:** moment换成dayjs ([25a3e9e](https://github.com/tiny-open-source/low-code-platform/commit/25a3e9e835c72c5c1ed78b50436f73f57f747a63))
-
-
-
-# [1.1.0-alpha.0](https://github.com/tiny-open-source/low-code-platform/compare/v1.0.4...v1.1.0-alpha.0) (2025-01-21)
-
-
-### Bug Fixes
-
-* **designer:** 添加组件粘贴操作支持偏移量 ([befbdf1](https://github.com/tiny-open-source/low-code-platform/commit/befbdf13adc85d9ee45f9d813d0bfbade9225b7c))
-* **designer:** id可能重复 ([6fef441](https://github.com/tiny-open-source/low-code-platform/commit/6fef4417d5873c89465cea1953dc507075e897d1))
-* **stage:** 单选后，粘贴多个组件，原来的单选状态没有取消 ([3e107a1](https://github.com/tiny-open-source/low-code-platform/commit/3e107a15b6cea6d555f1dfd77f1f95e1d9d5295b))
-
-
-### Features
-
-* **cli, runtime:** 优化入口配置文件生成 ([6bf68fa](https://github.com/tiny-open-source/low-code-platform/commit/6bf68facfe3b88fb23b6879cb0b13de1b2ceced1))
-* **cli:** 生成的entry文件不再在window挂对象，通过构建自动挂载 ([0c135eb](https://github.com/tiny-open-source/low-code-platform/commit/0c135eb45a71f46d4301c12f70c79c31194e7bed))
-* **cli:** 新增lowcode-cli,用于runtime 入口配置文件生成 ([6c8e414](https://github.com/tiny-open-source/low-code-platform/commit/6c8e414eb395226d58917d0660fc7d8ca68bd464))
-* **cli:** 支持配置temp文件夹，默认.lowcode ([46d2d7f](https://github.com/tiny-open-source/low-code-platform/commit/46d2d7f747140eed24c7a1762a19a202d240121c))
-* **designer:** 多选菜单支持复制粘贴删除 ([6ca1497](https://github.com/tiny-open-source/low-code-platform/commit/6ca1497bd5fd55efb1543510f5b7fc2385c5f012))
-* **designer:** 多选粘贴后同步选中粘贴的多个元素,并支持拖拽,粘贴删除支持多个元素同时撤销到上一步 ([a1c199d](https://github.com/tiny-open-source/low-code-platform/commit/a1c199dcb7717153ec7449a80e50b8953f3583ee))
-* **designer:** 添加storageService服务 ([8c8213f](https://github.com/tiny-open-source/low-code-platform/commit/8c8213fc3c7fca6296ffb54c33c77c4f14652a69))
-* **designer:** 完善storageService功能 ([d9d68a7](https://github.com/tiny-open-source/low-code-platform/commit/d9d68a72255c79006e77c946343dda4d8ca774bc))
-* release script ([6903c61](https://github.com/tiny-open-source/low-code-platform/commit/6903c6156a9dab3ef68d9a7ac6440affe54a3994))
-* **runtime,playground:** vue3使用lowcode-cli生成组件依赖入口 ([79ac6f5](https://github.com/tiny-open-source/low-code-platform/commit/79ac6f5c98dbd1ee02c4d3a74835b9c02e4bf13d))
-* **stage,runtime:** 去掉runtime getSnapElements 定义 ([3397903](https://github.com/tiny-open-source/low-code-platform/commit/33979039cd1cfc5ea8da2c81f43abded097383ab))
-* **stage:** 多选快捷键改成ctrl/cmd ([81c990a](https://github.com/tiny-open-source/low-code-platform/commit/81c990a08d276d65bc31ac6d5be60c4ba02f6ed0))
 
 
 
