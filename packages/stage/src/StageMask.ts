@@ -69,6 +69,7 @@ export default class StageMask extends Rule {
   private mode: Mode = Mode.ABSOLUTE;
   private pageResizeObserver: ResizeObserver | null = null;
   private wrapperResizeObserver: ResizeObserver | null = null;
+
   constructor(config: StageMaskConfig) {
     const wrapper = createWrapper();
     super(wrapper);

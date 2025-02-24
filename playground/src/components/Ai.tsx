@@ -349,7 +349,7 @@ export default defineComponent({
                     </div>
                   </div>
                 </div>
-                <p class="w-full text-center text-12px text-coolgray select-none">注：大模型采用蒸馏版 deepseek-r1:14b, 一次性传输过量 Token 可能会导致无法得出准确的回答，仅供测试。</p>
+                <p class="w-full text-center text-12px text-coolgray select-none">注：大模型采用蒸馏版 deepseek-r1:14b， 仅供测试。</p>
               </div>
             </div>
           </NDrawerContent>

@@ -13,6 +13,7 @@ const root = computed(() => editorService.get('root'));
 const page = computed(() => editorService.get('page'));
 const zoom = computed(() => uiService.get('zoom') || 1);
 const uiSelectMode = computed(() => uiService.get('uiSelectMode'));
+const stageDragMode = computed(() => uiService.get('stageDragMode'));
 
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
@@ -28,6 +29,9 @@ export function useStage(stageOptions: StageOptions) {
     containerHighlightType: stageOptions.containerHighlightType,
     canSelect: (el, event, stop) => {
       const elCanSelect = stageOptions.canSelect(el);
+      // 在拖拽组件过程中不能再往下选择，返回并触发 stage-drag
+      if (stageDragMode.value)
+        return false;
       // 在组件联动过程中不能再往下选择，返回并触发 ui-select
       if (uiSelectMode.value && elCanSelect && event.type === 'mousedown') {
         document.dispatchEvent(new CustomEvent('ui-select', { detail: el }));

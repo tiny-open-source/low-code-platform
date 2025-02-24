@@ -6,7 +6,7 @@ import type StageCore from '@lowcode/stage';
 import type { MoveableOptions } from '@lowcode/stage';
 import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
 import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@lowcode/stage';
-import { onBeforeUnmount, provide, reactive, ref, toRaw, watch } from 'vue';
+import { onBeforeUnmount, provide, reactive, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';

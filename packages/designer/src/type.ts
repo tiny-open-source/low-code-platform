@@ -77,6 +77,8 @@ export interface StoreState {
 export interface UiState {
   /** 当前点击画布是否触发选中，true: 不触发，false: 触发，默认为false */
   uiSelectMode: boolean;
+  /** 当前点击画布是否触发拖拽，true: 不触发，false: 触发，默认为false */
+  stageDragMode: boolean;
   /** 是否显示整个配置源码， true: 显示， false: 不显示，默认为false */
   showSrc: boolean;
   /** 画布显示放大倍数，默认为 1 */
