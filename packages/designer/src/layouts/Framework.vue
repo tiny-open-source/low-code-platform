@@ -13,6 +13,16 @@ const columnWidth = computed(() => uiService.get('columnWidth'));
 const showSrc = computed(() => uiService?.get('showSrc'));
 const root = computed(() => designerService?.get('root'));
 const pageLength = computed(() => designerService?.get('pageLength') || 0);
+
+function saveCode(value: string) {
+  try {
+    // eslint-disable-next-line no-eval
+    designerService.set('root', eval(value));
+  }
+  catch (e: any) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
@@ -21,7 +31,7 @@ const pageLength = computed(() => designerService?.get('pageLength') || 0);
       <slot name="header" />
     </div>
 
-    <low-code-editor v-if="showSrc" :code-options="codeOptions" :init-values="root" class="lc-d-framework__content" />
+    <low-code-editor v-if="showSrc" :code-options="codeOptions" :init-values="root" class="lc-d-framework__content" @save="saveCode" />
     <div v-else class="lc-d-framework__content">
       <div class="lc-d-framework__content__left" :style="{ width: `${columnWidth.left}px` }">
         <slot name="sidebar" />

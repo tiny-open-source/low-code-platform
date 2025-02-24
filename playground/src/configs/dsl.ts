@@ -1,4 +1,4 @@
-export const mockDSL = ({
+export const defaultDSLConfig = ({
   id: '75f0extui9d7yksklx27hff8xg',
   name: 'test',
   type: 'app',
