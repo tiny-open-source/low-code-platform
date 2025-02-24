@@ -6,11 +6,12 @@ import { FigmaParser } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
-import { dateZhCN, NConfigProvider, NDialogProvider, zhCN } from 'naive-ui';
+import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
 import Ai from './components/Ai';
 import DeviceGroup from './components/DeviceGroup';
+import GlobalMessageSetup from './components/GlobalMessageSetup';
 import ImportDSL from './components/Import';
 import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
@@ -50,7 +51,13 @@ asyncLoadJs(
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
 function parse(code: string) {
-  dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
+  try {
+    dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
+    (window as any).$message.success('导入成功');
+  }
+  catch (e: any) {
+    (window as any).$message.error(`导入失败，${e.message}`);
+  }
 }
 const llmOutputDSL = ref('');
 
@@ -74,6 +81,12 @@ function moveableOptions(core?: StageCore): MoveableOptions {
 
   return options;
 }
+window.onbeforeunload = function () {
+  if (import.meta.env.MODE !== 'development') {
+    return true;
+  }
+};
+
 const dslSerialized = computed(() => {
   return serialize(toRaw(dsl.value), {
     space: 2,
@@ -158,6 +171,7 @@ const menu: MenuBarData = {
       icon: SaveOutlined,
       handler: () => {
         save();
+        (window as any).$message.success('保存成功');
       },
     },
     '/',
@@ -180,32 +194,35 @@ const menu: MenuBarData = {
     :locale="zhCN"
     :date-locale="dateZhCN"
   >
-    <NDialogProvider>
-      <LowCodeDesigner
-        ref="designer"
-        v-model="dsl"
-        :default-selected="defaultSelectedId"
-        :moveable-options="moveableOptions"
-        :props-configs="propsConfigs"
-        :props-values="propsValues"
-        :event-method-list="eventMethodList"
-        :component-group-list="componentGroupList"
-        :stage-rect="stageRect"
-        :menu="menu"
-        :runtime-url="runtimeUrl"
-      >
-        <template #workspace-content>
-          <DeviceGroup v-model="stageRectStr" class="device-group" />
-        </template>
-      </LowCodeDesigner>
-      <Ai
-        v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
-          dsl = dslEvaled;
-        }"
-      />
-      <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page')?.id}`" />
-      <ImportDSL v-model:show="importDialogVisible" @save="parse" />
-    </NDialogProvider>
+    <NMessageProvider>
+      <NDialogProvider>
+        <LowCodeDesigner
+          ref="designer"
+          v-model="dsl"
+          :default-selected="defaultSelectedId"
+          :moveable-options="moveableOptions"
+          :props-configs="propsConfigs"
+          :props-values="propsValues"
+          :event-method-list="eventMethodList"
+          :component-group-list="componentGroupList"
+          :stage-rect="stageRect"
+          :menu="menu"
+          :runtime-url="runtimeUrl"
+        >
+          <template #workspace-content>
+            <DeviceGroup v-model="stageRectStr" class="device-group" />
+          </template>
+        </LowCodeDesigner>
+        <Ai
+          v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
+            dsl = dslEvaled;
+          }"
+        />
+        <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page')?.id}`" />
+        <ImportDSL v-model:show="importDialogVisible" @save="parse" />
+        <GlobalMessageSetup />
+      </NDialogProvider>
+    </NMessageProvider>
   </NConfigProvider>
 </template>
 

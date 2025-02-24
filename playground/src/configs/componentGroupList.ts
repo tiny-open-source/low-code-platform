@@ -80,6 +80,16 @@ export default [
           ],
         },
       },
+      {
+        icon: markRaw(FileTextOutlined),
+        text: '护理标签',
+        type: 'text',
+      },
+      {
+        icon: markRaw(FileTextOutlined),
+        text: '床位列表',
+        type: 'text',
+      },
     ],
   },
 ] as ComponentGroup[];

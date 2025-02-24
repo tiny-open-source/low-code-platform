@@ -302,6 +302,7 @@ export class FigmaParser {
 
   parse(figmaJson: FigmaJson): MApp {
     try {
+      this.validateFigmaJson(figmaJson);
       const { artboard, meta } = figmaJson;
       return {
         type: NodeType.ROOT,
@@ -312,6 +313,18 @@ export class FigmaParser {
     }
     catch (error: any) {
       throw new Error(`Figma parse error: ${error.message}`);
+    }
+  }
+
+  private validateFigmaJson(figmaJson: FigmaJson): void {
+    if (!figmaJson) {
+      throw new Error('Figma JSON is empty');
+    }
+    if (!figmaJson.artboard) {
+      throw new Error('Figma JSON must have an artboard node');
+    }
+    if (!figmaJson.meta) {
+      throw new Error('Figma JSON must have a meta node');
     }
   }
 

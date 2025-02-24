@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ComponentGroup, MenuButton, MenuComponent, MenuItem, Services } from '../../type';
+import type { ComponentGroup, MenuButton, MenuComponent, Services } from '../../type';
 import { NodeType } from '@lowcode/schema';
 import { CopyOutlined, DeleteOutlined, PlusOutlined } from '@vicons/antd';
 import { computed, inject, markRaw, ref } from 'vue';

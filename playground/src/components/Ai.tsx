@@ -291,7 +291,7 @@ export default defineComponent({
                                 class="px-2 py-2 w-full resize-none bg-transparent focus-within:outline-none focus:ring-0 focus-visible:ring-0 ring-0 dark:ring-0 border-0 dark:text-gray-100"
                                 rows="1"
                                 tabindex="0"
-                                placeholder="来吧，提出你的要求，哥帮你解决"
+                                placeholder="提出你的要求"
                                 style={{ minHeight: '30px' }}
                                 disabled={ollamaStatus.value !== 'success'}
                                 onKeydown={e => handleKeyDown(e)}
@@ -317,7 +317,11 @@ export default defineComponent({
                                               ),
                                             }}
                                           >
-                                            提交
+                                            {
+                                              ollamaStatus.value === 'success'
+                                                ? '提交'
+                                                : '未连接'
+                                            }
                                           </NButton>
                                         )
                                       : (
@@ -345,6 +349,7 @@ export default defineComponent({
                     </div>
                   </div>
                 </div>
+                <p class="w-full text-center text-12px text-coolgray select-none">注：大模型采用蒸馏版 deepseek-r1:14b, 一次性传输过量 Token 可能会导致无法得出准确的回答，仅供测试。</p>
               </div>
             </div>
           </NDrawerContent>
