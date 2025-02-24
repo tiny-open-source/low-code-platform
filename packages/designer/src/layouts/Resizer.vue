@@ -26,7 +26,7 @@ onMounted(() => {
     if (!target.value || !services)
       return;
     let { left, right } = {
-      ...toRaw(services.uiService.get<GetColumnWidth>('columnWidth')),
+      ...toRaw(services.uiService.get('columnWidth')),
     };
 
     if (props.type === 'left') {

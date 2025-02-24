@@ -1,8 +1,9 @@
-import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
+import type { Id, MApp, MComponent, MContainer, MNode, MPage } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
+import type { DesignerNodeInfo } from '../type';
 import { NodeType } from '@lowcode/schema';
-import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 
+import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
 import { Layout } from '../type';
 
 export const COPY_STORAGE_KEY = '$LowCodeDesignerCopyData';
@@ -59,9 +60,9 @@ export const generatePageNameByApp = (app: MApp): string => generatePageName(get
  */
 export const isFixed = (node: MNode): boolean => node.style?.position === 'fixed';
 
-export function getNodeIndex(node: MNode, parent: MContainer | MApp): number {
+export function getNodeIndex(id: Id, parent: MContainer | MApp): number {
   const items = parent?.items || [];
-  return items.findIndex((item: MNode) => `${item.id}` === `${node.id}`);
+  return items.findIndex((item: MNode) => `${item.id}` === `${id}`);
 }
 
 export function getRelativeStyle(style: Record<string, any> = {}): Record<string, any> {
@@ -224,4 +225,37 @@ export function fixNodePosition(config: MNode, parent: MContainer, stage: StageC
     top: getMiddleTop(config, parent, stage),
     left: fixNodeLeft(config, parent, stage?.renderer.contentWindow?.document),
   };
+}
+export function getNodeInfo(id: Id, root: Pick<MApp, 'id' | 'items'> | null) {
+  const info: DesignerNodeInfo = {
+    node: null,
+    parent: null,
+    page: null,
+  };
+
+  if (!root)
+    return info;
+
+  if (id === root.id) {
+    info.node = root;
+    return info;
+  }
+
+  const path = getNodePath(id, root.items);
+
+  if (!path.length)
+    return info;
+
+  path.unshift(root);
+
+  info.node = path[path.length - 1] as MComponent;
+  info.parent = path[path.length - 2] as MContainer;
+
+  path.forEach((item) => {
+    if (isPage(item)) {
+      info.page = item as MPage;
+    }
+  });
+
+  return info;
 }

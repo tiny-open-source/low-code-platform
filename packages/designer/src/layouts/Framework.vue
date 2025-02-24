@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { MApp } from '@lowcode/schema';
-import type { GetColumnWidth, Services } from '../type';
-import { NScrollbar } from 'naive-ui';
+import type { Services } from '../type';
 import { computed, inject } from 'vue';
+import AddPageBox from './AddPageBox.vue';
 import Resizer from './Resizer.vue';
 
 defineProps<{
   codeOptions?: Record<string, any>;
 }>();
 const { uiService, designerService } = inject<Services>('services')!;
-const columnWidth = computed(() => uiService.get<GetColumnWidth>('columnWidth'));
+const columnWidth = computed(() => uiService.get('columnWidth'));
 
-const showSrc = computed(() => uiService?.get<boolean>('showSrc'));
-const root = computed(() => designerService?.get<MApp>('root'));
+const showSrc = computed(() => uiService?.get('showSrc'));
+const root = computed(() => designerService?.get('root'));
+const pageLength = computed(() => designerService?.get('pageLength') || 0);
 </script>
 
 <template>
@@ -27,13 +27,18 @@ const root = computed(() => designerService?.get<MApp>('root'));
         <slot name="sidebar" />
       </div>
       <Resizer type="left" />
-      <div class="lc-d-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
-        <slot name="workspace" />
-      </div>
-      <Resizer type="right" />
-      <div class="lc-d-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
-        <slot name="props-panel" />
-      </div>
+      <template v-if="pageLength > 0">
+        <div class="lc-d-framework__content__center" :style="{ width: `${columnWidth.center}px` }">
+          <slot name="workspace" />
+        </div>
+        <Resizer type="right" />
+        <div class="lc-d-framework__content__right" :style="{ width: `${columnWidth.right}px` }">
+          <slot name="props-panel" />
+        </div>
+      </template>
+      <slot v-else name="empty">
+        <AddPageBox />
+      </slot>
     </div>
   </div>
 </template>

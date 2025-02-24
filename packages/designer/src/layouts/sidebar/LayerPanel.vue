@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { MNode } from '@lowcode/schema';
-import type StageCore from '@lowcode/stage';
 import type { TreeDropInfo, TreeOption, TreeOverrideNodeClickBehavior, TreeOverrideNodeClickBehaviorReturn } from 'naive-ui';
 import type { AllowDrop } from 'naive-ui/es/tree/src/interface';
+import type { Ref } from 'vue';
 import type { DesignerService } from '../../services/designer.service';
 import type { Services } from '../../type';
 import { SearchOutlined } from '@vicons/antd';
 import { throttle } from 'lodash-es';
 import { NIcon, NInput, NScrollbar, NTree } from 'naive-ui';
-import { computed, h, inject, ref, type Ref, watchEffect } from 'vue';
+import { computed, h, inject, ref, watchEffect } from 'vue';
 import LayerMenu from './LayerMenu.vue';
 
 defineOptions({
@@ -39,8 +39,8 @@ function useFilter() {
 }
 
 function useStatus(tree: Ref<InstanceType<typeof NTree> | undefined>, designerService: Services['designerService']) {
-  const highlightNode = ref<MNode>();
-  const node = ref<MNode>();
+  const highlightNode = ref<MNode | null>();
+  const node = ref<MNode | null>();
   const page = computed(() => designerService?.get('page'));
   watchEffect(() => {
     if (!tree.value)
@@ -77,7 +77,7 @@ function highlight(data: MNode, designerService?: DesignerService) {
     throw new Error('没有id');
   }
   designerService?.highlight(data);
-  designerService?.get<StageCore>('stage')?.highlight(data.id);
+  designerService?.get('stage')?.highlight(data.id);
 }
 const highlightHandler = throttle((data: MNode) => {
   highlight(data, designerService);
@@ -89,10 +89,10 @@ async function select(data: MNode, editorService?: DesignerService) {
   }
 
   await editorService?.select(data);
-  editorService?.get<StageCore>('stage')?.select(data.id);
+  editorService?.get('stage')?.select(data.id);
 }
 const override: TreeOverrideNodeClickBehavior = ({ option }): TreeOverrideNodeClickBehaviorReturn => {
-  if (services?.uiService.get<boolean>('uiSelectMode')) {
+  if (services?.uiService.get('uiSelectMode')) {
     document.dispatchEvent(new CustomEvent('ui-select', { detail: option }));
     return 'toggleSelect';
   }

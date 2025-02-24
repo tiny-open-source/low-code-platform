@@ -45,11 +45,13 @@
         justify-content: space-evenly;
         align-items: center;
         margin-bottom: 5px;
-
         &:hover {
-          background: #2882e0;
+          background: #2FBEDF;
           color: #fff;
-          border-color: #4e8be1;
+          border-color: #02AED2;
+        }
+        &:active {
+          background: #0199AC;
         }
       }
 

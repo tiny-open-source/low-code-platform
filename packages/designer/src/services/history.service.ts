@@ -34,6 +34,13 @@ class History extends BaseService {
 
   public reset() {
     Object.assign(this.state, getInitialHistoryState());
+    this.resetPage();
+  }
+
+  public resetPage() {
+    this.state.pageId = undefined;
+    this.state.canRedo = false;
+    this.state.canUndo = false;
   }
 
   public changePage(page: MPage) {

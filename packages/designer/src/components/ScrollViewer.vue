@@ -41,7 +41,7 @@ const scrollHeight = ref(0);
 let scrollViewer: ScrollViewer;
 const vOffset = ref(0);
 const hOffset = ref(0);
-const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
+const zoom = computed(() => services?.uiService.get('zoom') || 1);
 const stageRect = computed(() => services?.uiService.get('stageRect'));
 watch(
   [zoom, stageRect],

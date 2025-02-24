@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
-import type { Id } from '@lowcode/schema';
 import type StageCore from '@lowcode/stage';
 import { LowCodeDesigner } from '@lowcode/designer';
 import { FigmaParser } from '@lowcode/dsl-resolver';
@@ -15,7 +14,7 @@ import DeviceGroup from './components/DeviceGroup';
 import ImportDSL from './components/Import';
 import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
-import { mockDSL } from './configs/dsl';
+import { defaultDSLConfig } from './configs/dsl';
 
 const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
@@ -23,7 +22,8 @@ const previewVisible = ref(false);
 const importDialogVisible = ref(false);
 const aiPanelVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
-const value = ref(mockDSL as any);
+const dsl = ref(defaultDSLConfig as any);
+const defaultSelectedId = computed(() => dsl.value?.items?.[0]?.id);
 const propsValues = ref<Record<string, any>>({});
 const propsConfigs = ref<Record<string, any>>({});
 const eventMethodList = ref<Record<string, any>>({});
@@ -49,8 +49,8 @@ asyncLoadJs(
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
-function parse(dsl: string) {
-  value.value = figmaParser.parse(typeof dsl === 'string' ? JSON.parse(dsl) : dsl) as any;
+function parse(code: string) {
+  dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
 }
 const llmOutputDSL = ref('');
 
@@ -75,26 +75,40 @@ function moveableOptions(core?: StageCore): MoveableOptions {
   return options;
 }
 const dslSerialized = computed(() => {
-  return serialize(toRaw(value.value), {
+  return serialize(toRaw(dsl.value), {
     space: 2,
     unsafe: true,
   }).replace(/"(\w+)":\s/g, '$1: ');
 });
 
 const dslEvaled = computed(() => {
+  // eslint-disable-next-line no-eval
   return eval(`(${dslSerialized.value})`);
 });
 function save() {
   localStorage.setItem(
     'lowcodeDSL',
-    serialize(toRaw(value.value), {
+    serialize(toRaw(dsl.value), {
       space: 2,
       unsafe: true,
     }).replace(/"(\w+)":\s/g, '$1: '),
   );
   designer.value?.designerService.resetModifiedNodeId();
 }
-save();
+try {
+  // eslint-disable-next-line no-eval
+  const lowcodeDSL = eval(`(${localStorage.getItem('lowcodeDSL')})`);
+  if (!lowcodeDSL) {
+    save();
+  }
+  else {
+    dsl.value = lowcodeDSL;
+  }
+}
+catch (e) {
+  console.error(e);
+  save();
+}
 const menu: MenuBarData = {
   left: [
     {
@@ -126,7 +140,7 @@ const menu: MenuBarData = {
       text: '预览',
       icon: PlayCircleOutlined,
       handler: async (services) => {
-        if (services?.designerService.get<Map<Id, Id>>('modifiedNodeIds').size > 0) {
+        if (services?.designerService.get('modifiedNodeIds').size > 0) {
           try {
             save();
           }
@@ -169,8 +183,8 @@ const menu: MenuBarData = {
     <NDialogProvider>
       <LowCodeDesigner
         ref="designer"
-        v-model="value"
-        :default-selected="value.items[0].id"
+        v-model="dsl"
+        :default-selected="defaultSelectedId"
         :moveable-options="moveableOptions"
         :props-configs="propsConfigs"
         :props-values="propsValues"
@@ -184,10 +198,12 @@ const menu: MenuBarData = {
           <DeviceGroup v-model="stageRectStr" class="device-group" />
         </template>
       </LowCodeDesigner>
-      <Ai v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
-        value = dslEvaled;
-      }" />
-      <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page').id}`" />
+      <Ai
+        v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
+          dsl = dslEvaled;
+        }"
+      />
+      <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page')?.id}`" />
       <ImportDSL v-model:show="importDialogVisible" @save="parse" />
     </NDialogProvider>
   </NConfigProvider>

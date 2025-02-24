@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MenuButton, MenuComponent, MenuItem } from '../type';
+import type { MenuButton, MenuComponent } from '../type';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import ToolButton from './ToolButton.vue';
 

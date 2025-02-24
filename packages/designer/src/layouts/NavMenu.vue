@@ -21,13 +21,14 @@ const props = withDefaults(
 
 const services = inject<Services>('services');
 const uiService = services?.uiService;
+const designerService = services?.designerService;
 
-const columnWidth = computed(() => services?.uiService.get<GetColumnWidth>('columnWidth'));
+const columnWidth = computed(() => services?.uiService.get('columnWidth'));
 const keys = Object.values(ColumnLayout);
 
-const showGuides = computed((): boolean => uiService?.get<boolean>('showGuides') ?? true);
-const showRule = computed((): boolean => uiService?.get<boolean>('showRule') ?? true);
-const zoom = computed((): number => uiService?.get<number>('zoom') ?? 1);
+const showGuides = computed((): boolean => uiService?.get('showGuides') ?? true);
+const showRule = computed((): boolean => uiService?.get('showRule') ?? true);
+const zoom = computed((): number => uiService?.get('zoom') ?? 1);
 
 const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
 const ctrl = isMac ? 'Command' : 'Ctrl';
@@ -60,7 +61,10 @@ function getConfig(item: MenuItem): (MenuButton | MenuComponent)[] {
         icon: markRaw(DeleteOutlined),
         tooltip: `刪除(Delete)`,
         disabled: () => services?.designerService.get('node')?.type === NodeType.PAGE,
-        handler: () => services?.designerService.remove(services?.designerService.get('node')),
+        handler: () => {
+          const node = designerService?.get('node');
+          node && designerService?.remove(node);
+        },
       });
       break;
     case 'undo':

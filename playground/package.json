@@ -13,9 +13,9 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@lowcode/ai": "workspace:1.1.0-alpha.1",
+    "@lowcode/ai": "workspace:^",
     "@lowcode/designer": "workspace:^",
-    "@lowcode/dsl-resolver": "workspace:1.1.0-alpha.1",
+    "@lowcode/dsl-resolver": "workspace:^",
     "@lowcode/form": "workspace:^",
     "@lowcode/schema": "workspace:^",
     "@lowcode/stage": "workspace:^",

@@ -1,5 +1,3 @@
-import type { MApp, MPage } from '@lowcode/schema';
-
 import type { SortEventData, UpdateEventData } from '@lowcode/stage';
 import type { StageOptions } from '../type';
 import StageCore, { GuidesType } from '@lowcode/stage';
@@ -11,10 +9,10 @@ import { H_GUIDE_LINE_STORAGE_KEY, V_GUIDE_LINE_STORAGE_KEY } from '../type';
 
 import { getGuideLineFromCache } from './editor';
 
-const root = computed(() => editorService.get<MApp>('root'));
-const page = computed(() => editorService.get<MPage>('page'));
-const zoom = computed(() => uiService.get<number>('zoom') || 1);
-const uiSelectMode = computed(() => uiService.get<boolean>('uiSelectMode'));
+const root = computed(() => editorService.get('root'));
+const page = computed(() => editorService.get('page'));
+const zoom = computed(() => uiService.get('zoom') || 1);
+const uiSelectMode = computed(() => uiService.get('uiSelectMode'));
 
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 

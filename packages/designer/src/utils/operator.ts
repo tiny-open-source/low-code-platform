@@ -1,5 +1,4 @@
-import type { Id, MApp, MContainer, MNode } from '@lowcode/schema';
-import type StageCore from '@lowcode/stage';
+import type { Id, MContainer, MNode } from '@lowcode/schema';
 
 import type { AddMNode, PastePosition } from '../type';
 import { isPage } from '@lowcode/utils';
@@ -19,7 +18,7 @@ import { generatePageNameByApp, getInitPositionStyle } from '../utils/editor';
 export async function beforePaste(position: PastePosition, config: MNode[]): Promise<MNode[]> {
   if (!config[0]?.style)
     return config;
-  const curNode = designerService.get<MContainer>('node');
+  const curNode = designerService.get('node');
   // 将数组中第一个元素的坐标作为参照点
   const { left: referenceLeft, top: referenceTop } = config[0].style;
   // 坐标校准后的粘贴数据
@@ -29,7 +28,7 @@ export async function beforePaste(position: PastePosition, config: MNode[]): Pro
       const { offsetX = 0, offsetY = 0, ...positionClone } = position;
       let pastePosition = positionClone;
 
-      if (!isEmpty(pastePosition) && curNode.items) {
+      if (!isEmpty(pastePosition) && curNode?.items) {
         // 如果没有传入粘贴坐标则可能为键盘操作，不再转换
         // 如果粘贴时选中了容器，则将元素粘贴到容器内，坐标需要转换为相对于容器的坐标
         pastePosition = getPositionInContainer(pastePosition, curNode.id);
@@ -61,7 +60,7 @@ export async function beforePaste(position: PastePosition, config: MNode[]): Pro
         };
       }
       if (isPage(pasteConfig)) {
-        pasteConfig.name = generatePageNameByApp(designerService.get('root'));
+        pasteConfig.name = generatePageNameByApp(designerService.get('root')!);
       }
       return pasteConfig as MNode;
     }),
@@ -77,7 +76,7 @@ export async function beforePaste(position: PastePosition, config: MNode[]): Pro
  */
 export function getPositionInContainer(position: PastePosition = {}, id: Id) {
   let { left = 0, top = 0 } = position;
-  const parentEl = designerService.get<StageCore>('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
+  const parentEl = designerService.get('stage')?.renderer?.contentWindow?.document.getElementById(`${id}`);
   const parentElRect = parentEl?.getBoundingClientRect();
   left = left - (parentElRect?.left || 0);
   top = top - (parentElRect?.top || 0);
@@ -88,17 +87,17 @@ export function getPositionInContainer(position: PastePosition = {}, id: Id) {
 }
 
 export function getAddParent(node: MNode) {
-  const curNode = designerService.get<MContainer>('node');
+  const curNode = designerService.get('node');
 
   let parentNode;
   if (isPage(node)) {
-    parentNode = designerService.get<MApp>('root');
+    parentNode = designerService.get('root');
   }
-  else if (curNode.items) {
-    parentNode = curNode;
+  else if (curNode?.items) {
+    parentNode = curNode as MContainer;
   }
   else {
-    parentNode = designerService.getParentById(curNode.id, false);
+    parentNode = designerService.getParentById(curNode!.id, false) as MContainer;
   }
   return parentNode;
 }

@@ -11,7 +11,7 @@ defineOptions({
 });
 const services = inject<Services>('services');
 const workspace = ref<HTMLElement | null>(null);
-const nodes = computed(() => services?.designerService.get<MNode[]>('nodes'));
+const nodes = computed(() => services?.designerService.get('nodes'));
 let keycon: KeyController;
 function mouseenterHandler() {
   workspace.value?.focus();
@@ -134,7 +134,7 @@ onMounted(() => {
       services?.uiService.set('zoom', 1);
     }); ;
 });
-const page = computed(() => services?.designerService.get<MPage>('page'));
+const page = computed(() => services?.designerService.get('page'));
 </script>
 
 <template>

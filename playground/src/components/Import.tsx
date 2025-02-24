@@ -29,7 +29,7 @@ export default defineComponent({
               <CodeEditor
                 style="height: 800px; width: 900px;"
                 init-values={values.value}
-                language="json"
+                language="javascript"
                 onSave={save}
               />
             ),
@@ -38,7 +38,6 @@ export default defineComponent({
             },
             positiveText: '解析并导入',
             onPositiveClick: () => {
-              console.log(values.value);
               emit('save', values.value);
             },
           });

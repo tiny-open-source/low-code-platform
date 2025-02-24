@@ -1,5 +1,4 @@
-import type StageCore from '@lowcode/stage';
-import type { GetColumnWidth, SetColumnWidth, StageRect, UiState } from '../type';
+import type { SetColumnWidth, StageRect, UiState } from '../type';
 import { reactive, toRaw } from 'vue';
 import BaseService from '../services/base.service';
 import designerService from './designer.service';
@@ -43,12 +42,12 @@ class Ui extends BaseService {
     });
   }
 
-  public get<T>(name: keyof typeof state): T {
-    return (state as any)[name];
+  public get<K extends keyof UiState>(name: K): UiState[K] {
+    return state[name];
   }
 
   public set<T>(name: keyof typeof state, value: T) {
-    const mask = designerService.get<StageCore>('stage')?.mask;
+    const mask = designerService.get('stage')?.mask;
     if (name === 'columnWidth') {
       this.setColumnWidth(value as unknown as SetColumnWidth);
       return;
@@ -69,8 +68,8 @@ class Ui extends BaseService {
   }
 
   public zoom(zoom: number) {
-    this.set('zoom', (this.get<number>('zoom') * 100 + zoom * 100) / 100);
-    if (this.get<number>('zoom') < 0.1)
+    this.set('zoom', (this.get('zoom') * 100 + zoom * 100) / 100);
+    if (this.get('zoom') < 0.1)
       this.set('zoom', 0.1);
   }
 
@@ -84,7 +83,7 @@ class Ui extends BaseService {
 
   private setColumnWidth({ left, center, right }: SetColumnWidth) {
     const columnWidth = {
-      ...toRaw(this.get<GetColumnWidth>('columnWidth')),
+      ...toRaw(this.get('columnWidth')),
     };
 
     if (left) {

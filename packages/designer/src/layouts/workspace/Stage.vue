@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { MApp, MContainer, MNode, MPage } from '@lowcode/schema';
+import type { MContainer } from '@lowcode/schema';
 import type { Runtime } from '@lowcode/stage';
 import type StageCore from '@lowcode/stage';
-import type { Services, StageOptions, StageRect } from '../../type';
+import type { Services, StageOptions } from '../../type';
 import { calcValueByFontsize, getOffset } from '@lowcode/stage';
 import { cloneDeep } from 'lodash-es';
 import { computed, inject, markRaw, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
@@ -17,13 +17,13 @@ const services = inject<Services>('services');
 let stage: StageCore | null = null;
 let runtime: Runtime | null = null;
 
-const root = computed(() => services?.designerService.get<MApp>('root'));
-const stageRect = computed(() => services?.uiService.get<StageRect>('stageRect'));
-const zoom = computed(() => services?.uiService.get<number>('zoom') || 1);
-const stageContainerRect = computed(() => services?.uiService.get<StageRect>('stageContainerRect'));
-const isMultiSelect = computed(() => services?.designerService.get('nodes')?.length > 1);
-const page = computed(() => services?.designerService.get<MPage>('page'));
-const node = computed(() => services?.designerService.get<MNode>('node'));
+const root = computed(() => services?.designerService.get('root'));
+const stageRect = computed(() => services?.uiService.get('stageRect'));
+const zoom = computed(() => services?.uiService.get('zoom') || 1);
+const stageContainerRect = computed(() => services?.uiService.get('stageContainerRect') || { width: 0, height: 0 });
+const isMultiSelect = computed(() => !!(services?.designerService.get('nodes') && services?.designerService.get('nodes').length > 1));
+const page = computed(() => services?.designerService.get('page'));
+const node = computed(() => services?.designerService.get('node'));
 const stageWrap = ref<InstanceType<typeof ScrollViewer> | null>(null);
 const menu = ref<InstanceType<typeof ViewerMenu>>();
 
@@ -79,7 +79,7 @@ async function dropHandler(e: DragEvent) {
     `.${stageOptions?.containerHighlightClassName}`,
   );
 
-  let parent: MContainer | undefined = page.value;
+  let parent: MContainer | null | undefined = page.value;
   if (parentEl) {
     parent = services?.designerService.getNodeById(parentEl.id, false) as MContainer;
   }

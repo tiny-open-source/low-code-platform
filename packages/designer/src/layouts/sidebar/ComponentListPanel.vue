@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type StageCore from '@lowcode/stage';
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
 import { removeClassNameByClassName } from '@lowcode/utils';
 import { SearchOutlined } from '@vicons/antd';
@@ -16,7 +15,7 @@ const searchText = ref('');
 const services = inject<Services>('services');
 const stageOptions = inject<StageOptions>('stageOptions');
 
-const stage = computed(() => services?.designerService.get<StageCore>('stage'));
+const stage = computed(() => services?.designerService.get('stage'));
 const list = computed(() =>
   services?.componentListService.getList().map((group: ComponentGroup) => ({
     ...group,

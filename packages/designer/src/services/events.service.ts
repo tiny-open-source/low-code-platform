@@ -1,4 +1,5 @@
-import { DEFAULT_EVENTS, DEFAULT_METHODS, type EventOption } from '@lowcode/core';
+import type { EventOption } from '@lowcode/core';
+import { DEFAULT_EVENTS, DEFAULT_METHODS } from '@lowcode/core';
 import { toLine } from '@lowcode/utils';
 import { cloneDeep } from 'lodash-es';
 import { reactive } from 'vue';

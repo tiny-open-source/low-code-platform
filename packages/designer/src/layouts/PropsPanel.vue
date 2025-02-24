@@ -1,10 +1,7 @@
 <script lang="ts" setup>
 import type { FormConfig, FormValue, LForm } from '@lowcode/form';
-import type { MNode } from '@lowcode/schema';
 
-import type StageCore from '@lowcode/stage';
 import type { Services } from '../type';
-import { setValueByKeyPath } from '@lowcode/utils';
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';
 
 defineOptions({
@@ -17,9 +14,9 @@ const values = ref<FormValue>({});
 const configForm = ref<InstanceType<typeof LForm>>();
 const curFormConfig = ref<FormConfig>();
 const services = inject<Services>('services');
-const node = computed(() => services?.designerService.get<MNode | null>('node'));
+const node = computed(() => services?.designerService.get('node'));
 const propsPanelSize = computed(() => services?.uiService.get('propsPanelSize') || 'small');
-const stage = computed(() => services?.designerService.get<StageCore>('stage'));
+const stage = computed(() => services?.designerService.get('stage'));
 
 async function init() {
   if (!node.value) {

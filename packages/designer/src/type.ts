@@ -37,9 +37,9 @@ export interface StageOptions {
   updateDragEl: (el: HTMLDivElement) => void;
 }
 export interface DesignerNodeInfo {
-  node?: MNode;
-  parent?: MContainer;
-  page?: MPage;
+  node: MNode | null;
+  parent: MContainer | null;
+  page: MPage | null;
 }
 export enum ColumnLayout {
   LEFT = 'left',
@@ -72,6 +72,7 @@ export interface StoreState {
   stage: StageCore | null;
   modifiedNodeIds: Map<Id, Id>;
   pageLength: number;
+  stageLoading: boolean;
 }
 export interface UiState {
   /** 当前点击画布是否触发选中，true: 不触发，false: 触发，默认为false */

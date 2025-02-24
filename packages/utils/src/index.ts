@@ -192,7 +192,7 @@ export function getUrlParam(param: string, url?: string) {
 
 export const isPop = (node: MNode): boolean => Boolean(node.type?.toLowerCase().endsWith('pop'));
 
-export function isPage(node: MNode | undefined): boolean {
+export function isPage(node: MNode | undefined | null): boolean {
   if (!node)
     return false;
   return Boolean(node.type?.toLowerCase() === NodeType.PAGE);

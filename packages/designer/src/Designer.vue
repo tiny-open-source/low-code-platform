@@ -60,8 +60,10 @@ const props = withDefaults(
 
 defineEmits(['propsPanelMounted']);
 
-const modelValue = defineModel<MApp>({ required: true });
+const modelValue = defineModel<MApp | undefined>({ required: true });
 designerService.on('root-change', async (value) => {
+  if (!value)
+    return;
   const nodeId = designerService.get('node')?.id || props.defaultSelected;
   let node;
   if (nodeId) {
@@ -78,7 +80,7 @@ designerService.on('root-change', async (value) => {
     designerService.set('parent', null);
     designerService.set('page', null);
   }
-  modelValue.value = toRaw(designerService.get('root'));
+  modelValue.value = toRaw(value);
 });
 
 const services: Services = {
@@ -93,7 +95,7 @@ const services: Services = {
 watch(
   modelValue,
   (n) => {
-    designerService.set('root', toRaw(n));
+    designerService.set('root', toRaw(n) || null);
   },
   {
     immediate: true,

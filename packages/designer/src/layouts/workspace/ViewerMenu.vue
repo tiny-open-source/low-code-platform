@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type { MNode } from '@lowcode/schema';
-import type StageCore from '@lowcode/stage';
-import type { MenuButton, MenuComponent, MenuItem, Services } from '../../type';
+import type { MenuButton, MenuComponent, Services } from '../../type';
 import { NodeType } from '@lowcode/schema';
 import { isPage } from '@lowcode/utils';
 import { CopyOutlined, DeleteOutlined, DownOutlined, UpOutlined } from '@vicons/antd';
-import { computed, inject, markRaw, onMounted, reactive, ref, watch } from 'vue';
+import { computed, inject, markRaw, reactive, ref, watch } from 'vue';
 import ContentMenu from '../../components/ContentMenu.vue';
 import storageService from '../../services/storage.service';
 import { LayerOffset, Layout } from '../../type';
@@ -23,8 +21,8 @@ const menu = ref<InstanceType<typeof ContentMenu>>();
 const allowCenter = ref(false);
 const allowPaste = ref(false);
 const node = computed(() => designerService?.get('node'));
-const nodes = computed(() => designerService?.get<MNode[]>('nodes'));
-const stage = computed(() => designerService?.get<StageCore>('stage'));
+const nodes = computed(() => designerService?.get('nodes'));
+const stage = computed(() => designerService?.get('stage'));
 
 const parent = computed(() => designerService?.get('parent'));
 const menuData = reactive<(MenuButton | MenuComponent)[]>([
@@ -127,7 +125,7 @@ const menuData = reactive<(MenuButton | MenuComponent)[]>([
     type: 'button',
     text: '清空参考线',
     handler: () => {
-      designerService?.get<StageCore>('stage').clearGuides();
+      designerService?.get('stage')!.clearGuides();
     },
   },
   ...stageContentMenu,
