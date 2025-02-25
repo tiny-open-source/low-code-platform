@@ -138,12 +138,12 @@ export function addSelectedClassName(el: Element, doc: Document) {
   });
 }
 export function calcValueByFontsize(doc: Document, value: number) {
-  const { fontSize } = doc.documentElement.style;
+  // const { fontSize } = doc.documentElement.style;
 
-  if (fontSize) {
-    // const times = Number.parseFloat(fontSize) / 32;
-    // return (value / times).toFixed(2);
-  }
+  // if (fontSize) {
+  //   const times = Number.parseFloat(fontSize) / 32;
+  //   return (value / times).toFixed(2);
+  // }
 
   return value;
 }
