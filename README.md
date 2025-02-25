@@ -1,34 +1,101 @@
-# `Turborepo` Vite starter
+# 整体介绍
 
-This is an official starter Turborepo.
+## 项目简介
 
-## Using this example
+## 子包功能介绍
 
-Run the following command:
+ - `ai`: 人工智能模块，封装了大语言模型的对话接口
+ - `cli`: 命令行工具，脚手架，用于为runtime子包快速链接 `runtime-ui` 的组件
+ - `core`: 渲染核心，其内部包含了运行时的核心逻辑，如设备适配、尺寸兼容、样式解析、事件处理等
+ - `designer`: 模板设计器，主要导出了一个Vue组件，用于渲染模板设计器，包含设计器顶部工具栏、左侧组件库、中间画布、右侧属性表单面板等，并封装了这些面板和stage的交互逻辑
+ - `form`: 表单模块，主要包含了表单组件的渲染逻辑，如输入框、下拉框、单选框、多选框等
+ - `runtime-ui`: 运行时UI，主要包含了运行时的UI组件，如按钮、文本、图片等，DSL解析出的每一个元素都是一个组件，这些组件都是由 `runtime-ui` 提供的
+ - `stage`: 设计器舞台，主要包含了编辑器的核心逻辑，内部封装了与runtime的通信逻辑，可通过控制模板上方覆盖的蒙层间接控制runtime的缩放、拖拽、选中、复制、粘贴、删除等
+ - `schema`: 模板数据结构，主要包含了模板的数据结构定义，如模板、页面、组件、事件、样式等
+ - `utils`: 工具库，主要包含了一些常用的工具函数，如颜色转换、样式解析、事件处理等
+ - `playground`: 演示项目，用于演示各个模块的使用方法
+ - `runtime`: 渲染运行时，用于渲染实际页面，根据DSL生成对应的UI组件树，并暴露出`stage`子包所需的一系列控制方法。
 
-```sh
-npx create-turbo@latest -e with-vite
-```
+## 核心架构分层是怎样的？
 
-## What's inside?
+可以将低代码H5模板设计项目分为以下几个核心层次:
 
-This Turborepo includes the following packages and apps:
+### 1. 编辑器层 (Designer Layer)
+- **设计器UI (`designer`包)**
+  - 顶部工具栏
+  - 左侧组件库
+  - 中间画布区域
+  - 右侧属性配置面板
 
-### Apps and Packages
+- **舞台控制层 (`stage`包)**
+  - 负责画布交互
+  - 拖拽、选中、复制等核心编辑操作
+  - 与运行时层通信
 
-- `docs`: a vanilla [vite](https://vitejs.dev) ts app
-- `web`: another vanilla [vite](https://vitejs.dev) ts app
-- `@repo/ui`: a stub component & utility library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: shared `eslint` configurations
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### 2. 运行时层 (Runtime Layer)
+- **核心运行时 (`core`包)**
+  - 设备适配
+  - 尺寸兼容
+  - 样式解析
+  - 事件处理
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **组件运行时 (`runtime-ui`包)**
+  - 基础UI组件库
+  - 组件生命周期管理
+  - 组件间通信
 
-### Utilities
+- **渲染运行时 (`runtime`包)**
+  - 渲染DSL模板
+  - 生成实际页面
+  - 与舞台控制层通信
 
-This Turborepo has some additional tools already setup for you:
+### 3. 数据模型层 (Schema Layer)
+- **模板协议 (`schema`包)**
+  - DSL(领域特定语言)定义
+  - 组件属性描述
+  - 页面结构描述
+  - 事件系统定义
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### 4. 工具支持层 (Utils Layer)
+- **开发工具 (`cli`包)**
+  - 组件脚手架
+  - 开发环境配置
 
+- **通用工具 (`utils`包)**
+  - 样式处理
+  - 事件工具
+  - 通用函数
+
+### 5. 智能增强层 (AI Layer)
+- **AI 能力 (`ai`包)**
+  - 大语言模型集成
+  - 智能代码生成
+  - 组件推荐
+
+## 工作流程
+
+1. 设计器层提供可视化界面
+2. 通过舞台控制层管理编辑操作
+3. 生成DSL模板数据
+4. 运行时层同步操作DSL并解析渲染实际页面
+5. AI层提供智能辅助能力
+
+## 如何实现多框架（Vue2.7/Vue3/React）的动态渲染？运行时编译方案如何设计？
+
+项目通过模板设计最终产物是DSL数据，它描述了页面的层级结构，样式、事件等信息。运行时层根据DSL数据生成实际页面，所以只需要设计不同框架的DSL解析器，将DSL数据解析为对应框架的组件树即可。
+
+我们提供了基于这三种框架的runtime实现，分别是`runtime-vue2`、`runtime-vue3`、`runtime-react`，它们的核心逻辑是一致的，只是组件的实现方式不同。在设计时，我们将组件的生命周期、props、事件等信息抽象为一个接口，不同框架的组件实现这个接口即可。
+
+## 可视化编辑器的拖拽交互如何实现？如何解决组件层级嵌套、联动通信问题？
+
+1. 设计器层的拖拽交互主要由舞台控制层实现，它负责画布的交互逻辑，如拖拽、选中、复制等操作。
+
+对于拖拽交互，我们主要通过moveable.js实现，它提供了丰富的拖拽交互API，如拖拽、缩放、旋转等。
+
+选中元素主要靠stage中的selectFromPoint实现，通过鼠标点击的坐标，判断点击的元素，然后通过蒙层控制元素的选中状态。
+
+结合moveable.js对选中的元素进行拖拽、缩放等操作，修改设计器层DSL，并同步修改runtime层的DSL。
+
+2. 对于层级嵌套我们也做了特殊处理，例如在拖拽状态下，检测到鼠标在容器元素之上悬停一段事件，将状态切换为 投入容器状态，此时鼠标松开，将元素插入到容器中，并同步修改DSL。
+
+3. 联动通信主要通过core这个子包实现的事件系统完成，我们在DSL中会实现一个特殊的事件对象，这个对象指定了事件的触发条件，如点击、双击、长按等，以及当事件触发时需要联动的组件ID，触发的回调函数，当runtime挂载完成之后，core会为每个dom元素注册指定的事件，当这些dom元素事件触发时，core会找到指定的组件执行其所暴露的方法。
