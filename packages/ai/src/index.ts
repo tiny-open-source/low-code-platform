@@ -72,8 +72,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
       model: 'deepseek-r1:14b',
       baseUrl: cleanUrl(url),
       keepAlive: undefined,
-      temperature:
-         userDefaultModelSettings?.temperature,
+      temperature: 0.0,
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
       numCtx: 10240,
