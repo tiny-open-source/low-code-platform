@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
       base,
 
       build: {
-        publicDir: './.tmagic/public',
+        publicDir: './.lowcode/public',
         emptyOutDir: true,
         sourcemap: true,
         outDir,

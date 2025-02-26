@@ -26,8 +26,8 @@ export default defineConfig({
     cssCodeSplit: false,
     rollupOptions: {
       input: {
-        page: './page.html',
-        playground: './playground.html',
+        page: './page/index.html',
+        playground: './playground/index.html',
       },
 
       output: {

@@ -53,4 +53,4 @@ export enum Mode {
 }
 
 /** 选中节点的class name */
-export const SELECTED_CLASS = 'tmagic-stage-selected-area';
+export const SELECTED_CLASS = 'lowcode-stage-selected-area';
