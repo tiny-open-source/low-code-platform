@@ -34,7 +34,8 @@
     "clear:type": "rimraf ./types"
   },
   "dependencies": {
-    "@lowcode/schema": "workspace:^"
+    "@lowcode/schema": "workspace:^",
+    "promise-worker": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.17.19",

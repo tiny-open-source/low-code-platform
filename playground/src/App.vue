@@ -2,7 +2,7 @@
 import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type StageCore from '@lowcode/stage';
 import { LowCodeDesigner } from '@lowcode/designer';
-import { FigmaParser } from '@lowcode/dsl-resolver';
+import { FigmaParser, parse as parseByWorker } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
@@ -50,10 +50,16 @@ asyncLoadJs(
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
-function parse(code: string) {
+async function parse(code: Record<string, any> | string) {
   try {
-    dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
-    (window as any).$message.success('导入成功');
+    parseByWorker(code).then((dsl) => {
+      console.log(dsl);
+
+      // dsl.value = dsl as any;
+      // (window as any).$message.success('导入成功');
+    });
+    // dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
+    // (window as any).$message.success('导入成功');
   }
   catch (e: any) {
     (window as any).$message.error(`导入失败，${e.message}`);
