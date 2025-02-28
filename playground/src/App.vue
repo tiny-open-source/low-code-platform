@@ -2,7 +2,7 @@
 import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type StageCore from '@lowcode/stage';
 import { LowCodeDesigner } from '@lowcode/designer';
-import { FigmaParser, parse as parseByWorker } from '@lowcode/dsl-resolver';
+import { parse as parseByWorker } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
@@ -17,7 +17,6 @@ import Preview from './components/Preview';
 import componentGroupList from './configs/componentGroupList';
 import { defaultDSLConfig } from './configs/dsl';
 
-const figmaParser = new FigmaParser();
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const importDialogVisible = ref(false);
@@ -50,16 +49,18 @@ asyncLoadJs(
 ).then(() => {
   eventMethodList.value = (globalThis as any).lowcodePresetEvents;
 });
-async function parse(code: Record<string, any> | string) {
+function parse(code: string) {
   try {
-    parseByWorker(code).then((dsl) => {
-      console.log(dsl);
-
-      // dsl.value = dsl as any;
-      // (window as any).$message.success('导入成功');
+    const loading = (window as any).$message.loading('导入中');
+    parseByWorker(code).then((res) => {
+      dsl.value = res.data;
+      loading.destroy();
+      (window as any).$message.success('导入成功');
+    }).catch((e) => {
+      console.error(e);
+      loading.destroy();
+      (window as any).$message.error(`导入失败，${e.message}`);
     });
-    // dsl.value = figmaParser.parse(typeof code === 'string' ? JSON.parse(code) : code) as any;
-    // (window as any).$message.success('导入成功');
   }
   catch (e: any) {
     (window as any).$message.error(`导入失败，${e.message}`);
