@@ -9,7 +9,7 @@ import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOut
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
-import Ai from './components/Ai';
+import AiChat from './components/AiChat';
 import DeviceGroup from './components/DeviceGroup';
 import GlobalMessageSetup from './components/GlobalMessageSetup';
 import ImportDSL from './components/Import';
@@ -220,7 +220,7 @@ const menu: MenuBarData = {
             <DeviceGroup v-model="stageRectStr" class="device-group" />
           </template>
         </LowCodeDesigner>
-        <Ai
+        <AiChat
           v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
             dsl = dslEvaled;
           }"

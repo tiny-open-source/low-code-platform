@@ -26,6 +26,7 @@ export type ChatHistory = {
   image?: string;
   messageType?: string;
 }[];
+export * from './composables/ui';
 export { parseReasoning } from './libs/reasoning';
 export { isOllamaRunning } from './service/ollama';
 export function useOllamaStatus() {
