@@ -5,12 +5,12 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-ai.js",
-      "require": "./dist/lowcode-ai.umd.cjs"
+      "import": "./dist/low-code-ai.js",
+      "require": "./dist/low-code-ai.umd.cjs"
     }
   },
-  "main": "dist/lowcode-ai.umd.cjs",
-  "module": "dist/lowcode-ai.js",
+  "main": "dist/low-code-ai.umd.cjs",
+  "module": "dist/low-code-ai.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=14"

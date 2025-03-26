@@ -34,7 +34,6 @@ else {
     rimraf.sync(path.resolve(packagesDir, `./${packageName}/dist`));
     const pkg = createRequire(import.meta.url)(`../packages/${packageName}/package.json`);
 
-    console.log('🚀 ~ pkg:', pkg);
     build({ packageName, format: 'es', pkg, packagesDir });
     build({ packageName, format: 'umd', pkg, packagesDir });
   }

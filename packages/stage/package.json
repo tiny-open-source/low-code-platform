@@ -11,8 +11,8 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-stage.js",
-      "require": "./dist/lowcode-stage.umd.cjs"
+      "import": "./dist/low-code-stage.js",
+      "require": "./dist/low-code-stage.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -20,8 +20,8 @@
     },
     "./*": "./*"
   },
-  "main": "dist/lowcode-stage.umd.cjs",
-  "module": "dist/lowcode-stage.js",
+  "main": "dist/low-code-stage.umd.cjs",
+  "module": "dist/low-code-stage.js",
   "types": "dist/index.d.ts",
   "engines": {
     "node": ">=18"

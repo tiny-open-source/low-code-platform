@@ -9,13 +9,13 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-schema.js",
-      "require": "./dist/lowcode-schema.umd.cjs"
+      "import": "./dist/low-code-schema.js",
+      "require": "./dist/low-code-schema.umd.cjs"
     },
     "./*": "./*"
   },
-  "main": "dist/lowcode-schema.umd.js",
-  "module": "dist/lowcode-schema.js",
+  "main": "dist/low-code-schema.umd.js",
+  "module": "dist/low-code-schema.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=18"

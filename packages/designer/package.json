@@ -6,16 +6,16 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-designer.js",
-      "require": "./dist/lowcode-designer.umd.cjs"
+      "import": "./dist/low-code-designer.js",
+      "require": "./dist/low-code-designer.umd.cjs"
     },
     "./style": {
-      "import": "./dist/lowcode-designer.css",
-      "require": "./dist/lowcode-designer.css"
+      "import": "./dist/low-code-designer.css",
+      "require": "./dist/low-code-designer.css"
     }
   },
-  "main": "dist/lowcode-designer.umd.cjs",
-  "module": "dist/lowcode-designer.js",
+  "main": "dist/low-code-designer.umd.cjs",
+  "module": "dist/low-code-designer.js",
   "types": "types/index.d.ts",
   "peerDependencies": {
     "monaco-editor": "^0.52.2",

@@ -11,8 +11,8 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-adapter.js",
-      "require": "./dist/lowcode-adapter.umd.cjs"
+      "import": "./dist/low-code-adapter.js",
+      "require": "./dist/low-code-adapter.umd.cjs"
     },
     "./dist/style.css": {
       "import": "./dist/style.css",
@@ -21,8 +21,8 @@
     "./dist/*": "./dist/*",
     "./*": "./*"
   },
-  "main": "dist/lowcode-adapter.umd.cjs",
-  "module": "dist/lowcode-adapter.js",
+  "main": "dist/low-code-adapter.umd.cjs",
+  "module": "dist/low-code-adapter.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=18"

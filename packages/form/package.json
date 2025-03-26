@@ -13,17 +13,17 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/lowcode-form.js",
-      "require": "./dist/lowcode-form.umd.cjs"
+      "import": "./dist/low-code-form.js",
+      "require": "./dist/low-code-form.umd.cjs"
     },
     "./style": {
-      "import": "./dist/lowcode-form.css",
-      "require": "./dist/lowcode-form.css"
+      "import": "./dist/low-code-form.css",
+      "require": "./dist/low-code-form.css"
     }
   },
   "style": "dist/low-code-form.css",
-  "main": "dist/lowcode-form.umd.cjs",
-  "module": "dist/lowcode-form.js",
+  "main": "dist/low-code-form.umd.cjs",
+  "module": "dist/low-code-form.js",
   "types": "types/index.d.ts",
   "peerDependencies": {
     "naive-ui": "^2.40.4",
