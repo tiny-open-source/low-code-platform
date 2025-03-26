@@ -12,21 +12,13 @@
       "import": "./dist/lowcode-schema.js",
       "require": "./dist/lowcode-schema.umd.cjs"
     },
-    "./style": {
-      "import": "./dist/lowcode-schema.css",
-      "require": "./dist/lowcode-schema.css"
-    }
+    "./*": "./*"
   },
   "main": "dist/lowcode-schema.umd.js",
   "module": "dist/lowcode-schema.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=18"
-  },
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
   },
   "devDependencies": {
     "@types/node": "^20.17.19",

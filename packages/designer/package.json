@@ -17,11 +17,6 @@
   "main": "dist/lowcode-designer.umd.cjs",
   "module": "dist/lowcode-designer.js",
   "types": "types/index.d.ts",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
-  },
   "peerDependencies": {
     "monaco-editor": "^0.52.2",
     "naive-ui": "^2.40.4",

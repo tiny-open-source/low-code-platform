@@ -15,11 +15,6 @@
   "engines": {
     "node": ">=14"
   },
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
-  },
   "dependencies": {
     "@langchain/core": "^0.3.40",
     "@lowcode/schema": "workspace:^",

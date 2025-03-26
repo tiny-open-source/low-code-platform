@@ -14,9 +14,9 @@
       "import": "./dist/lowcode-core.js",
       "require": "./dist/lowcode-core.umd.cjs"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./resetcss.css": {
+      "import": "./resetcss.css",
+      "require": "./resetcss.css"
     },
     "./*": "./*"
   },
@@ -25,11 +25,6 @@
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=18"
-  },
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
   },
   "dependencies": {
     "@lowcode/schema": "workspace:^",

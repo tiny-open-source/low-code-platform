@@ -3,9 +3,10 @@ import { getUrlParam } from '@lowcode/utils';
 import { createApp } from 'vue';
 import components from '../.lowcode/comp-entry';
 import plugins from '../.lowcode/plugin-entry';
-
 import { getLocalConfig } from '../utils';
+
 import App from './App.vue';
+import '@lowcode/core/resetcss.css';
 
 const vm = createApp(App);
 

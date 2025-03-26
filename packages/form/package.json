@@ -25,11 +25,6 @@
   "main": "dist/lowcode-form.umd.cjs",
   "module": "dist/lowcode-form.js",
   "types": "types/index.d.ts",
-  "scripts": {
-    "build": "npm run build:type && vite build",
-    "build:type": "npm run clear:type && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build.json",
-    "clear:type": "rimraf ./types"
-  },
   "peerDependencies": {
     "naive-ui": "^2.40.4",
     "vue": "^3.5.13"

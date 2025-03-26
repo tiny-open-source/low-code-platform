@@ -13,9 +13,9 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@lowcode/adapter": "workspace:^",
     "@lowcode/ai": "workspace:^",
     "@lowcode/designer": "workspace:^",
-    "@lowcode/dsl-resolver": "workspace:^",
     "@lowcode/form": "workspace:^",
     "@lowcode/schema": "workspace:^",
     "@lowcode/stage": "workspace:^",

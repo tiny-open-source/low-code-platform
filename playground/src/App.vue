@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
 import type StageCore from '@lowcode/stage';
+import { parse as parseByWorker } from '@lowcode/adapter';
 import { LowCodeDesigner } from '@lowcode/designer';
-import { parse as parseByWorker } from '@lowcode/dsl-resolver';
 import { NodeType } from '@lowcode/schema';
 import { asyncLoadJs } from '@lowcode/utils';
 import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
