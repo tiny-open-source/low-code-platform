@@ -1,3 +1,4 @@
+import type { Plugin } from 'vite';
 import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import vue from '@vitejs/plugin-vue';
@@ -26,9 +27,9 @@ export default defineConfig({
       '@vueuse/core',
     ],
     viteOptimizeDeps: true,
-  }), Components({
+  }) as Plugin, Components({
     resolvers: [AntDesignVueResolver()],
-  })],
+  }) as Plugin],
   resolve: {
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },
