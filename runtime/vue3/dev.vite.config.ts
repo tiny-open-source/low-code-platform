@@ -11,8 +11,8 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },
-      { find: /^@lowcode\/core\/resetcss.css/, replacement: path.join(__dirname, '../../packages/core/resetcss.css') },
-      { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../../packages/$1/src') },
+      { find: /^@low-code\/core\/resetcss.css/, replacement: path.join(__dirname, '../../packages/core/resetcss.css') },
+      { find: /@low-code\/(.*)/, replacement: path.join(__dirname, '../../packages/$1/src') },
     ],
   },
   server: {

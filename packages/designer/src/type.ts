@@ -1,7 +1,7 @@
-import type { FormConfig } from '@lowcode/form';
-import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
-import type StageCore from '@lowcode/stage';
-import type { ContainerHighlightType, MoveableOptions } from '@lowcode/stage';
+import type { FormConfig } from '@low-code/form';
+import type { Id, MApp, MContainer, MNode, MPage } from '@low-code/schema';
+import type StageCore from '@low-code/stage';
+import type { ContainerHighlightType, MoveableOptions } from '@low-code/stage';
 import type { Component } from 'vue';
 import type { ComponentListService } from './services/component-list.service';
 import type { DesignerService } from './services/designer.service';

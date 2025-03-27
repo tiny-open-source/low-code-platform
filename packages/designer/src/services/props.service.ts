@@ -1,7 +1,7 @@
-import type { FormConfig } from '@lowcode/form';
-import type { MComponent, MNode } from '@lowcode/schema';
+import type { FormConfig } from '@low-code/form';
+import type { MComponent, MNode } from '@low-code/schema';
 import type { PropsState } from '../type';
-import { toLine } from '@lowcode/utils';
+import { toLine } from '@low-code/utils';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import { reactive } from 'vue';
 import { fillConfig } from '../utils/props';

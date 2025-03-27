@@ -1,5 +1,5 @@
 {
-  "name": "@lowcode/core",
+  "name": "@low-code/core",
   "type": "module",
   "version": "1.1.2",
   "description": "",
@@ -27,7 +27,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@lowcode/schema": "workspace:^",
+    "@low-code/schema": "workspace:^",
     "eventemitter3": "^5.0.1"
   },
   "devDependencies": {

@@ -74,7 +74,7 @@ importers:
 
   packages/adapter:
     dependencies:
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
       promise-worker:
@@ -99,7 +99,7 @@ importers:
       '@langchain/core':
         specifier: ^0.3.43
         version: 0.3.43(openai@4.85.2(ws@8.18.0)(zod@3.24.2))
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
       langchain:
@@ -152,7 +152,7 @@ importers:
 
   packages/core:
     dependencies:
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
       eventemitter3:
@@ -171,19 +171,19 @@ importers:
 
   packages/designer:
     dependencies:
-      '@lowcode/core':
+      '@low-code/core':
         specifier: workspace:^
         version: link:../core
-      '@lowcode/form':
+      '@low-code/form':
         specifier: workspace:^
         version: link:../form
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
-      '@lowcode/stage':
+      '@low-code/stage':
         specifier: workspace:^
         version: link:../stage
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../utils
       '@vicons/antd':
@@ -280,7 +280,7 @@ importers:
 
   packages/form:
     dependencies:
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../utils
       '@vicons/antd':
@@ -326,13 +326,13 @@ importers:
 
   packages/runtime-ui:
     dependencies:
-      '@lowcode/core':
+      '@low-code/core':
         specifier: workspace:^
         version: link:../core
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../utils
       qrcode:
@@ -363,13 +363,13 @@ importers:
 
   packages/stage:
     dependencies:
-      '@lowcode/core':
+      '@low-code/core':
         specifier: workspace:^
         version: link:../core
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../utils
       '@scena/guides':
@@ -409,7 +409,7 @@ importers:
 
   packages/utils:
     dependencies:
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../schema
       dayjs:
@@ -437,25 +437,25 @@ importers:
 
   playground:
     dependencies:
-      '@lowcode/adapter':
+      '@low-code/adapter':
         specifier: workspace:^
         version: link:../packages/adapter
-      '@lowcode/ai':
+      '@low-code/ai':
         specifier: workspace:^
         version: link:../packages/ai
-      '@lowcode/designer':
+      '@low-code/designer':
         specifier: workspace:^
         version: link:../packages/designer
-      '@lowcode/form':
+      '@low-code/form':
         specifier: workspace:^
         version: link:../packages/form
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../packages/schema
-      '@lowcode/stage':
+      '@low-code/stage':
         specifier: workspace:^
         version: link:../packages/stage
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../packages/utils
       '@vicons/antd':
@@ -552,13 +552,13 @@ importers:
 
   runtime/vue3:
     dependencies:
-      '@lowcode/cli':
+      '@low-code/cli':
         specifier: workspace:^
         version: link:../../packages/cli
-      '@lowcode/core':
+      '@low-code/core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@lowcode/utils':
+      '@low-code/utils':
         specifier: workspace:^
         version: link:../../packages/utils
       axios:
@@ -568,7 +568,7 @@ importers:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.7.2)
     devDependencies:
-      '@lowcode/schema':
+      '@low-code/schema':
         specifier: workspace:^
         version: link:../../packages/schema
       '@types/node':

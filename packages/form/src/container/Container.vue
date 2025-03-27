@@ -104,7 +104,7 @@ function trimHandler(trim: any, value: FormValue | number | string) {
   }
 }
 
-const onChangeHandler = async function (v: FormValue, key?: string) {
+async function onChangeHandler(v: FormValue, key?: string) {
   const { filter, onChange, trim, name, dynamicKey } = props.config as any;
   let value: FormValue | number | string = v;
 
@@ -135,7 +135,7 @@ const onChangeHandler = async function (v: FormValue, key?: string) {
     }
 
   emit('change', props.model);
-};
+}
 </script>
 
 <template>

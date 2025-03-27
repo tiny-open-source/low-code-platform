@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { FormState, TextConfig } from '../schema';
+import type { TextConfig } from '../schema';
 import { NInput } from 'naive-ui';
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({

@@ -1,6 +1,6 @@
-import type { Id } from '@lowcode/schema';
+import type { Id } from '@low-code/schema';
 import type { CanSelect, ContainerHighlightType, GuidesEventData, IsContainer, RemoveData, Runtime, StageCoreConfig, UpdateData, UpdateEventData } from './types';
-import { addClassName } from '@lowcode/utils';
+import { addClassName } from '@low-code/utils';
 import { EventEmitter } from 'eventemitter3';
 import { CONTAINER_HIGHLIGHT_CLASS, DEFAULT_ZOOM, GHOST_EL_ID_PREFIX, PAGE_CLASS } from './const';
 import StageDragResize from './StageDragResize';

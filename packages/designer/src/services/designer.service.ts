@@ -1,10 +1,10 @@
-import type { Id, MApp, MContainer, MNode, MPage } from '@lowcode/schema';
+import type { Id, MApp, MContainer, MNode, MPage } from '@low-code/schema';
 
 import type { AddMNode, DesignerNodeInfo, PastePosition, StoreState } from '../type';
 import type { StepValue } from './history.service';
-import { NodeType } from '@lowcode/schema';
+import { NodeType } from '@low-code/schema';
 
-import { getNodePath, isNumber, isPage, isPop } from '@lowcode/utils';
+import { getNodePath, isNumber, isPage, isPop } from '@low-code/utils';
 import { cloneDeep, isObject, mergeWith, uniq } from 'lodash-es';
 import { reactive, toRaw } from 'vue';
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { EventOption } from '@lowcode/core';
-import type { FormConfig } from '@lowcode/form';
-import type { MApp, MContainer, MNode } from '@lowcode/schema';
-import type StageCore from '@lowcode/stage';
-import type { MoveableOptions } from '@lowcode/stage';
+import type { EventOption } from '@low-code/core';
+import type { FormConfig } from '@low-code/form';
+import type { MApp, MContainer, MNode } from '@low-code/schema';
+import type StageCore from '@low-code/stage';
+import type { MoveableOptions } from '@low-code/stage';
 import type { ComponentGroup, MenuBarData, MenuButton, MenuComponent, Services, SideBarData, StageRect } from './type';
-import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@lowcode/stage';
+import { CONTAINER_HIGHLIGHT_CLASS, ContainerHighlightType } from '@low-code/stage';
 import { onBeforeUnmount, provide, reactive, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -51,7 +51,7 @@ const props = withDefaults(
     menu: () => ({ left: [], right: [] }),
     componentGroupList: () => [],
     propsValues: () => ({}),
-    isContainer: (el: HTMLElement) => el.classList.contains('lowcode-ui-container'),
+    isContainer: (el: HTMLElement) => el.classList.contains('low-code-ui-container'),
     containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS,
     containerHighlightDuration: 800,
     containerHighlightType: ContainerHighlightType.DEFAULT,

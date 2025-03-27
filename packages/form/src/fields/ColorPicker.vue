@@ -2,7 +2,7 @@
 import type { PropType } from 'vue';
 import type { HiddenConfig } from '../schema';
 import { NColorPicker } from 'naive-ui';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({

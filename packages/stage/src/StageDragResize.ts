@@ -3,7 +3,7 @@ import type StageCore from './StageCore';
 import type StageMask from './StageMask';
 import type { StageDragResizeConfig } from './types';
 
-import { removeClassNameByClassName } from '@lowcode/utils';
+import { removeClassNameByClassName } from '@low-code/utils';
 import { EventEmitter } from 'eventemitter3';
 import KeyController from 'keycon';
 import Moveable from 'moveable';

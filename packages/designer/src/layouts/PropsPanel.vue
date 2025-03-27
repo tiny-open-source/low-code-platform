@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { FormConfig, FormValue, LForm } from '@lowcode/form';
+import type { FormConfig, FormValue, LForm } from '@low-code/form';
 
 import type { Services } from '../type';
 import { computed, getCurrentInstance, inject, onMounted, ref, watchEffect } from 'vue';

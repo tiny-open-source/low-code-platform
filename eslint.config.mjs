@@ -23,7 +23,7 @@ export default antfu({
   ignores: [
     'types/**',
     '.entry-dist/**',
-    '.lowcode/**',
+    '.low-code/**',
     '.prettierrc',
     '**/.prettierrc/**',
     'pnpm*',

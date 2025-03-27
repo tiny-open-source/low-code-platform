@@ -1,5 +1,5 @@
 {
-  "name": "@lowcode/designer",
+  "name": "@low-code/designer",
   "type": "module",
   "version": "1.1.2",
   "style": "dist/low-code-designer.css",
@@ -23,11 +23,11 @@
     "vue": "^3.5.13"
   },
   "dependencies": {
-    "@lowcode/core": "workspace:^",
-    "@lowcode/form": "workspace:^",
-    "@lowcode/schema": "workspace:^",
-    "@lowcode/stage": "workspace:^",
-    "@lowcode/utils": "workspace:^",
+    "@low-code/core": "workspace:^",
+    "@low-code/form": "workspace:^",
+    "@low-code/schema": "workspace:^",
+    "@low-code/stage": "workspace:^",
+    "@low-code/utils": "workspace:^",
     "@vicons/antd": "^0.13.0",
     "buffer": "^6.0.3",
     "eventemitter3": "^5.0.1",

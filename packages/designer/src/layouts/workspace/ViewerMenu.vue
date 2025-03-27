@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MenuButton, MenuComponent, Services } from '../../type';
-import { NodeType } from '@lowcode/schema';
-import { isPage } from '@lowcode/utils';
+import { NodeType } from '@low-code/schema';
+import { isPage } from '@low-code/utils';
 import { CopyOutlined, DeleteOutlined, DownOutlined, UpOutlined } from '@vicons/antd';
 import { computed, inject, markRaw, reactive, ref, watch } from 'vue';
 import ContentMenu from '../../components/ContentMenu.vue';

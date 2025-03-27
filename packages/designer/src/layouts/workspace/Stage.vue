@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { MContainer } from '@lowcode/schema';
-import type { Runtime } from '@lowcode/stage';
-import type StageCore from '@lowcode/stage';
+import type { MContainer } from '@low-code/schema';
+import type { Runtime } from '@low-code/stage';
+import type StageCore from '@low-code/stage';
 import type { Services, StageOptions } from '../../type';
-import { calcValueByFontsize, getOffset } from '@lowcode/stage';
+import { calcValueByFontsize, getOffset } from '@low-code/stage';
 import { cloneDeep } from 'lodash-es';
 import { computed, inject, markRaw, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect } from 'vue';
 import ScrollViewer from '../../components/ScrollViewer.vue';

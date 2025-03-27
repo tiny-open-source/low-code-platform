@@ -1,6 +1,6 @@
-import type { SortEventData, UpdateEventData } from '@lowcode/stage';
+import type { SortEventData, UpdateEventData } from '@low-code/stage';
 import type { StageOptions } from '../type';
-import StageCore, { GuidesType } from '@lowcode/stage';
+import StageCore, { GuidesType } from '@low-code/stage';
 
 import { computed } from 'vue';
 import editorService from '../services/designer.service';

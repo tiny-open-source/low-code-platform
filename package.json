@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "pnpm build:dts && node scripts/build.mjs",
-    "build:dts": "pnpm --filter \"@lowcode/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
+    "build:dts": "pnpm --filter \"@low-code/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
     "build:playground": "turbo build --filter=runtime-vue3 && turbo build --filter=playground",
     "lint": "turbo lint",
     "clean:top": "rimraf */**/dist */**/entry-dist */dist coverage dwt*",

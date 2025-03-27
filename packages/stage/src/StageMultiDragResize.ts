@@ -182,7 +182,7 @@ export default class StageMultiDragResize extends EventEmitter {
     const currentTargetMode = getMode(el);
     let selectedDomMode = '';
     if (this.core.selectedDom?.className.includes(PAGE_CLASS)) {
-      // 先单击选中了页面(lowcode-ui-page)，再按住多选键多选时，任一元素均可选中
+      // 先单击选中了页面(low-code-ui-page)，再按住多选键多选时，任一元素均可选中
       return true;
     }
     if (this.targetList.length === 0 && this.core.selectedDom) {

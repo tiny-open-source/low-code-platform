@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ComponentGroup, ComponentItem, Services, StageOptions } from '../../type';
-import { removeClassNameByClassName } from '@lowcode/utils';
+import { removeClassNameByClassName } from '@low-code/utils';
 import { SearchOutlined } from '@vicons/antd';
 import { NCollapse, NCollapseItem, NIcon, NInput, NScrollbar } from 'naive-ui';
 

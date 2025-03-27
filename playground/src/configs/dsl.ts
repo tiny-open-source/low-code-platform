@@ -1715,7 +1715,7 @@ export const defaultDSLConfig = ({
           multiple: true,
           events: [
             {
-              name: 'lowcode:common:events:click',
+              name: 'low-code:common:events:click',
               key: 1736928257401,
               to: 'component_6138',
               method: 'openOverlay',

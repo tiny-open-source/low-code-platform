@@ -13,7 +13,7 @@
     "build": "npm run build:libs && npm run build:page && npm run build:playground",
     "build:page": "vite build --config prod.vite.config.ts --mode page",
     "build:playground": "vite build --config prod.vite.config.ts --mode playground",
-    "build:libs": "lowcode entry && npm run build:config && npm run build:value && npm run build:event",
+    "build:libs": "low-code entry && npm run build:config && npm run build:value && npm run build:event",
     "build:config": "vite build --config prod.vite.config.ts --mode config",
     "build:value": "vite build --config prod.vite.config.ts --mode value",
     "build:event": "vite build --config prod.vite.config.ts --mode event",
@@ -28,14 +28,14 @@
     "vue": "^3.5.13"
   },
   "dependencies": {
-    "@lowcode/cli": "workspace:^",
-    "@lowcode/core": "workspace:^",
-    "@lowcode/utils": "workspace:^",
+    "@low-code/cli": "workspace:^",
+    "@low-code/core": "workspace:^",
+    "@low-code/utils": "workspace:^",
     "axios": "^1.8.4",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@lowcode/schema": "workspace:^",
+    "@low-code/schema": "workspace:^",
     "@types/node": "^20.17.27",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",

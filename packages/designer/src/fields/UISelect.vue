@@ -1,5 +1,5 @@
 <script setup lang="ts" name="UISelect">
-import type { FormState } from '@lowcode/form';
+import type { FormState } from '@low-code/form';
 import type { Services } from '../type';
 import { DeleteOutlined } from '@vicons/antd';
 

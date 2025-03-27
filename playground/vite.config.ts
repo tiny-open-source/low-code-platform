@@ -33,7 +33,7 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: '@', replacement: fileURLToPath(new URL('src', import.meta.url)) },
-      { find: /@lowcode\/(.*)/, replacement: path.join(__dirname, '../packages/$1/src') },
+      { find: /@low-code\/(.*)/, replacement: path.join(__dirname, '../packages/$1/src') },
     ],
   },
   optimizeDeps: {

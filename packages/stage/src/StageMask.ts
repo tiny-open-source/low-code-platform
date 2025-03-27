@@ -1,6 +1,6 @@
 import type StageCore from './StageCore';
 import type { StageMaskConfig } from './types';
-import { createDiv, injectStyle } from '@lowcode/utils';
+import { createDiv, injectStyle } from '@low-code/utils';
 import KeyController from 'keycon';
 import { throttle } from 'lodash-es';
 import { Mode, MouseButton, ZIndex } from './const';

@@ -50,7 +50,7 @@ defineExpose({
 </script>
 
 <template>
-  <button class="lowcode-ui-button" @click="clickHandler">
+  <button class="low-code-ui-button" @click="clickHandler">
     <slot>
       <LowCodeRuntimeUiText :config="textConfig" />
     </slot>

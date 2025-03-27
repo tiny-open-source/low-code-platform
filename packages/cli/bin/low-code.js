@@ -8,5 +8,5 @@ cli({
   packages: {},
   componentFileAffix: '',
   cleanTemp: true,
-  temp: '.lowcode',
+  temp: '.low-code',
 });

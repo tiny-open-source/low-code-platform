@@ -12,7 +12,7 @@
     "moduleResolution": "bundler",
     "paths": {
       // 内部模块都指向 src/index.ts, 会有更好的代码跳转体验.
-      "@lowcode/*": ["./packages/*/src"],
+      "@low-code/*": ["./packages/*/src"],
       "@designer/*": ["./packages/designer/src/*"],
       "@form/*": ["./packages/form/src/*"]
     },

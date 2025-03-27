@@ -1,5 +1,5 @@
 import type { Offset, SortEventData } from './types';
-import { removeClassName } from '@lowcode/utils';
+import { removeClassName } from '@low-code/utils';
 import { GHOST_EL_ID_PREFIX, Mode, SELECTED_CLASS, ZIndex } from './const';
 
 function getParents(el: Element, relative: Element) {

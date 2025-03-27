@@ -40,7 +40,7 @@ export { default as uiService } from './services/ui.service';
 
 export * from './type';
 
-export type { MoveableOptions } from '@lowcode/stage';
+export type { MoveableOptions } from '@low-code/stage';
 const defaultInstallOptions: InstallOptions = {
   // @todo, 自定义图片上传方法等编辑器依赖的外部选项
 };

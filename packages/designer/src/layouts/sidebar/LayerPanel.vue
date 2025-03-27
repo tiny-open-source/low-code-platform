@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MNode } from '@lowcode/schema';
+import type { MNode } from '@low-code/schema';
 import type { TreeDropInfo, TreeOption, TreeOverrideNodeClickBehavior, TreeOverrideNodeClickBehaviorReturn } from 'naive-ui';
 import type { AllowDrop } from 'naive-ui/es/tree/src/interface';
 import type { Ref } from 'vue';

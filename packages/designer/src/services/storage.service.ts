@@ -20,7 +20,7 @@ export enum Protocol {
  */
 export class WebStorage extends BaseService {
   private storage: Storage = globalThis.localStorage;
-  private namespace = 'lowcode';
+  private namespace = 'low-code';
 
   constructor() {
     super(['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem']);

@@ -1,7 +1,7 @@
-import type { Id, MContainer, MNode } from '@lowcode/schema';
+import type { Id, MContainer, MNode } from '@low-code/schema';
 
 import type { AddMNode, PastePosition } from '../type';
-import { isPage } from '@lowcode/utils';
+import { isPage } from '@low-code/utils';
 import { isEmpty } from 'lodash-es';
 import { toRaw } from 'vue';
 

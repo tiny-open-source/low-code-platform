@@ -94,7 +94,7 @@ async function build({ packageName, format, pkg, packagesDir }) {
     resolve: {
       alias: [
         { find: /^@designer/, replacement: path.join(packagesDir, './designer/src') },
-        { find: /@lowcode\/(.*)/, replacement: path.join(packagesDir, './$1/src') },
+        { find: /@low-code\/(.*)/, replacement: path.join(packagesDir, './$1/src') },
 
       ],
     },

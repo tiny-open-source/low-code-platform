@@ -1,6 +1,6 @@
-import type { MApp, MNode, MPage } from '@lowcode/schema';
+import type { MApp, MNode, MPage } from '@low-code/schema';
 import type { FigmaJson, FigmaLayersNode, FigmaPageNode } from './figma-json';
-import { NodeType } from '@lowcode/schema';
+import { NodeType } from '@low-code/schema';
 
 // 基础样式接口
 interface BaseStyle {

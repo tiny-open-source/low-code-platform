@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     const capitalToken = mode.charAt(0).toUpperCase() + mode.slice(1);
     return {
       build: {
-        publicDir: './.lowcode/public',
+        publicDir: './.low-code/public',
         cssCodeSplit: false,
         sourcemap: true,
         minify: false,
@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         outDir: `../../playground/public/entry/vue3/${mode}`,
 
         lib: {
-          entry: `.lowcode/${mode}-entry.ts`,
+          entry: `.low-code/${mode}-entry.ts`,
           name: `lowcodePreset${capitalToken}s`,
           fileName: format => `index.${format}.js`,
           formats: ['umd'],
@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
       base,
 
       build: {
-        publicDir: './.lowcode/public',
+        publicDir: './.low-code/public',
         emptyOutDir: true,
         sourcemap: true,
         outDir,

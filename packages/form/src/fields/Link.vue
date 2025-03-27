@@ -3,7 +3,7 @@ import type { PropType } from 'vue';
 import type Dialog from '../Dialog.vue';
 import type { FormState, LinkConfig } from '../schema';
 import { NButton } from 'naive-ui';
-import { computed, inject, ref, watchEffect } from 'vue';
+import { computed, inject, ref } from 'vue';
 import fieldProps from '../utils/fieldProps';
 
 defineOptions({

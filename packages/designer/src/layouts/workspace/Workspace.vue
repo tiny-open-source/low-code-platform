@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Services } from '../../type';
-import { isPage } from '@lowcode/utils';
+import { isPage } from '@low-code/utils';
 import KeyController from 'keycon';
 import { computed, inject, onMounted, ref } from 'vue';
 import LowCodeStage from './Stage.vue';

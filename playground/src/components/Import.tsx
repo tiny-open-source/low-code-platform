@@ -1,4 +1,4 @@
-import { CodeEditor } from '@lowcode/designer';
+import { CodeEditor } from '@low-code/designer';
 import { useDialog } from 'naive-ui';
 import { defineComponent } from 'vue';
 import mockFigmaJson from './figma-json.json?raw';

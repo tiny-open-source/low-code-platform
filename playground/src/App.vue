@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { MenuBarData, MoveableOptions } from '@lowcode/designer';
-import type StageCore from '@lowcode/stage';
-import { parse as parseByWorker } from '@lowcode/adapter';
-import { LowCodeDesigner } from '@lowcode/designer';
-import { NodeType } from '@lowcode/schema';
-import { asyncLoadJs } from '@lowcode/utils';
+import type { MenuBarData, MoveableOptions } from '@low-code/designer';
+import type StageCore from '@low-code/stage';
+import { parse as parseByWorker } from '@low-code/adapter';
+import { LowCodeDesigner } from '@low-code/designer';
+import { NodeType } from '@low-code/schema';
+import { asyncLoadJs } from '@low-code/utils';
 import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';

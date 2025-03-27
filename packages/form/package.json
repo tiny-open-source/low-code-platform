@@ -1,5 +1,5 @@
 {
-  "name": "@lowcode/form",
+  "name": "@low-code/form",
   "type": "module",
   "version": "1.1.2",
   "description": "",
@@ -30,7 +30,7 @@
     "vue": "^3.5.13"
   },
   "dependencies": {
-    "@lowcode/utils": "workspace:^",
+    "@low-code/utils": "workspace:^",
     "@vicons/antd": "^0.13.0",
     "lodash-es": "^4.17.21",
     "tinycolor2": "^1.6.0"

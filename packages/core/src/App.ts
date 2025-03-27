@@ -1,4 +1,4 @@
-import type { EventItemConfig, Id, MApp } from '@lowcode/schema';
+import type { EventItemConfig, Id, MApp } from '@low-code/schema';
 import { EventEmitter } from 'eventemitter3';
 import Env from './Env';
 import { bindCommonEventListener, DEFAULT_EVENTS, getCommonEventName, isCommonMethod, triggerCommonMethod } from './events';

@@ -1,9 +1,9 @@
 import { createApp } from 'vue';
 
 import App from './App.vue';
-import '@lowcode/core/resetcss.css';
+import '@low-code/core/resetcss.css';
 
-Promise.all([import('../.lowcode/comp-entry'), import('../.lowcode/plugin-entry')]).then(([components, plugins]) => {
+Promise.all([import('../.low-code/comp-entry'), import('../.low-code/plugin-entry')]).then(([components, plugins]) => {
   const vm = createApp(App);
 
   Object.entries(components.default).forEach(([type, component]: [string, any]) => {
