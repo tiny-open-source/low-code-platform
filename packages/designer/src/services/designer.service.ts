@@ -145,6 +145,33 @@ class Designer extends BaseService {
     return pasteConfigs;
   }
 
+  public async replace(nodes: MNode[], config: MNode[] | MNode) {
+    if (config && !Array.isArray(config)) {
+      config = [config];
+    }
+    // 如果粘贴的节点和当前选中的节点相同，则不进行替换
+    if (config![0]!.id === nodes[0].id)
+      return;
+
+    const { parent } = this.getNodeInfo(nodes[0].id, false);
+    const configs = await this.doReplace(nodes, config);
+    await this.remove(nodes);
+    await this.add(configs, parent!);
+  }
+
+  public async doReplace(beReplacedNode: MNode[], replacedNode: MNode[]) {
+    const left = Math.min(...beReplacedNode.map(item => item.style?.left || 0));
+    const top = Math.min(...beReplacedNode.map(item => item.style?.top || 0));
+    const pasteConfigs = await beforePaste({
+      left,
+      top,
+    }, replacedNode);
+    if (pasteConfigs.length > 1) {
+      return pasteConfigs;
+    }
+    return pasteConfigs[0] as AddMNode;
+  }
+
   /**
    * 选中指定节点（将指定节点设置成当前选中状态）
    * @param config 指定节点配置或者ID

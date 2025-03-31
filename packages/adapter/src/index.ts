@@ -1,1 +1,1 @@
-export * from './lanhu';
+export * from './resolvers/lanhu';
