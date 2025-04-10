@@ -234,6 +234,9 @@ importers:
       sass-embedded:
         specifier: ^1.86.3
         version: 1.86.3
+      type-fest:
+        specifier: ^4.39.1
+        version: 4.39.1
       unplugin-auto-import:
         specifier: ^19.1.2
         version: 19.1.2(@vueuse/core@12.8.2(typescript@5.7.2))
@@ -4691,6 +4694,10 @@ packages:
 
   type-fest@4.32.0:
     resolution: {integrity: sha512-rfgpoi08xagF3JSdtJlCwMq9DGNDE0IMh3Mkpc1wUypg9vPi786AiqeBBKcqvIkq42azsBM85N490fyZjeUftw==}
+    engines: {node: '>=16'}
+
+  type-fest@4.39.1:
+    resolution: {integrity: sha512-uW9qzd66uyHYxwyVBYiwS4Oi0qZyUqwjU+Oevr6ZogYiXt99EOYtwvzMSLw1c3lYo2HzJsep/NB23iEVEgjG/w==}
     engines: {node: '>=16'}
 
   typescript@5.6.2:
@@ -9670,6 +9677,8 @@ snapshots:
   type-fest@0.8.1: {}
 
   type-fest@4.32.0: {}
+
+  type-fest@4.39.1: {}
 
   typescript@5.6.2: {}
 

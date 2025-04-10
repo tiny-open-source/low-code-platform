@@ -7,6 +7,7 @@ import type { ComponentListService } from './services/component-list.service';
 import type { DesignerService } from './services/designer.service';
 import type { HistoryService } from './services/history.service';
 import type { PropsService } from './services/props.service';
+import type { StageOverlayService } from './services/stage-overlay.service';
 import type { StorageService } from './services/storage.service';
 import type { UiService } from './services/ui.service';
 
@@ -20,21 +21,22 @@ export interface Services {
   propsService: PropsService;
   componentListService: ComponentListService;
   storageService: StorageService;
+  stageOverlayService: StageOverlayService;
 }
 
 export interface StageOptions {
-  runtimeUrl: string;
-  autoScrollIntoView: boolean;
-  containerHighlightClassName: string;
-  containerHighlightDuration: number;
-  containerHighlightType: ContainerHighlightType;
+  runtimeUrl?: string;
+  autoScrollIntoView?: boolean;
+  containerHighlightClassName?: string;
+  containerHighlightDuration?: number;
+  containerHighlightType?: ContainerHighlightType;
 
-  render: () => HTMLDivElement;
-  moveableOptions: MoveableOptions | ((core?: StageCore) => MoveableOptions);
-  isContainer: (el: HTMLElement) => boolean | Promise<boolean>;
-  canSelect: (el: HTMLElement) => boolean | Promise<boolean>;
+  render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
+  moveableOptions?: MoveableOptions | ((core?: StageCore) => MoveableOptions);
+  isContainer?: (el: HTMLElement) => boolean | Promise<boolean>;
+  canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
 
-  updateDragEl: (el: HTMLDivElement) => void;
+  updateDragEl?: (el: HTMLDivElement) => void;
 }
 export interface DesignerNodeInfo {
   node: MNode | null;
@@ -273,4 +275,15 @@ export interface ScrollViewerEvent {
   scrollTop: number;
   scrollHeight: number;
   scrollWidth: number;
+}
+
+export interface StageOverlayState {
+  wrapDiv: HTMLDivElement;
+  sourceEl: HTMLElement | null;
+  contentEl: HTMLElement | null;
+  stage: StageCore | null;
+  stageOptions: StageOptions | null;
+  wrapWidth: number;
+  wrapHeight: number;
+  stageOverlayVisible: boolean;
 }

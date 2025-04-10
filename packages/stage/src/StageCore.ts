@@ -111,7 +111,10 @@ class StageCore extends EventEmitter {
           this.selectedDomList.push(el);
         }
         this.multiSelect(this.selectedDomList);
-      }); ;
+      })
+      .on('dblclick', async (event: MouseEvent) => {
+        this.emit('dblclick', event);
+      });
 
     // 要先触发select，在触发update
     this.dr
