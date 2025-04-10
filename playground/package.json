@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@low-code/adapter": "workspace:^",
-    "@low-code/ai": "workspace:^",
     "@low-code/designer": "workspace:^",
     "@low-code/form": "workspace:^",
+    "@low-code/llm": "workspace:^",
     "@low-code/schema": "workspace:^",
     "@low-code/stage": "workspace:^",
     "@low-code/utils": "workspace:^",

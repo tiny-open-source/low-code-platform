@@ -1,6 +1,6 @@
 import type { PropType } from 'vue';
-import { parseReasoning, useDynamicTextareaSize, useMessageOption, useOllamaStatus } from '@low-code/ai';
 import { CodeEditor } from '@low-code/designer';
+import { parseReasoning, useDynamicTextareaSize, useMessageOption, useOllamaStatus } from '@low-code/llm';
 import { EnterOutlined, StopOutlined } from '@vicons/antd';
 import { NButton, NCollapseTransition, NDrawer, NDrawerContent, NIcon, NScrollbar, NSwitch } from 'naive-ui';
 import { computed, defineComponent, onMounted, ref, watch, watchEffect } from 'vue';

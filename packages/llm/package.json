@@ -1,16 +1,16 @@
 {
-  "name": "@low-code/ai",
+  "name": "@low-code/llm",
   "type": "module",
   "version": "1.1.2",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/low-code-ai.js",
-      "require": "./dist/low-code-ai.umd.cjs"
+      "import": "./dist/low-code-llm.js",
+      "require": "./dist/low-code-llm.umd.cjs"
     }
   },
-  "main": "dist/low-code-ai.umd.cjs",
-  "module": "dist/low-code-ai.js",
+  "main": "dist/low-code-llm.umd.cjs",
+  "module": "dist/low-code-llm.js",
   "types": "types/index.d.ts",
   "engines": {
     "node": ">=14"
