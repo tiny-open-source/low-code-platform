@@ -512,8 +512,6 @@ class StageDragResize extends EventEmitter {
   }
 
   private canContainerHighlight() {
-    console.log(this.core.containerHighlightType);
-
     return (
       this.core.containerHighlightType === ContainerHighlightType.DEFAULT
       || (this.core.containerHighlightType === ContainerHighlightType.ALT && this.isContainerHighlight)

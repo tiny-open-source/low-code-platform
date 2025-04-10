@@ -673,7 +673,7 @@ class Designer extends BaseService {
 
   /**
    * 删除组件
-   * @param {object} node
+   * @param {object} nodeOrNodeList
    */
   public async remove(nodeOrNodeList: MNode | MNode[]): Promise<void> {
     const nodes = Array.isArray(nodeOrNodeList) ? nodeOrNodeList : [nodeOrNodeList];

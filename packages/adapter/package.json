@@ -32,9 +32,9 @@
     "promise-worker": "^2.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.17.27",
+    "@types/node": "^20.17.30",
     "rimraf": "^6.0.1",
-    "vite": "^6.2.3",
-    "vitest": "^3.0.9"
+    "vite": "^6.2.5",
+    "vitest": "^3.1.1"
   }
 }

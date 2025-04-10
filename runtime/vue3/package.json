@@ -36,13 +36,13 @@
   },
   "devDependencies": {
     "@low-code/schema": "workspace:^",
-    "@types/node": "^20.17.27",
+    "@types/node": "^20.17.30",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
     "npm-run-all2": "^7.0.2",
     "rollup-plugin-external-globals": "^0.13.0",
     "unplugin-auto-import": "^19.1.2",
-    "vite": "^6.2.3",
+    "vite": "^6.2.5",
     "vue-tsc": "2.0.29"
   }
 }

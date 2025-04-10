@@ -32,7 +32,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.5",
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.17.27",
+    "@types/node": "^20.17.30",
     "@types/serialize-javascript": "^5.0.4",
     "@unocss/reset": "^65.5.0",
     "@vitejs/plugin-vue": "^5.2.3",
@@ -43,14 +43,14 @@
     "@vueuse/core": "^12.8.2",
     "jsdom": "^26.0.0",
     "npm-run-all2": "^7.0.2",
-    "sass-embedded": "^1.86.0",
+    "sass-embedded": "^1.86.3",
     "unocss": "^65.5.0",
     "unocss-preset-scrollbar": "^3.2.0",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.4.1",
-    "vite": "^6.2.3",
+    "vite": "^6.2.5",
     "vite-plugin-vue-devtools": "^7.7.2",
-    "vitest": "^3.0.9",
+    "vitest": "^3.1.1",
     "vue-tsc": "2.0.29"
   }
 }
