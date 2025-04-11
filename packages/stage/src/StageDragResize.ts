@@ -450,6 +450,7 @@ class StageDragResize extends EventEmitter {
     if (typeof this.core.config.updateDragEl === 'function') {
       this.core.config.updateDragEl(this.dragEl, el);
     }
+    console.log('🚀 ~ StageDragResize ~ init ~ this.dragEl:', this.dragEl);
     this.moveableOptions = this.getOptions({
       target: this.dragEl,
     });
@@ -530,6 +531,7 @@ class StageDragResize extends EventEmitter {
 
     if (typeof moveableOptions === 'function') {
       moveableOptions = moveableOptions(this.core);
+      console.log('🚀 ~ StageDragResize ~ getOptions ~ moveableOptions:', moveableOptions);
     }
 
     const elementGuidelines: any = moveableOptions.elementGuidelines || this.target.parentElement?.children || [];

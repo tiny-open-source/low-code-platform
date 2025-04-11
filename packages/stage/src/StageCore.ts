@@ -206,6 +206,7 @@ class StageCore extends EventEmitter {
       await runtime.beforeSelect(el);
     }
 
+    this.selectedDom = el;
     this.mask.setLayout(el);
     this.dr.select(el, event);
 
@@ -213,7 +214,6 @@ class StageCore extends EventEmitter {
       this.mask.intersectionObserver?.observe(el);
     }
 
-    this.selectedDom = el;
     if (this.renderer.contentWindow) {
       removeSelectedClassName(this.renderer.contentWindow.document);
       if (this.selectedDom) {

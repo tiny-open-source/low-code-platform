@@ -196,6 +196,7 @@ defineExpose({
       <div
         v-show="isShiftPressed"
         ref="dragMask"
+        :style="`transform: scale(${zoom});`"
         class="drag-mask"
         @mousedown="preventDefault"
         @click="preventDefault"
