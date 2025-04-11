@@ -86,6 +86,13 @@ function moveableOptions(core?: StageCore): MoveableOptions {
   options.resizable = !isPage;
   options.rotatable = !isPage;
 
+  // 双击后在弹层中编辑时，根组件不能拖拽
+  if (core?.selectedDom?.parentElement?.classList.contains('low-code-sub-stage-wrap')) {
+    options.draggable = false;
+    options.resizable = false;
+    options.rotatable = false;
+  }
+
   return options;
 }
 window.onbeforeunload = function () {

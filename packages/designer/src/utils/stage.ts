@@ -17,18 +17,18 @@ const stageDragMode = computed(() => uiService.get('stageDragMode'));
 
 const getGuideLineKey = (key: string) => `${key}_${root.value?.id}_${page.value?.id}`;
 
-export function useStage(stageOptions: StageOptions) {
+export function useStage(stageOptions: StageOptions = {}) {
   const stage = new StageCore({
     render: stageOptions.render,
     runtimeUrl: stageOptions.runtimeUrl,
-    zoom: zoom.value,
+    zoom: stageOptions.zoom ?? zoom.value,
     autoScrollIntoView: stageOptions.autoScrollIntoView,
-    isContainer: stageOptions.isContainer,
+    isContainer: stageOptions.isContainer!,
     containerHighlightClassName: stageOptions.containerHighlightClassName,
     containerHighlightDuration: stageOptions.containerHighlightDuration,
     containerHighlightType: stageOptions.containerHighlightType,
     canSelect: (el, event, stop) => {
-      const elCanSelect = stageOptions.canSelect(el);
+      const elCanSelect = stageOptions.canSelect!(el);
       // 在拖拽组件过程中不能再往下选择，返回并触发 stage-drag
       if (stageDragMode.value)
         return false;
@@ -43,7 +43,6 @@ export function useStage(stageOptions: StageOptions) {
     moveableOptions: stageOptions.moveableOptions,
     updateDragEl: stageOptions.updateDragEl,
   });
-
   stage.mask.setGuides([
     getGuideLineFromCache(getGuideLineKey(H_GUIDE_LINE_STORAGE_KEY)),
     getGuideLineFromCache(getGuideLineKey(V_GUIDE_LINE_STORAGE_KEY)),
@@ -92,6 +91,5 @@ export function useStage(stageOptions: StageOptions) {
       globalThis.localStorage.removeItem(storageKey);
     }
   });
-
   return stage;
 }

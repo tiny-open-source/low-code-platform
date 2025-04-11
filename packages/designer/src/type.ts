@@ -37,6 +37,7 @@ export interface StageOptions {
   canSelect?: (el: HTMLElement) => boolean | Promise<boolean>;
 
   updateDragEl?: (el: HTMLDivElement) => void;
+  zoom?: number;
 }
 export interface DesignerNodeInfo {
   node: MNode | null;

@@ -5,7 +5,7 @@ import { computed, inject, onBeforeUnmount, useTemplateRef, watch } from 'vue';
 
 const { stageOverlayService, designerService } = inject<Services>('services')!;
 
-const stageOptions = inject<StageOptions>('stageOptions');
+const stageOptions = inject<StageOptions>('stageOptions')!;
 
 const stageOverlayEl = useTemplateRef<HTMLDivElement>('stageOverlay');
 
@@ -34,10 +34,9 @@ watch(stage, (stage) => {
   }
 });
 
-watch(stageOverlayEl, (stageOverlay) => {
+watch(stageOverlayEl, async (stageOverlay) => {
   const subStage = stageOverlayService.createStage(stageOptions);
   stageOverlayService.set('stage', subStage);
-
   if (stageOverlay && subStage) {
     subStage.mount(stageOverlay);
 

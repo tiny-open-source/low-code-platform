@@ -184,9 +184,9 @@ onBeforeUnmount(() => {
       @drop="dropHandler"
       @dragover="dragoverHandler"
     />
-    <StageOverlay />
     <teleport to="body">
       <ViewerMenu ref="menu" :is-multi-select="isMultiSelect" />
     </teleport>
   </ScrollViewer>
+  <StageOverlay />
 </template>

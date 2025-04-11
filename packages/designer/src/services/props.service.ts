@@ -7,6 +7,18 @@ import { reactive } from 'vue';
 import { fillConfig } from '../utils/props';
 import BaseService from './base.service';
 
+const canUsePluginMethods = {
+  async: [
+    'setPropsConfig',
+    'getPropsConfig',
+    'setPropsValue',
+    'getPropsValue',
+    'createId',
+    'setNewItemId',
+    'fillConfig',
+    'getDefaultPropsValue',
+  ] as const,
+};
 class Props extends BaseService {
   private state = reactive<PropsState>({
     propsConfigMap: {},
@@ -14,16 +26,9 @@ class Props extends BaseService {
   });
 
   constructor() {
-    super([
-      'setPropsConfig',
-      'getPropsConfig',
-      'setPropsValue',
-      'getPropsValue',
-      'createId',
-      'setNewItemId',
-      'fillConfig',
-      'getDefaultPropsValue',
-    ]);
+    super(
+      canUsePluginMethods.async.map(methodName => ({ name: methodName, isAsync: true })),
+    );
   }
 
   public setPropsConfigs(configs: Record<string, FormConfig>) {

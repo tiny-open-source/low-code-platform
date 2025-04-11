@@ -193,7 +193,7 @@ const stageOptions: StageOptions = {
 };
 stageOverlayService.set('stageOptions', stageOptions);
 
-provide('stageOptions', reactive(stageOptions));
+provide('stageOptions', stageOptions);
 designerService.usePlugin({
   beforeDoAdd: (config: MNode, parent?: MContainer | null) => {
     if (config.type === 'overlay') {

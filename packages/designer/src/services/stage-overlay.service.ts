@@ -7,6 +7,10 @@ import { useStage } from '../utils';
 import BaseService from './base.service';
 import designerService from './designer.service';
 
+const canUsePluginMethods = {
+  async: [],
+  sync: ['openOverlay', 'closeOverlay', 'updateOverlay', 'createStage'] as const,
+};
 class StageOverlay extends BaseService {
   private state: StageOverlayState = shallowReactive({
     wrapDiv: document.createElement('div'),
@@ -20,9 +24,9 @@ class StageOverlay extends BaseService {
   });
 
   constructor() {
-    super(['openOverlay', 'closeOverlay', 'updateOverlay', 'createStage']);
+    super(canUsePluginMethods.sync.map(methodName => ({ name: methodName, isAsync: false })));
 
-    this.get('wrapDiv').classList.add('low-code-editor-sub-stage-wrap');
+    this.get('wrapDiv').classList.add('low-code-sub-stage-wrap');
   }
 
   public get<K extends keyof StageOverlayState>(name: K): StageOverlayState[K] {
@@ -93,10 +97,11 @@ class StageOverlay extends BaseService {
       ...stageOptions,
       runtimeUrl: '',
       autoScrollIntoView: false,
+      zoom: 1,
       render: async (stage: StageCore) => {
         this.copyDocumentElement();
 
-        const rootEls = stage.renderer?.contentWindow?.document?.body.children;
+        const rootEls = stage.renderer?.getDocument()?.body.children;
         if (rootEls) {
           Array.from(rootEls).forEach((element) => {
             if (['SCRIPT', 'STYLE'].includes(element.tagName)) {
@@ -129,9 +134,10 @@ class StageOverlay extends BaseService {
 
   private copyDocumentElement() {
     const subStage = this.get('stage');
+    const stage = designerService.get('stage');
 
-    const doc = subStage?.renderer?.contentWindow?.document;
-    const documentElement = subStage?.renderer?.contentWindow?.document.documentElement;
+    const doc = subStage?.renderer?.getDocument();
+    const documentElement = stage?.renderer?.getDocument()?.documentElement;
 
     if (doc && documentElement) {
       doc.replaceChild(documentElement.cloneNode(true), doc.documentElement);
@@ -160,17 +166,14 @@ class StageOverlay extends BaseService {
       const child = wrapDiv.children[i];
       child.remove();
     }
-
     wrapDiv.appendChild(contentEl);
-
-    setTimeout(() => {
+    setTimeout(async () => {
       subStage?.renderer?.contentWindow?.['low-code'].onPageElUpdate(wrapDiv);
+      if (await stageOptions?.canSelect?.(contentEl)) {
+        const id = contentEl.id;
+        id && subStage?.select(id);
+      }
     });
-
-    if (await stageOptions?.canSelect?.(contentEl)) {
-      const id = contentEl.id;
-      id && subStage?.select(id);
-    }
   }
 
   private updateHandler = () => {
