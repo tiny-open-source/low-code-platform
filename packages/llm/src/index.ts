@@ -255,7 +255,6 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
 
       setIsProcessing(false);
       setStreaming(false);
-      setIsProcessing(false);
       setStreaming(false);
     }
     catch (e) {

@@ -1,12 +1,13 @@
-import { CodeEditor } from '@low-code/designer';
-import { parseReasoning, useMessageOption, useOllamaStatus } from '@low-code/llm';
+import { aiAssistantService, CodeEditor } from '@low-code/designer';
+import { useMessageOption, useOllamaStatus } from '@low-code/llm';
 import { NDrawer, NDrawerContent, NScrollbar } from 'naive-ui';
 import { computed, defineComponent, onMounted, ref, watch, watchEffect } from 'vue';
+import Messages from './ChatMessages';
 import TextAreaForm from './InputArea';
 import StatusIndicator from './OllamaStatusIndicator';
 
 export default defineComponent({
-  name: 'AiChat',
+  name: 'ChatLLM',
   props: {
     show: {
       type: Boolean,
@@ -22,32 +23,22 @@ export default defineComponent({
     const codeStr = ref('');
     const divRef = ref<HTMLDivElement>();
     const textAreaFormRef = ref<InstanceType<typeof TextAreaForm>>();
+
+    // Ollama 状态检查
+    const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
     onMounted(() => {
+      checkOllamaStatus();
       emit('update:code', codeStr.value);
       (textAreaFormRef.value as any)?.focus();
     });
 
-    // Ollama 状态检查
-    const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
-
     // 构建提示语
     const prompt = computed(() => {
-      return `
-      ${props.code}
-
-      以上是一个医护终端H5页面的模板定制系统输出的JSON数据。模板结构为：
-      - app (根节点)
-        - page (页面节点)
-          - container/text/button 等组件节点
-      请按照我提出的要求修改 JSON 代码，以便生成正确的页面。
-      注意事项：
-      1. 直接输出代码，不要包含任何额外的解释性文字。
-      2. 请确保代码的正确性，否则可能导致页面无法正常显示。
-      `;
+      return aiAssistantService.generatePromptTemplate();
     });
 
     // 消息处理
-    const { onSubmit, messages, streaming, stopStreamingRequest } = useMessageOption({
+    const { onSubmit, messages, streaming, stopStreamingRequest, isProcessing } = useMessageOption({
       prompt,
     });
 
@@ -61,9 +52,10 @@ export default defineComponent({
       // 解析最新的机器人消息
       const latestMessage = messages.value[messages.value.length - 1];
       if (latestMessage && latestMessage.isBot) {
-        parseReasoning(latestMessage.message).forEach((e) => {
-          emit('update:code', e.content);
-        });
+        aiAssistantService.processStreamChunk(latestMessage.message);
+        if (!isProcessing.value) {
+          aiAssistantService.finalizeStream();
+        }
       }
     });
 
@@ -72,7 +64,6 @@ export default defineComponent({
       if (props.show) {
         checkOllamaStatus();
         (textAreaFormRef.value as any)?.focus();
-        console.log('🚀 ~ watchEffect ~ textAreaFormRef:', textAreaFormRef);
       }
     });
 
@@ -96,37 +87,6 @@ export default defineComponent({
       });
     };
 
-    // 渲染消息
-    const renderMessages = () => {
-      return messages.value.map(message => (
-        <div class="relative flex w-full flex-col items-center pt-4 pb-4">
-          <div class="group relative flex w-full max-w-3xl flex-col items-end justify-center pb-2 md:px-4 lg:w-4/5 text-gray-800 dark:text-gray-100">
-            <div class="flex w-full flex-col gap-2">
-              <span class="text-xs font-bold text-gray-800 dark:text-white">
-                {message.isBot ? message.name : 'You'}
-              </span>
-              <div></div>
-              <div class="flex flex-grow flex-col">
-                {message.isBot
-                  ? parseReasoning(message.message).map((e) => {
-                      return <p>{e.content}</p>;
-                    })
-                  : (
-                      <p
-                        class={`prose dark:prose-invert whitespace-pre-line prose-p:leading-relaxed prose-pre:p-0 dark:prose-dark ${
-                          message.messageType
-                          && 'italic text-gray-500 dark:text-gray-400 text-sm'}`}
-                      >
-                        {message.message}
-                      </p>
-                    )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ));
-    };
-
     return () =>
       (
         <NDrawer
@@ -147,7 +107,7 @@ export default defineComponent({
             <div class="h-full flex flex-col relative">
               <div class="code-block relative w-full">
                 <CodeEditor
-                  style="height: 50vh; width: 100%;"
+                  style="height: 40vh; width: 100%;"
                   type="diff"
                   init-values={props.code}
                   modified-values={codeStr.value}
@@ -157,7 +117,7 @@ export default defineComponent({
 
               {/* 消息区域 */}
               <NScrollbar class="h-full w-full flex-1 relative">
-                {renderMessages()}
+                <Messages messages={messages.value} />
                 <div ref={divRef} />
                 <div class="w-full pb-[220px]"></div>
               </NScrollbar>

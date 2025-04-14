@@ -1,6 +1,6 @@
 import { cleanUrl } from '../libs/clean-url';
 
-const DEFAULT_OLLAMA_URL = 'https://frp-web.hgyn23.cn';
+const DEFAULT_OLLAMA_URL = 'http://192.168.31.78:11434';
 export async function getOllamaURL() {
   const ollamaURL = localStorage.getItem('ollamaURL');
   if (!ollamaURL || ollamaURL.length === 0) {

@@ -1,7 +1,8 @@
 import type { PropType } from 'vue';
 import { useDynamicTextareaSize } from '@low-code/llm';
-import { EnterOutlined, StopOutlined } from '@vicons/antd';
-import { NButton, NIcon } from 'naive-ui';
+import { EnterOutlined, QuestionCircleOutlined, StopOutlined } from '@vicons/antd';
+import { NButton, NIcon, NTooltip } from 'naive-ui';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'TextAreaForm',
@@ -67,16 +68,17 @@ export default defineComponent({
     const handleStop = () => {
       emit('stop');
     };
+
     // 动态调整文本框大小
     useDynamicTextareaSize(textareaRef, message, 150);
 
     return () => (
-      <div class="absolute bottom-0 w-full">
-        <div class="flex w-full flex-col items-center p-2 pt-1 pb-4">
+      <div class="absolute bottom-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div class="flex w-full flex-col items-center p-2 pt-2 pb-4">
           <div class="relative z-10 flex w-full flex-col items-center justify-center gap-2 text-base">
             <div class="relative flex w-full flex-row justify-center gap-2 lg:w-4/5">
-              <div class="bg-neutral-50 relative w-full max-w-[48rem] p-1 backdrop-blur-lg duration-100 border border-gray-300 border-solid rounded-xl">
-                <div class="flex bg-transparent">
+              <div class="bg-neutral-50 dark:bg-gray-800 relative w-full max-w-[48rem] p-1 backdrop-blur-lg duration-100 border border-gray-300 dark:border-gray-700 border-solid rounded-xl">
+                <div class="mb-1 flex bg-transparent">
                   <form
                     ref={form}
                     onSubmit={handleSubmit}
@@ -103,7 +105,26 @@ export default defineComponent({
                       />
 
                       <div class="mt-2 flex justify-between items-center">
-                        <div></div>
+                        <div>
+                          <NTooltip>
+                            {{
+                              trigger: () => (
+                                <NButton text size="small">
+                                  <NIcon size="small">
+                                    <QuestionCircleOutlined />
+                                  </NIcon>
+                                </NButton>
+                              ),
+                              default: () => (
+                                <div>
+                                  <p>使用提示：</p>
+                                  <p>- 按Enter发送消息</p>
+                                  <p>- Shift+Enter换行</p>
+                                </div>
+                              ),
+                            }}
+                          </NTooltip>
+                        </div>
                         <div class="flex !justify-end gap-3">
                           <div class="ant-space-compact css-dev-only-do-not-override-xjks6i ant-space-compact-block ant-dropdown-button !justify-end !w-auto">
                             {!(props.status === 'pending')
@@ -131,7 +152,7 @@ export default defineComponent({
                               : (
                                   <NButton
                                     size="small"
-                                    type="primary"
+                                    type="warning"
                                     onClick={handleStop}
                                     v-slots={{
                                       icon: () => (
@@ -154,7 +175,7 @@ export default defineComponent({
             </div>
           </div>
         </div>
-        <p class="w-full text-center text-12px text-coolgray select-none">注：大模型使用 deepseek-r1:14b， 仅供测试。</p>
+        <p class="w-full text-center text-12px text-coolgray select-none pb-1">注：大模型使用 deepseek-r1:14b， 仅供测试。</p>
       </div>
     );
   },
