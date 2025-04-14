@@ -70,7 +70,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
     const url = await getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
     const ollama = await pageAssistModel({
-      model: 'deepseek-r1:14b',
+      model: 'deepseek-coder-v2:latest',
       baseUrl: cleanUrl(url),
       keepAlive: undefined,
       temperature: 0.0,
@@ -110,7 +110,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
         },
         {
           isBot: true,
-          name: 'deepseek-r1:14b',
+          name: 'deepseek-coder-v2:latest',
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -122,7 +122,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
         ...messages.value,
         {
           isBot: true,
-          name: 'deepseek-r1:14b',
+          name: 'deepseek-coder-v2:latest',
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -141,10 +141,10 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> }) {
             type: 'text',
           },
         ],
-        model: 'deepseek-r1:14b',
+        model: 'deepseek-coder-v2:latest',
       });
 
-      const applicationChatHistory = generateHistory(history.value, 'deepseek-r1:14b');
+      const applicationChatHistory = generateHistory(history.value, 'deepseek-coder-v2:latest');
 
       if (prompt?.value) {
         applicationChatHistory.unshift(

@@ -14,7 +14,10 @@ export enum Protocol {
   NUMBER = 'number',
   BOOLEAN = 'boolean',
 }
-
+const canUsePluginMethods = {
+  async: ['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem'] as const,
+  sync: [],
+};
 /**
  * 数据存储服务
  */
@@ -23,7 +26,7 @@ export class WebStorage extends BaseService {
   private namespace = 'low-code';
 
   constructor() {
-    super(['getStorage', 'getNamespace', 'clear', 'getItem', 'removeItem', 'setItem']);
+    super(canUsePluginMethods.sync.map(methodName => ({ name: methodName, isAsync: true })));
   }
 
   /**

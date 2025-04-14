@@ -83,6 +83,7 @@ export default class StageMask extends Rule {
     this.content.addEventListener('wheel', this.mouseWheelHandler, { passive: true });
     this.content.addEventListener('mousemove', this.highlightHandler);
     this.content.addEventListener('mouseleave', this.mouseLeaveHandler);
+    this.content.addEventListener('dblclick', this.dblclickHandler);
 
     const isMac = /mac os x/.test(navigator.userAgent.toLowerCase());
 
@@ -344,6 +345,10 @@ export default class StageMask extends Rule {
     if (!this.isMultiSelectStatus) {
       this.emit('select');
     }
+  };
+
+  private dblclickHandler = (event: MouseEvent): void => {
+    this.emit('dblclick', event);
   };
 
   /**

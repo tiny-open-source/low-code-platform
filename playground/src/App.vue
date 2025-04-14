@@ -9,7 +9,7 @@ import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOut
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
-import AiChat from './components/AiChat';
+import ChatLLM from './components/ChatLLM';
 import DeviceGroup from './components/DeviceGroup';
 import GlobalMessageSetup from './components/GlobalMessageSetup';
 import ImportDSL from './components/Import';
@@ -85,6 +85,13 @@ function moveableOptions(core?: StageCore): MoveableOptions {
   options.draggable = !isPage;
   options.resizable = !isPage;
   options.rotatable = !isPage;
+
+  // 双击后在弹层中编辑时，根组件不能拖拽
+  if (core?.selectedDom?.parentElement?.classList.contains('low-code-sub-stage-wrap')) {
+    options.draggable = false;
+    options.resizable = false;
+    options.rotatable = false;
+  }
 
   return options;
 }
@@ -220,7 +227,7 @@ const menu: MenuBarData = {
             <DeviceGroup v-model="stageRectStr" class="device-group" />
           </template>
         </LowCodeDesigner>
-        <AiChat
+        <ChatLLM
           v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
             dsl = dslEvaled;
           }"

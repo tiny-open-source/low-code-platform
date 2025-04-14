@@ -12,7 +12,7 @@ export default class StageRenderer extends EventEmitter {
   public runtime: Runtime | null = null;
   public runtimeUrl?: string;
   public iframe?: HTMLIFrameElement;
-  private render?: (renderer: StageCore) => Promise<HTMLElement> | HTMLElement;
+  private render?: (stage: StageCore) => HTMLDivElement | void | Promise<HTMLDivElement | void>;
 
   constructor({ core }: { core: StageCore }) {
     super();
@@ -67,6 +67,10 @@ export default class StageRenderer extends EventEmitter {
       this.on('runtime-ready', listener);
     });
   };
+
+  public getDocument(): Document | undefined {
+    return this.contentWindow?.document;
+  }
 
   public getLowCodeApi = () => ({
     onPageElUpdate: (el: HTMLElement) => this.emit('page-el-update', el),

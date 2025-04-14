@@ -16,6 +16,31 @@ import historyService from './history.service';
 import propsService from './props.service';
 import storageService, { Protocol } from './storage.service';
 
+const canUsePluginMethods = {
+  async: [
+    'getLayout',
+    'select',
+    'doAdd',
+    'add',
+    'doRemove',
+    'remove',
+    'doUpdate',
+    'update',
+    'sort',
+    'copy',
+    'paste',
+    'doPaste',
+    'duAlignCenter',
+    'alignCenter',
+    'moveLayer',
+    'moveToContainer',
+    'move',
+    'undo',
+    'redo',
+    'highlight',
+  ] as const,
+  sync: [],
+};
 class Designer extends BaseService {
   public state: StoreState = reactive({
     root: null,
@@ -34,28 +59,7 @@ class Designer extends BaseService {
 
   constructor() {
     super(
-      [
-        'getLayout',
-        'select',
-        'doAdd',
-        'add',
-        'doRemove',
-        'remove',
-        'doUpdate',
-        'update',
-        'sort',
-        'copy',
-        'paste',
-        'doPaste',
-        'duAlignCenter',
-        'alignCenter',
-        'moveLayer',
-        'moveToContainer',
-        'move',
-        'undo',
-        'redo',
-        'highlight',
-      ],
+      canUsePluginMethods.async.map(methodName => ({ name: methodName, isAsync: true })),
       // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
       ['select', 'update', 'moveLayer'],
     );
