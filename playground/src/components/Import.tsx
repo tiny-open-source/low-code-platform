@@ -1,7 +1,7 @@
 import { CodeEditor } from '@low-code/designer';
 import { useDialog } from 'naive-ui';
 import { defineComponent } from 'vue';
-import mockFigmaJson from './figma-json.json?raw';
+import mockFigmaJson from './FigmaJSON.json?raw';
 
 export default defineComponent({
   name: 'Preview',
