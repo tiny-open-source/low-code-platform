@@ -24,7 +24,7 @@ function inputHandler(value: string | [string, string]) {
   // lForm?.$emit('fieldInput', props.prop, value);
 }
 const modelValue = computed({
-  get: () => props.model[modelName.value],
+  get: () => props.model[modelName.value] || void 0,
   set: (value) => {
     emit('change', value);
   },

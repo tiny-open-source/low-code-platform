@@ -70,7 +70,6 @@ function action(data: any) {
     props.model[props.name] = data;
     formValue.value = data;
     emit('change', props.model[props.name]);
-    console.log('emit change', props.model[props.name]);
   }
   editor.value?.cancel();
 }

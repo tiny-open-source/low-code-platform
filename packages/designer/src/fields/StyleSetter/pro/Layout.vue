@@ -25,7 +25,7 @@ defineProps<{
 const emit = defineEmits(['change']);
 
 const config = {
-  type: '',
+  type: 'form',
   items: [
     {
       name: 'display',
