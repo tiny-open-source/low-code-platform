@@ -227,11 +227,11 @@ const menu: MenuBarData = {
             <DeviceGroup v-model="stageRectStr" class="device-group" />
           </template>
         </LowCodeDesigner>
-        <l-form-llm-chat
+        <!-- <l-form-llm-chat
           v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl: any) => llmOutputDSL = dsl" @save="() => {
             dsl = dslEvaled;
           }"
-        />
+        /> -->
         <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page')?.id}`" />
         <ImportDSL v-model:show="importDialogVisible" @save="parse" />
         <GlobalMessageSetup />

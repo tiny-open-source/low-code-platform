@@ -75,6 +75,23 @@ class AIAssistant extends BaseService {
   }
 
   registerDefaultTools() {
+    // 选择节点工具
+    this.registerTool({
+      name: 'selectNode',
+      description: '选择指定ID的节点',
+      parameters: {
+        nodeId: {
+          type: 'string',
+          description: '要选择的节点ID',
+          required: true,
+        },
+      },
+      handler: async ({ nodeId }) => {
+        const node = await designerService.select(nodeId);
+        await designerService.get('stage')?.select(nodeId);
+        return { success: true, selectedNode: { id: node.id, type: node.type } };
+      },
+    });
     // 居中对齐工具
     this.registerTool({
       name: 'alignCenter',
