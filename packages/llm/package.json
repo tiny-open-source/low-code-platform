@@ -17,11 +17,17 @@
   },
   "dependencies": {
     "@langchain/core": "^0.3.44",
+    "@low-code/designer": "workspace:^",
     "@low-code/schema": "workspace:^",
+    "@vicons/antd": "^0.13.0",
+    "highlight.js": "^11.11.1",
     "langchain": "^0.3.21",
+    "markdown-it": "^14.1.0",
+    "naive-ui": "^2.41.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.17.30",
     "rimraf": "^6.0.1",
     "vite": "^6.2.5",

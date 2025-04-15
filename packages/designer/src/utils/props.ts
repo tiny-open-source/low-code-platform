@@ -160,6 +160,16 @@ export function fillConfig(config: FormConfig = []): FormConfig {
             },
           ],
         },
+        {
+          title: 'ai助手',
+          labelWidth: '80px',
+          items: [
+            {
+              type: 'llm-chat',
+              items: [],
+            },
+          ],
+        },
       ],
     },
   ];

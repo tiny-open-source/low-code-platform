@@ -1,0 +1,21 @@
+.lc-llm-chat-drawer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  &__code-block {
+    position: relative;
+    width: 100%;
+  }
+
+  &__code-editor {
+    height: 40vh;
+    width: 100%;
+  }
+
+  &__spacer {
+    width: 100%;
+    padding-bottom: 220px;
+  }
+}

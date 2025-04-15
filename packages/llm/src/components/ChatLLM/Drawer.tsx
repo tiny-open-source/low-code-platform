@@ -1,13 +1,14 @@
 import { aiAssistantService, CodeEditor } from '@low-code/designer';
-import { useMessageOption, useOllamaStatus } from '@low-code/llm';
 import { NDrawer, NDrawerContent, NScrollbar } from 'naive-ui';
 import { computed, defineComponent, onMounted, ref, watch, watchEffect } from 'vue';
+import { useMessageOption } from '../../composables/chat';
+import { useOllamaStatus } from '../../composables/ollama';
 import Messages from './ChatMessages';
 import TextAreaForm from './InputArea';
 import StatusIndicator from './OllamaStatusIndicator';
 
 export default defineComponent({
-  name: 'ChatLLM',
+  name: 'ChatLLMDrawer',
   props: {
     show: {
       type: Boolean,
@@ -26,10 +27,11 @@ export default defineComponent({
 
     // Ollama 状态检查
     const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
-    onMounted(() => {
+    onMounted(async () => {
       checkOllamaStatus();
       emit('update:code', codeStr.value);
-      (textAreaFormRef.value as any)?.focus();
+
+      // (textAreaFormRef.value as any)?.focus();
     });
 
     // 构建提示语
@@ -63,7 +65,7 @@ export default defineComponent({
     watchEffect(() => {
       if (props.show) {
         checkOllamaStatus();
-        (textAreaFormRef.value as any)?.focus();
+        // (textAreaFormRef.value as any)?.focus();
       }
     });
 
@@ -104,10 +106,10 @@ export default defineComponent({
               header: () => <StatusIndicator status={ollamaStatus.value} />,
             }}
           >
-            <div class="h-full flex flex-col relative">
-              <div class="code-block relative w-full">
+            <div class="lc-llm-chat-drawer">
+              <div class="lc-llm-chat-drawer__code-block">
                 <CodeEditor
-                  style="height: 40vh; width: 100%;"
+                  class="lc-llm-chat-drawer__code-editor"
                   type="diff"
                   init-values={props.code}
                   modified-values={codeStr.value}
@@ -119,7 +121,7 @@ export default defineComponent({
               <NScrollbar class="h-full w-full flex-1 relative">
                 <Messages messages={messages.value} />
                 <div ref={divRef} />
-                <div class="w-full pb-[220px]"></div>
+                <div class="lc-llm-chat-drawer__spacer"></div>
               </NScrollbar>
 
               {/* 输入区域 */}

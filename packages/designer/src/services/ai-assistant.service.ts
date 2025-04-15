@@ -392,4 +392,6 @@ ${JSON.stringify(currentSchema, null, 2)}
   }
 }
 const aiAssistantService = new AIAssistant();
+
+export type AiAssistantService = AIAssistant;
 export default aiAssistantService;

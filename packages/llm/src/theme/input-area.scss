@@ -1,0 +1,131 @@
+.lc-llm-input-area {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+
+  .dark & {
+    background-color: #111827;
+    border-color: #374151;
+  }
+
+  &__container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+  }
+
+  &__wrapper {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+
+  &__form-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+
+    @media (min-width: 1024px) {
+      width: 80%;
+    }
+  }
+
+  &__form-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 48rem;
+    padding: 0.25rem;
+    backdrop-filter: blur(10px);
+    transition-duration: 100ms;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    background-color: #f9fafb;
+    display: flex;
+
+    .dark & {
+      background-color: #1f2937;
+      border-color: #4b5563;
+    }
+  }
+
+  &__form {
+    width: 100%;
+    display: flex;
+    flex-shrink: 0;
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    background-color: transparent;
+
+    >form {
+      width: 100%;
+    }
+  }
+
+  &__input-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+
+    .dark & {
+      border-color: #4b5563;
+    }
+  }
+
+  &__textarea {
+    padding: 0.5rem;
+    width: 100%;
+    resize: none;
+    background-color: transparent;
+    min-height: 30px;
+
+    &:focus-within,
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      ring: 0;
+    }
+
+    .dark & {
+      color: #f3f4f6;
+    }
+  }
+
+  &__controls {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  &__footer {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    user-select: none;
+    padding-bottom: 0.25rem;
+  }
+}

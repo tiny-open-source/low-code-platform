@@ -1,0 +1,52 @@
+.lc-llm-status-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-wrap: nowrap;
+
+  &__container {
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+
+    &--pending {
+      background-color: #3b82f6; // blue-500
+    }
+
+    &--success {
+      background-color: #10b981; // green-500
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    &--error {
+      background-color: #ef4444; // red-500
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  }
+
+  &__text {
+    color: #111827; // gray-900
+    
+    .dark & {
+      color: #9ca3af; // gray-400
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

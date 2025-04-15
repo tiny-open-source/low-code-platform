@@ -250,7 +250,6 @@ async function onChangeHandler(v: FormValue, key?: string) {
 .lc-f-container ::v-deep(.n-form-item-blank){
   flex-wrap: wrap !important;
 }
-
 .label-wrapper {
   display: inline-flex;
   align-items: center;

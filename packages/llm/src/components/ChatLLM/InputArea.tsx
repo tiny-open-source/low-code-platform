@@ -18,7 +18,7 @@ export default defineComponent({
   },
   emits: ['submit', 'stop'],
   expose: ['focus'],
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const form = ref<HTMLFormElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
     const message = ref('');
@@ -68,17 +68,19 @@ export default defineComponent({
     const handleStop = () => {
       emit('stop');
     };
-
+    expose({
+      focus,
+    });
     // 动态调整文本框大小
     useDynamicTextareaSize(textareaRef, message, 150);
 
     return () => (
-      <div class="absolute bottom-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-        <div class="flex w-full flex-col items-center p-2 pt-2 pb-4">
-          <div class="relative z-10 flex w-full flex-col items-center justify-center gap-2 text-base">
-            <div class="relative flex w-full flex-row justify-center gap-2 lg:w-4/5">
-              <div class="bg-neutral-50 dark:bg-gray-800 relative w-full max-w-[48rem] p-1 backdrop-blur-lg duration-100 border border-gray-300 dark:border-gray-700 border-solid rounded-xl">
-                <div class="mb-1 flex bg-transparent">
+      <div class="lc-llm-input-area">
+        <div class="lc-llm-input-area__container">
+          <div class="lc-llm-input-area__wrapper">
+            <div class="lc-llm-input-area__form-container">
+              <div class="lc-llm-input-area__form-wrapper">
+                <div class="lc-llm-input-area__form">
                   <form
                     ref={form}
                     onSubmit={handleSubmit}
@@ -91,10 +93,10 @@ export default defineComponent({
                       class="sr-only"
                       accept="image/*"
                     />
-                    <div class="w-full flex flex-col dark:border-gray-600 p-2">
+                    <div class="lc-llm-input-area__input-container">
                       <textarea
                         ref={textareaRef}
-                        class="px-2 py-2 w-full resize-none bg-transparent focus-within:outline-none focus:ring-0 focus-visible:ring-0 ring-0 dark:ring-0 border-0 dark:text-gray-100"
+                        class="lc-llm-input-area__textarea"
                         rows="1"
                         tabindex="0"
                         placeholder="提出你的要求"
@@ -104,7 +106,7 @@ export default defineComponent({
                         v-model={message.value}
                       />
 
-                      <div class="mt-2 flex justify-between items-center">
+                      <div class="lc-llm-input-area__controls">
                         <div>
                           <NTooltip>
                             {{
@@ -125,7 +127,7 @@ export default defineComponent({
                             }}
                           </NTooltip>
                         </div>
-                        <div class="flex !justify-end gap-3">
+                        <div class="lc-llm-input-area__button-group">
                           <div class="ant-space-compact css-dev-only-do-not-override-xjks6i ant-space-compact-block ant-dropdown-button !justify-end !w-auto">
                             {!(props.status === 'pending')
                               ? (
@@ -175,7 +177,7 @@ export default defineComponent({
             </div>
           </div>
         </div>
-        <p class="w-full text-center text-12px text-coolgray select-none pb-1">注：大模型使用 deepseek-r1:14b， 仅供测试。</p>
+        <p class="lc-llm-input-area__footer">注：大模型使用 deepseek-r1:14b， 仅供测试。</p>
       </div>
     );
   },

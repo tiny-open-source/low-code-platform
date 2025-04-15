@@ -9,7 +9,6 @@ import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOut
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
-import ChatLLM from './components/ChatLLM';
 import DeviceGroup from './components/DeviceGroup';
 import GlobalMessageSetup from './components/GlobalMessageSetup';
 import ImportDSL from './components/Import';
@@ -151,6 +150,7 @@ const menu: MenuBarData = {
       text: '使用AI优化',
       icon: FireOutlined,
       handler: async () => {
+        console.log('🚀 ~ handler: ~ aiPanelVisible:', aiPanelVisible);
         aiPanelVisible.value = true;
       },
     },
@@ -227,8 +227,8 @@ const menu: MenuBarData = {
             <DeviceGroup v-model="stageRectStr" class="device-group" />
           </template>
         </LowCodeDesigner>
-        <ChatLLM
-          v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
+        <l-form-llm-chat
+          v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl: any) => llmOutputDSL = dsl" @save="() => {
             dsl = dslEvaled;
           }"
         />

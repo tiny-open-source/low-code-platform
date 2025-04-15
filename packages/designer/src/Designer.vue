@@ -25,6 +25,7 @@ import NavMenu from './layouts/NavMenu.vue';
 import PropsPanel from './layouts/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
+import aiAssistantService from './services/ai-assistant.service';
 import componentListService from './services/component-list.service';
 import designerService from './services/designer.service';
 import eventsService from './services/events.service';
@@ -109,6 +110,7 @@ const services: Services = {
   componentListService,
   storageService,
   stageOverlayService,
+  aiAssistantService,
 };
 
 watch(

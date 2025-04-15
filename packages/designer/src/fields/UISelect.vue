@@ -20,8 +20,6 @@ const props = withDefaults(defineProps<{
 });
 const emit = defineEmits(['change']);
 
-console.log(props);
-
 const uiSelectMode = ref(false);
 const services = inject<Services>('services');
 const lForm = inject<FormState>('lForm');
