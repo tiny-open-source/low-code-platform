@@ -19,7 +19,6 @@ import { defaultDSLConfig } from './configs/dsl';
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const importDialogVisible = ref(false);
-const aiPanelVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const dsl = ref(defaultDSLConfig as any);
 const defaultSelectedId = computed(() => dsl.value?.items?.[0]?.id);
@@ -145,15 +144,6 @@ const menu: MenuBarData = {
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
   right: [
     '/',
-    {
-      type: 'button',
-      text: '使用AI优化',
-      icon: FireOutlined,
-      handler: async () => {
-        console.log('🚀 ~ handler: ~ aiPanelVisible:', aiPanelVisible);
-        aiPanelVisible.value = true;
-      },
-    },
     {
       type: 'button',
       text: '导入',

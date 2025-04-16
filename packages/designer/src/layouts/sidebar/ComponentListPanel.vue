@@ -60,7 +60,7 @@ function dragendHandler() {
   }
   const doc = stage.value?.renderer.contentWindow?.document;
   if (doc && stageOptions) {
-    removeClassNameByClassName(doc, stageOptions.containerHighlightClassName);
+    removeClassNameByClassName(doc, stageOptions.containerHighlightClassName!);
   }
   clientX = 0;
   clientY = 0;

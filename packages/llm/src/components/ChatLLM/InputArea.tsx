@@ -17,7 +17,6 @@ export default defineComponent({
     status: String as PropType<'initial' | 'pending' | 'disabled'>,
   },
   emits: ['submit', 'stop'],
-  expose: ['focus'],
   setup(props, { emit, expose }) {
     const form = ref<HTMLFormElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
@@ -31,6 +30,8 @@ export default defineComponent({
       message.value = '';
     };
     const handleSubmit = async (e: Event) => {
+      if (props.status === 'disabled' || props.status === 'pending')
+        return;
       e.preventDefault();
       const messageText = textareaRef.value?.value;
 
@@ -45,6 +46,8 @@ export default defineComponent({
 
     // 键盘按键处理
     const handleKeyDown = async (e: KeyboardEvent) => {
+      if (props.status === 'disabled' || props.status === 'pending')
+        return;
       // 忽略中文输入法正在处理的按键
       if (e.key === 'Process' || e.key === '229')
         return;
@@ -95,13 +98,13 @@ export default defineComponent({
                     />
                     <div class="lc-llm-input-area__input-container">
                       <textarea
+                        autofocus
                         ref={textareaRef}
                         class="lc-llm-input-area__textarea"
                         rows="1"
                         tabindex="0"
                         placeholder="提出你的要求"
                         style={{ minHeight: '30px' }}
-                        disabled={props.status === 'disabled' || props.status === 'pending'}
                         onKeydown={handleKeyDown}
                         v-model={message.value}
                       />
@@ -127,6 +130,7 @@ export default defineComponent({
                             }}
                           </NTooltip>
                         </div>
+
                         <div class="lc-llm-input-area__button-group">
                           <div class="ant-space-compact css-dev-only-do-not-override-xjks6i ant-space-compact-block ant-dropdown-button !justify-end !w-auto">
                             {!(props.status === 'pending')

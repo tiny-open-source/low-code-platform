@@ -5,6 +5,7 @@ import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import Messages from './ChatMessages';
 import TextAreaForm from './InputArea';
+import OllamaStatusIndicator from './OllamaStatusIndicator';
 
 export default defineComponent({
   name: 'l-form-llm-chat',
@@ -15,16 +16,17 @@ export default defineComponent({
 
     // Ollama 状态检查
     const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
-    onMounted(checkOllamaStatus);
-
-    console.log(services?.aiAssistantService);
+    onMounted(() => {
+      (textAreaFormRef.value as any)?.focus();
+      checkOllamaStatus();
+    });
     // 构建提示语
     const prompt = computed(() => {
       return services?.aiAssistantService?.generatePromptTemplate() || '';
     });
 
     // 消息处理
-    const { onSubmit, messages, streaming, stopStreamingRequest, isProcessing } = useMessageOption({
+    const { onSubmit, messages, streaming, stopStreamingRequest } = useMessageOption({
       prompt,
     });
 
@@ -39,7 +41,7 @@ export default defineComponent({
       const latestMessage = messages.value[messages.value.length - 1];
       if (latestMessage && latestMessage.isBot) {
         services?.aiAssistantService!.processStreamChunk(latestMessage.message);
-        if (!isProcessing.value) {
+        if (latestMessage.generationInfo) {
           services?.aiAssistantService!.finalizeStream();
         }
       }
@@ -66,6 +68,7 @@ export default defineComponent({
     };
     return () => (
       <div class="lc-llm-chat-form">
+        <OllamaStatusIndicator status={ollamaStatus.value} />
         {/* 消息区域 */}
         <NScrollbar class="lc-llm-chat-form__messages-container">
           <Messages messages={messages.value} />

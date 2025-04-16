@@ -18,6 +18,7 @@ export interface Message {
   reasoning_time_taken?: number;
   id?: string;
   messageType?: string;
+  generationInfo?: any;
 }
 
 export type ChatHistory = {
@@ -62,11 +63,11 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
       temperature: 0.0,
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
-      numCtx: 10240,
+      numCtx: 8192, // 影响的是模型可以一次记住的最大 token 数量。
       seed: undefined,
       numGpu:
          userDefaultModelSettings?.numGpu,
-      numPredict: 10240,
+      numPredict: 4096, // 影响模型最大可以生成的 token 数量。
       useMMap:
         userDefaultModelSettings?.useMMap,
       minP: userDefaultModelSettings?.minP,

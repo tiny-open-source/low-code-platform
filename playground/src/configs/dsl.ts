@@ -36,7 +36,7 @@ export const defaultDSLConfig = ({
             left: '57',
             width: '176',
             height: '176',
-            top: 212,
+            top: '212',
           },
           name: '二维码',
           url: 'https://m.film.qq.com',
