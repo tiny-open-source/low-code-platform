@@ -1,5 +1,5 @@
 import type { MNode } from '@low-code/schema';
-import { cloneDeep, debounce, merge } from 'lodash-es';
+import { cloneDeep, merge, throttle } from 'lodash-es';
 import BaseService from './base.service';
 import componentListService from './component-list.service';
 import designerService from './designer.service';
@@ -41,6 +41,9 @@ interface StreamState {
   partialResponse: string;
   parsedAction: AIActionResponse | null;
   error: string | null;
+  executedActions: AIActionResponse[]; // 新增：记录已执行的动作
+  processingAction: boolean; // 新增：标记是否正在处理动作
+  lastExecutedActionId: string | null; // 新增：上次执行的动作ID
 }
 class AIAssistant extends BaseService {
   private availableTools: ToolDescription[] = [];
@@ -52,6 +55,7 @@ class AIAssistant extends BaseService {
     error: null as string | null,
     partialResponse: '',
     streamingError: null as string | null,
+    executedActionsCount: 0, // 新增：已执行的动作数量
   });
 
   private streamState: StreamState = {
@@ -59,6 +63,9 @@ class AIAssistant extends BaseService {
     partialResponse: '',
     parsedAction: null,
     error: null,
+    executedActions: [], // 初始化为空数组
+    processingAction: false, // 初始化为非处理状态
+    lastExecutedActionId: null, // 初始化为空
   };
 
   constructor() {
@@ -67,8 +74,9 @@ class AIAssistant extends BaseService {
     this.registerDefaultTools();
   }
 
-  // 防抖处理器，用于流处理中尝试解析JSON
-  private tryParseDebounced = debounce(this.tryParseStreamedJSON, 300);
+  // 节流处理器，用于流处理中尝试解析JSON
+  private tryParseThrottle = throttle(this.tryParseStreamedJSON, 300);
+
   /**
    * 注册新的工具
    */
@@ -301,6 +309,14 @@ class AIAssistant extends BaseService {
   }
 
   /**
+   * 生成动作的唯一标识
+   */
+  private generateActionId(action: AIActionResponse): string {
+    // 根据工具名称和参数生成唯一标识
+    return `${action.tool}-${JSON.stringify(action.parameters)}`;
+  }
+
+  /**
    * 处理大模型流式响应的单个块
    */
   public processStreamChunk(chunk: string): void {
@@ -308,57 +324,212 @@ class AIAssistant extends BaseService {
     this.state.streamingInProgress = true;
     this.state.partialResponse = chunk;
     this.streamState.partialResponse = chunk;
-
-    // 尝试解析（防抖处理）
-    this.tryParseDebounced();
+    // 尝试解析（节流处理）
+    this.tryParseThrottle();
   }
 
   /**
-   * 尝试从流式数据中解析JSON
+   * 从可能不完整的JSON数组文本中提取有效的指令对象
    */
-  private tryParseStreamedJSON(): void {
-    if (this.streamState.complete)
-      return;
+  private extractValidActionsFromPartialArray(text: string): AIActionResponse[] {
+    try {
+      // 清理文本，移除代码块标记
+      let cleanText = text.replace(/```json|```/g, '').trim();
 
+      // 确保文本以 [ 开始
+      const startIndex = cleanText.indexOf('[');
+      if (startIndex === -1)
+        return [];
+      cleanText = cleanText.substring(startIndex);
+
+      // 提取所有可能的完整JSON对象
+      const actionObjects: AIActionResponse[] = [];
+      let depth = 0;
+      let currentObject = '';
+      let inObject = false;
+
+      for (let i = 0; i < cleanText.length; i++) {
+        const char = cleanText[i];
+
+        // 开始捕获对象
+        if (char === '{') {
+          depth++;
+          inObject = true;
+          currentObject += char;
+          continue;
+        }
+
+        // 结束捕获对象
+        if (char === '}') {
+          depth--;
+          currentObject += char;
+
+          // 对象完成
+          if (depth === 0 && inObject) {
+            try {
+              const parsedObject = JSON.parse(currentObject);
+              if (this.isValidActionResponse(parsedObject)) {
+                actionObjects.push(parsedObject);
+              }
+            }
+            catch {
+              // 忽略无效对象
+            }
+            currentObject = '';
+            inObject = false;
+          }
+          continue;
+        }
+
+        // 在对象内部
+        if (inObject) {
+          currentObject += char;
+        }
+      }
+
+      return actionObjects;
+    }
+    catch (e) {
+      console.error('从部分数组提取动作时出错:', e);
+      return [];
+    }
+  }
+
+  /**
+   * 尝试从流式数据中解析JSON并执行
+   */
+  private async tryParseStreamedJSON(): Promise<void> {
+    if (this.streamState.complete || this.streamState.processingAction)
+      return;
     try {
       const text = this.streamState.partialResponse;
-      console.log(text);
+      console.log('流式响应:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
 
-      // 先尝试直接解析完整JSON
+      // 跟踪已处理的动作ID，用于去重
+      const processedActionIds = this.streamState.executedActions.map(action =>
+        this.generateActionId(action),
+      );
+
+      // 方法1: 尝试解析为完整的指令数组
       try {
-        const parsed = JSON.parse(text);
-        if (this.isValidActionResponse(parsed)) {
-          this.streamState.parsedAction = parsed;
-          this.streamState.complete = true;
+        const fullText = text.replace(/```json|```/g, '').trim();
+        const arrayMatch = fullText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+
+        if (arrayMatch) {
+          const actionArray = JSON.parse(arrayMatch[0]);
+          if (Array.isArray(actionArray)) {
+            console.log('检测到完整指令数组:', actionArray.length);
+
+            // 顺序处理数组中的每个动作
+            for (const action of actionArray) {
+              if (this.isValidActionResponse(action)) {
+                const actionId = this.generateActionId(action);
+
+                // 检查是否已执行过
+                if (processedActionIds.includes(actionId)) {
+                  console.log('跳过重复动作:', actionId);
+                  continue;
+                }
+
+                await this.executeAndTrackAction(action);
+                processedActionIds.push(actionId);
+              }
+            }
+            return; // 成功处理了完整数组，退出
+          }
         }
-        return;
       }
-      catch {
-        // 直接解析失败，尝试从文本中提取JSON
+      catch (err) {
+        console.log('完整数组解析失败:', err);
       }
 
-      // 尝试查找完整的JSON块
-      const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/)
-        || text.match(/```\n([\s\S]*?)\n```/)
-        || text.match(/\{[\s\S]*\}/);
+      // 方法2: 尝试从不完整数组中提取有效指令
+      try {
+        // 检查是否存在数组开始标记 [
+        if (text.includes('[') && text.includes('{')) {
+          const partialActions = this.extractValidActionsFromPartialArray(text);
 
-      if (jsonMatch) {
+          if (partialActions.length > 0) {
+            console.log('从部分数组中提取到有效指令:', partialActions.length);
+
+            for (const action of partialActions) {
+              const actionId = this.generateActionId(action);
+
+              // 检查是否已执行过
+              if (processedActionIds.includes(actionId)) {
+                continue;
+              }
+
+              await this.executeAndTrackAction(action);
+              processedActionIds.push(actionId);
+            }
+            return; // 成功处理了部分数组中的指令，退出
+          }
+        }
+      }
+      catch (err) {
+        console.log('部分数组提取失败:', err);
+      }
+
+      // 方法3: 查找独立的JSON块
+      const jsonMatches = Array.from(text.matchAll(/```json\n([\s\S]*?)\n```/g))
+        || Array.from(text.matchAll(/```\n([\s\S]*?)\n```/g))
+        || Array.from(text.matchAll(/\{[\s\S]*?\}/g));
+
+      for (const match of jsonMatches) {
         try {
-          const jsonText = jsonMatch[1] || jsonMatch[0];
+          const jsonText = match[1] || match[0];
           const parsed = JSON.parse(jsonText);
 
           if (this.isValidActionResponse(parsed)) {
-            this.streamState.parsedAction = parsed;
-            this.streamState.complete = true;
+            const actionId = this.generateActionId(parsed);
+
+            // 检查是否已执行过
+            if (processedActionIds.includes(actionId)) {
+              console.log('跳过重复独立指令:', actionId);
+              continue;
+            }
+
+            await this.executeAndTrackAction(parsed);
+            processedActionIds.push(actionId);
           }
         }
-        catch {
-          // JSON解析错误，可能是不完整
+        catch (err) {
+          console.log('独立JSON解析错误:', err);
         }
       }
     }
-    catch {
-      // 暂不设置错误，等待更多数据
+    catch (err) {
+      console.log('处理流数据总体错误:', err);
+    }
+  }
+
+  /**
+   * 执行动作并记录到已执行列表
+   */
+  private async executeAndTrackAction(action: AIActionResponse): Promise<any> {
+    // 标记正在处理状态
+    this.streamState.processingAction = true;
+
+    try {
+      console.log('执行动作:', action.tool);
+      const result = await this.executeAction(action);
+      console.log('动作执行结果:', result);
+
+      // 记录已执行动作
+      this.streamState.executedActions.push(action);
+      this.streamState.lastExecutedActionId = this.generateActionId(action);
+      this.state.executedActionsCount = this.streamState.executedActions.length;
+
+      return result;
+    }
+    catch (err) {
+      console.error('执行动作失败:', err);
+      this.streamState.error = err instanceof Error ? err.message : String(err);
+      throw err;
+    }
+    finally {
+      this.streamState.processingAction = false;
     }
   }
 
@@ -369,21 +540,35 @@ class AIAssistant extends BaseService {
     this.state.streamingInProgress = false;
 
     // 确保最后一次解析尝试
-    this.tryParseDebounced.flush();
+    this.tryParseThrottle.flush();
 
-    if (this.streamState.parsedAction) {
-      // 有有效响应，执行操作
-      const result = await this.executeActions(this.streamState.parsedAction);
+    // 等待任何正在进行的动作执行完成
+    while (this.streamState.processingAction) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
 
-      // 重置流状态
+    // 如果已有执行过的动作，则返回最后一个动作的结果
+    if (this.streamState.executedActions.length > 0) {
+      const lastAction = this.streamState.executedActions[this.streamState.executedActions.length - 1];
+      const result = {
+        success: true,
+        executedActionsCount: this.streamState.executedActions.length,
+        lastAction,
+      };
+
+      // 重置流状态，但保留已执行的动作列表以供参考
+      const executedActions = [...this.streamState.executedActions];
       this.streamState = {
         complete: false,
         partialResponse: '',
         parsedAction: null,
         error: null,
+        executedActions: [],
+        processingAction: false,
+        lastExecutedActionId: null,
       };
 
-      return result;
+      return { ...result, allExecutedActions: executedActions };
     }
     else {
       // 无有效响应，尝试最后一次解析或返回错误
@@ -391,6 +576,15 @@ class AIAssistant extends BaseService {
         return await this.processModelResponse('', this.state.partialResponse);
       }
       catch {
+        this.streamState = {
+          complete: false,
+          partialResponse: '',
+          parsedAction: null,
+          error: null,
+          executedActions: [],
+          processingAction: false,
+          lastExecutedActionId: null,
+        };
         throw new Error('无法从流式响应中解析出有效指令');
       }
     }
@@ -408,6 +602,57 @@ class AIAssistant extends BaseService {
 
     try {
       // 尝试解析大模型的JSON响应
+      try {
+        // 尝试解析为指令数组
+        const arrayMatch = modelResponse.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (arrayMatch) {
+          const actionArray = JSON.parse(arrayMatch[0]);
+
+          if (Array.isArray(actionArray)) {
+            console.log('检测到指令数组:', actionArray.length);
+            const results = [];
+
+            // 顺序执行每个动作
+            for (const action of actionArray) {
+              if (this.isValidActionResponse(action)) {
+                const result = await this.executeAction(action);
+                results.push(result);
+              }
+            }
+
+            return {
+              success: true,
+              results,
+              message: `成功执行了${results.length}个操作`,
+            };
+          }
+        }
+
+        // 如果没有检测到数组，尝试提取部分指令
+        const partialActions = this.extractValidActionsFromPartialArray(modelResponse);
+        if (partialActions.length > 0) {
+          console.log('从响应中提取到部分指令:', partialActions.length);
+          const results = [];
+
+          for (const action of partialActions) {
+            if (this.isValidActionResponse(action)) {
+              const result = await this.executeAction(action);
+              results.push(result);
+            }
+          }
+
+          return {
+            success: true,
+            results,
+            message: `成功从部分响应中执行了${results.length}个操作`,
+          };
+        }
+      }
+      catch (err) {
+        console.log('数组解析失败，尝试单个指令:', err);
+      }
+
+      // 单个指令解析逻辑（原有逻辑）
       let parsedResponse: AIActionResponse;
 
       try {
@@ -435,7 +680,7 @@ class AIAssistant extends BaseService {
         }
       }
 
-      return await this.executeActions(parsedResponse);
+      return await this.executeAction(parsedResponse);
     }
     catch (error) {
       this.state.error = error instanceof Error ? error.message : String(error);
@@ -464,17 +709,6 @@ class AIAssistant extends BaseService {
     }
 
     return fixedJson;
-  }
-
-  private async executeActions(parsedResponse: AIActionResponse | AIActionResponse[]) {
-    if (Array.isArray(parsedResponse)) {
-      for (const action of parsedResponse) {
-        await this.executeAction(action);
-      }
-    }
-    else {
-      await this.executeAction(parsedResponse);
-    }
   }
 
   /**
@@ -534,8 +768,8 @@ Your main goal is to follow the USER's instructions to perform layout tasks in e
 <communication_guidelines>
 1. Maintain professional, conversational tone.
 2. Format responses in markdown with appropriate code formatting.
-4. Focus on accuracy and relevance.
-5. Prioritize proceeding with tasks over apologizing for unexpected results.
+3. Focus on accuracy and relevance.
+4. Prioritize proceeding with tasks over apologizing for unexpected results.
 </communication_guidelines>
 
 <project_context>
@@ -554,7 +788,6 @@ When addressing user layout and design requests:
 2. Provide response as parsable JSON with these fields:
    - "tool": Selected tool name
    - "parameters": Required parameters
-   - "reasoning": Brief explanation for the action
 
 <single_operation_format>
 \`\`\`json
@@ -562,22 +795,21 @@ When addressing user layout and design requests:
   "tool": "alignCenter",
   "parameters": {
     "nodeId": "button-123"
-  },
-  "reasoning": "Centering the button to improve layout balance"
+  }
 }
 \`\`\`
 </single_operation_format>
 
 <multiple_operation_format>
-Use an array for sequential operations:
+For multiple operations, use a JSON array format for better processing:
+
 \`\`\`json
 [
   {
     "tool": "selectNode",
     "parameters": {
       "nodeId": "input-456"
-    },
-    "reasoning": "Selecting target input field"
+    }
   },
   {
     "tool": "updateNode",
@@ -589,19 +821,22 @@ Use an array for sequential operations:
           "height": "40"
         }
       }
-    },
-    "reasoning": "Applying requested dimensions"
+    }
   }
 ]
 \`\`\`
+
+Each operation in the array will be processed in sequence.
 </multiple_operation_format>
 </response_format_instructions>
+
 <best_practices>
 1. Return valid JSON without extraneous text
 2. Position elements within canvas boundaries (${canvasWidth}px × ${canvasHeight}px)
 3. Use absolute values for style properties
 4. Select nodes before modifying them
 5. Break complex tasks into logical operation sequences
+6. For multiple operations, always use the array format for reliable processing
 </best_practices>
 `;
   }

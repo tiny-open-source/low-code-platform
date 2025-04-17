@@ -20,7 +20,8 @@ export default defineComponent({
   setup(props, { emit, expose }) {
     const form = ref<HTMLFormElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
-    const message = ref('');
+    const message = ref(`1. Add a container
+2. Update the container, absolute position, left 0, top 0, width 1024, height 600, style { backgroundColor: '#FFFFFF' }`);
     // 文本框聚焦
     const focus = () => {
       textareaRef.value?.focus();
