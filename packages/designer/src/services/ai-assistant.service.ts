@@ -156,9 +156,11 @@ class AIAssistant extends BaseService {
         },
       },
       handler: async ({ nodeId }) => {
-        const node = await designerService.select(nodeId);
-        await designerService.get('stage')?.select(nodeId);
-        return { success: true, selectedNode: { id: node.id, type: node.type } };
+        console.log(nodeId);
+
+        // const node = await designerService.select(nodeId);
+        // await designerService.get('stage')?.select(nodeId);
+        // return { success: true, selectedNode: { id: node.id, type: node.type } };
       },
     });
     // 更新节点工具
@@ -174,6 +176,11 @@ class AIAssistant extends BaseService {
         config: {
           type: 'object',
           properties: {
+            text: {
+              type: 'string',
+              description: 'Node text content',
+              required: false,
+            },
             type: { type: 'string', required: false, description: 'Node type' },
             id: { type: 'string', required: true, description: 'Node ID' },
             name: { type: 'string', required: false, description: 'Node name' },
@@ -184,30 +191,35 @@ class AIAssistant extends BaseService {
               width: { type: 'string', required: false, description: 'Width' },
               height: { type: 'string', required: false, description: 'Height' },
             } },
-            layout: { type: 'object', required: false, description: 'Node layout properties' },
+            layout: { type: 'object', required: true, description: 'Node layout properties, absolute or relative' },
             events: { type: 'array', required: false, description: 'Node events' },
             items: { type: 'array', required: false, description: 'Child nodes' },
             created: { type: 'string', required: false, description: 'Creation time' },
           },
+
           description: 'Updated configuration for the node',
           required: true,
         },
       },
       handler: async ({ nodeId, config }) => {
-        let node: MNode;
+        console.log(nodeId);
+        // let node: MNode;
 
-        if (nodeId) {
-          node = designerService.getNodeById(nodeId) as MNode;
-          if (!node) {
-            throw new Error(`找不到ID为${nodeId}的节点`);
-          }
-        }
-        else {
-          node = designerService.get('node') as MNode;
-          if (!node) {
-            throw new Error('当前没有选中节点');
-          }
-        }
+        // if (nodeId) {
+        //   node = designerService.getNodeById(nodeId) as MNode;
+        //   if (!node) {
+        //     throw new Error(`找不到ID为${nodeId}的节点`);
+        //   }
+        // }
+        // else {
+        //   node = designerService.get('node') as MNode;
+        //   if (!node) {
+        //     throw new Error('当前没有选中节点');
+        //   }
+        // }
+        const node = designerService.get('node');
+        if (!node)
+          return { success: false, message: '当前没有选中节点' };
         const mergedConfig = merge(node, config);
         await designerService.update(mergedConfig);
         return {
@@ -754,22 +766,19 @@ class AIAssistant extends BaseService {
     const canvasHeight = currentPage?.style?.height || '600';
 
     return `You are a powerful agentic Low-Code Platform AI Assistant.
-You are pairing programming with a USER to solve their element layout task.
-The task may require creating a new node, moving a node, deleting a node, modifying a node's properties, or performing a series of add, delete, change, and check tasks
-Each time the USER sends a message, this information may or may not be relevant to the layout task, it is up for you to decide, and try to turn the user request into a layout task.
-Your main goal is to follow the USER's instructions to perform layout tasks in each message
+The task may require creating a new node, moving a node, deleting a node, modifying a node's properties, or performing a series of add, delete, change, and check tasks.
+Your main goal is to follow the USER's instructions to perform layout tasks in each message.
 
 <context>
-- Working with a low-code design platform
-- Canvas dimensions: ${canvasWidth}px × ${canvasHeight}px
-- Available components and current structure provided in context
+1. Working with a low-code design platform.
+2. Canvas dimensions: ${canvasWidth}px × ${canvasHeight}px.
+3. Available components and current structure provided in context.
 </context>
 
 <communication_guidelines>
-1. Maintain professional, conversational tone.
-2. Format responses in markdown with appropriate code formatting.
-3. Focus on accuracy and relevance.
-4. Prioritize proceeding with tasks over apologizing for unexpected results.
+1. Format responses in markdown with appropriate code formatting.
+2. Focus on accuracy and relevance.
+3. Prioritize proceeding with tasks over apologizing for unexpected results.
 </communication_guidelines>
 
 <project_context>
@@ -783,49 +792,20 @@ ${JSON.stringify(toolDescriptions, null, 2)}
 
 <response_format_instructions>
 When addressing user layout and design requests:
-
-1. Analyze the request and convert it to actionable operations
-2. Provide response as parsable JSON with these fields:
-   - "tool": Selected tool name
-   - "parameters": Required parameters
+1. Analyze the request and convert it to actionable operations.
+2. Provide responses as compressed JSON without extra spaces or line breaks.
+3. Your response must be parsable JSON with these fields:
+   - "tool": Selected tool name.
+   - "parameters": Required parameters.
 
 <single_operation_format>
 \`\`\`json
-{
-  "tool": "alignCenter",
-  "parameters": {
-    "nodeId": "button-123"
-  }
-}
+{"tool":"alignCenter","parameters":{"nodeId":"button-123"}}
 \`\`\`
 </single_operation_format>
 
 <multiple_operation_format>
-For multiple operations, use a JSON array format for better processing:
-
-\`\`\`json
-[
-  {
-    "tool": "selectNode",
-    "parameters": {
-      "nodeId": "input-456"
-    }
-  },
-  {
-    "tool": "updateNode",
-    "parameters": {
-      "nodeId": "input-456",
-      "config": {
-        "style": {
-          "width": "300",
-          "height": "40"
-        }
-      }
-    }
-  }
-]
-\`\`\`
-
+For multiple, use an ARRAY format.
 Each operation in the array will be processed in sequence.
 </multiple_operation_format>
 </response_format_instructions>
@@ -837,6 +817,7 @@ Each operation in the array will be processed in sequence.
 4. Select nodes before modifying them
 5. Break complex tasks into logical operation sequences
 6. For multiple operations, always use the array format for reliable processing
+7. DO NOT include any formatting or indentation in your JSON output
 </best_practices>
 `;
   }

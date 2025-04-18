@@ -65,11 +65,12 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
+    overflow: auto;
   }
 
   &__text {
     max-width: none;
-    
+
     &--user {
       white-space: pre-line;
     }

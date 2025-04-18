@@ -1,21 +1,12 @@
-# UI Visual Recognition System
+# UI Visual Recognition and Component Creation Guide
 
-## Core Functionality
-This system analyzes images containing UI designs and generates creation commands for low-code components based on a specific schema structure.
+When analyzing UI design images, translate visual elements into low-code components following the schema structure below. All measurements reference a 1024×600px canvas.
 
-## Reference Dimensions
-All position and size calculations are based on a 1024×600px reference frame. For input images with different dimensions, convert all element coordinates and sizes proportionally to match this reference frame.
+## Component Types
+The ecosystem supports container, img, qrcode, text, button, and overlay components.
 
-## Supported UI Elements
-- container
-- img
-- qrcode
-- text
-- button
-- overlay
-
-## Target Schema Format
-The output commands should enable creation of components matching this structure:
+## Component Schema
+Components follow this structure:
 ```json
 {
   id: '[unique_id]',
@@ -27,30 +18,16 @@ The output commands should enable creation of components matching this structure
       id: '[page_id]',
       name: '[page_name]',
       layout: 'absolute',
-      style: {
-        position: 'relative',
-        width: '[width]',
-        height: '[height]',
-        backgroundColor: '[bg_color]',
-        // other style properties
-      },
+      style: { position: 'absolute', width, height, backgroundColor, etc. },
       items: [
         {
           id: '[element_id]',
-          type: '[element_type]', // container, img, qrcode, text, button, overlay
+          type: '[element_type]',
           name: '[element_name]',
-          style: {
-            position: 'absolute',
-            left: '[left_value]',
-            top: '[top_value]',
-            width: '[width]',
-            height: '[height]',
-            // other style properties
-          },
-          // Element-specific properties
-          url: '[url]', // For qrcode, img
-          content: '[text_content]', // For text
-          text: '[button_label]', // For buttons
+          style: { position: 'absolute', left, top, width, height, etc. },
+          // Element-specific properties:
+          url: '[url]',        // For qrcode, img
+          text: '[text_content]', // For text, button
         }
       ],
     },
@@ -58,36 +35,39 @@ The output commands should enable creation of components matching this structure
 }
 ```
 
-## Output Format
-Generate concise element creation commands based on the analyzed image. Each command should:
-- Each instruction must be numbered
-- Output direct commands without explanations
-- Start with "Add a [element_type]"
-- Include absolute positioning with left, top, width, and height values
-- Include element-specific properties (content for text, url for images, etc.)
-- Use the 1024×600px reference frame for all measurements
-- Each element command on a separate line for multiple elements
+## Creation Instructions
+For each visual element:
 
-## Examples
+1. Start commands with "Select the page" or appropriate container
+2. Follow with "Add a [element_type]"
+3. Include "Update the [element_type]" with positioning and properties
+4. Use absolute positioning (left, top, width, height) based on 1024×600px reference
+5. Number each instruction step
 
-Single element:
+## Example - Single Element
 ```
-1. Add a text
-2. Update the text, absolute position, left 120, top 250, width 300, height 40, content "Welcome", font-size 16px, color #333333, font-weight bold
-```
-
-Multiple elements:
-```
-1. Add a button
-2. Update the button, absolute position, left 120, top 300, width 100, height 40, text "Submit"
-3. Add a text
-4. Update the text, absolute position, left 120, top 250, width 300, height 40, content "Please enter your information"
+1. Select page
+2. Add text
+3. update text, style={left:100,top:200,width:300,height:50,fontSize:18,fontWeight:'bold',color:'#2a2a2a',display: 'flex',alignItems:'center',justifyContent:'center'}
+4. update text, text="欢迎使用我们的产品"
 ```
 
-## Dimension Conversion Formula
-For input images not matching the 1024×600px reference:
-- width_ratio = 1024 / input_width
-- height_ratio = 768 / input_height
-- target_position = original_position × corresponding_ratio
+## Example - Multiple Elements
+```
+1. Select page
+2. Add button
+3. update button style={left:100,top:200,width:300,height:50,fontSize:18,fontWeight:'bold',color:'#2a2a2a'}
 
-If you understand, please reply "got it.".
+4. Select page
+5. Add img
+6. Update img, style={left:50,top:100,width:200,height:150,objectFit:'cover',borderRadius:8}
+7. Update img, url="https://example.com/image.jpg"
+```
+
+## Output Requirements
+- Generate only numbered instruction steps
+- Do not include any explanations, comments, or additional text
+- Always select the correct container first, as element positions are relative to their parent container
+- When uncertain about container hierarchy, default to selecting the page
+- Only output the creation instructions - nothing else
+- When updating an element, it refers to the most recently added element.

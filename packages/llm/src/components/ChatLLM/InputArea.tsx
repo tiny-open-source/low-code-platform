@@ -20,8 +20,8 @@ export default defineComponent({
   setup(props, { emit, expose }) {
     const form = ref<HTMLFormElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
-    const message = ref(`1. Add a container
-2. Update the container, absolute position, left 0, top 0, width 1024, height 600, style { backgroundColor: '#FFFFFF' }`);
+    const message = ref(`1. Add a text
+2. Update the text, absolute position, left 0, top 0, width 1024, height 600, style { backgroundColor: '#FFFFFF' } text "111"`);
     // 文本框聚焦
     const focus = () => {
       textareaRef.value?.focus();
@@ -34,15 +34,15 @@ export default defineComponent({
       if (props.status === 'disabled' || props.status === 'pending')
         return;
       e.preventDefault();
-      const messageText = textareaRef.value?.value;
+      const val = textareaRef.value?.value;
 
-      if (!messageText || messageText.trim().length === 0) {
+      if (!val || val.trim().length === 0) {
         return;
       }
 
       resetFormState();
       focus();
-      emit('submit', messageText.trim());
+      emit('submit', val.trim());
     };
 
     // 键盘按键处理
@@ -56,16 +56,16 @@ export default defineComponent({
       // 处理回车键发送消息
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        const message = (e.target as HTMLTextAreaElement).value;
+        const val = (e.target as HTMLTextAreaElement).value;
 
         // 验证消息内容
-        if (!message || message.trim().length === 0) {
+        if (!val || val.trim().length === 0) {
           return;
         }
 
         resetFormState();
         focus();
-        emit('submit', message.trim());
+        emit('submit', val.trim());
       }
     };
 
