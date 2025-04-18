@@ -42,7 +42,7 @@
     "npm-run-all2": "^7.0.2",
     "rollup-plugin-external-globals": "^0.13.0",
     "unplugin-auto-import": "^19.1.2",
-    "vite": "^6.2.5",
+    "vite": "^6.3.2",
     "vue-tsc": "2.0.29"
   }
 }
