@@ -28,124 +28,124 @@ Add text
 Update text, style={left:10,top:40,width:100,height:30,fontSize:16,fontWeight:'bold',color:'#ffffff',backgroundColor:'#ff4d4f',borderRadius:4,padding:'4px 8px'}
 Update text, text="一级护理"
 Select container (left section)
-31. Add text
-32. Update text, style={left:120,top:40,width:150,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-33. Update text, text="男 36岁"
-34. Select container (left section)
-35. Add text
-36. Update text, style={left:10,top:70,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-37. Update text, text="登记号：235235235"
-38. Select container (left section)
-39. Add text
-40. Update text, style={left:10,top:100,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-41. Update text, text="诊断：慢性咽喉炎"
-42. Select container (left section)
-43. Add text
-44. Update text, style={left:10,top:130,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-45. Update text, text="手术时间：2025-03-29 00:39"
-46. Select container (left section)
-47. Add text
-48. Update text, style={left:10,top:160,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-49. Update text, text="入院时间：2025-04-14 08:14"
-50. Select container (left section)
-51. Add text
-52. Update text, style={left:10,top:190,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-53. Update text, text="责任医生：钱若霖"
-54. Select container (left section)
-55. Add text
-56. Update text, style={left:10,top:220,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
-57. Update text, text="责任护士：何炜"
-58. Select container (left section)
-59. Add img
-60. Update img, style={left:250,top:230,width:100,height:100,objectFit:'contain'}
-61. Update img, url="https://example.com/qr_code.png"
-62. Select container
-63. Add container
-64. Update container, style={left:400,top:60,width:624,height:540,backgroundColor:'#ffffff',borderRadius:8,boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}
-65. Select container (right section)
-66. Add container
-67. Update container, style={left:0,top:0,width:300,height:60,backgroundColor:'#ff4d4f',borderRadius:4}
-68. Select container (right section - top left)
-69. Add text
-70. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-71. Update text, text="跌倒/坠床（中度）"
-72. Select container (right section)
-73. Add container
-74. Update container, style={left:320,top:0,width:300,height:60,backgroundColor:'#5e81f5',borderRadius:4}
-75. Select container (right section - top right)
-76. Add text
-77. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-78. Update text, text="XXX运动"
-79. Select container (right section)
-80. Add container
-81. Update container, style={left:0,top:60,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-82. Select container (right section - middle left 1)
-83. Add text
-84. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-85. Update text, text="XXXXX"
-86. Select container (right section)
-87. Add container
-88. Update container, style={left:320,top:60,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-89. Select container (right section - middle right 1)
-90. Add text
-91. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-92. Update text, text="XXXXX"
-93. Select container (right section)
-94. Add container
-95. Update container, style={left:0,top:120,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-96. Select container (right section - middle left 2)
-97. Add text
-98. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-99. Update text, text="XXXXX"
-100. Select container (right section)
-101. Add container
-102. Update container, style={left:320,top:120,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-103. Select container (right section - middle right 2)
-104. Add text
-105. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-106. Update text, text="XXXXX"
-107. Select container (right section)
-108. Add container
-109. Update container, style={left:0,top:180,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-110. Select container (right section - bottom left)
-111. Add text
-112. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-113. Update text, text="XXXXX"
-114. Select container (right section)
-115. Add container
-116. Update container, style={left:320,top:180,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
-117. Select container (right section - bottom right)
-118. Add text
-119. Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
-120. Update text, text="XXXXX"
-121. Select container (right section)
-122. Add img
-123. Update img, style={left:350,top:100,width:100,height:100,objectFit:'contain'}
-124. Update img, url="https://example.com/hand_icon.png"
-125. Select container
-126. Add container
-127. Update container, style={left:924,top:0,width:100,height:600,backgroundColor:'#ffffff',borderRadius:8,boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}
-128. Select container (right sidebar)
-129. Add img
-130. Update img, style={left:10,top:10,width:30,height:30,objectFit:'contain'}
-131. Update img, url="https://example.com/bed_icon.png"
-132. Select container (right sidebar)
-133. Add text
-134. Update text, style={left:40,top:10,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
-135. Update text, text="床头卡"
-136. Select container (right sidebar)
-137. Add img
-138. Update img, style={left:10,top:60,width:30,height:30,objectFit:'contain'}
-139. Update img, url="https://example.com/plus_icon.png"
-140. Select container (right sidebar)
-141. Add text
-142. Update text, style={left:40,top:60,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
-143. Update text, text="增援"
-144. Select container (right sidebar)
-145. Add img
-146. Update img, style={left:10,top:110,width:30,height:30,objectFit:'contain'}
-147. Update img, url="https://example.com/heart_icon.png"
-148. Select container (right sidebar)
-149. Add text
-150. Update text, style={left:40,top:110,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
-151. Update text, text="护理" 
+Add text
+Update text, style={left:120,top:40,width:150,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="男 36岁"
+Select container (left section)
+Add text
+Update text, style={left:10,top:70,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="登记号：235235235"
+Select container (left section)
+Add text
+Update text, style={left:10,top:100,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="诊断：慢性咽喉炎"
+Select container (left section)
+Add text
+Update text, style={left:10,top:130,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="手术时间：2025-03-29 00:39"
+Select container (left section)
+Add text
+Update text, style={left:10,top:160,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="入院时间：2025-04-14 08:14"
+Select container (left section)
+Add text
+Update text, style={left:10,top:190,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="责任医生：钱若霖"
+Select container (left section)
+Add text
+Update text, style={left:10,top:220,width:380,height:30,fontSize:16,fontWeight:'normal',color:'#1a1a1a'}
+Update text, text="责任护士：何炜"
+Select container (left section)
+Add img
+Update img, style={left:250,top:230,width:100,height:100,objectFit:'contain'}
+Update img, url="https://example.com/qr_code.png"
+Select container
+Add container
+Update container, style={left:400,top:60,width:624,height:540,backgroundColor:'#ffffff',borderRadius:8,boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}
+Select container (right section)
+Add container
+Update container, style={left:0,top:0,width:300,height:60,backgroundColor:'#ff4d4f',borderRadius:4}
+Select container (right section - top left)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="跌倒/坠床（中度）"
+Select container (right section)
+Add container
+Update container, style={left:320,top:0,width:300,height:60,backgroundColor:'#5e81f5',borderRadius:4}
+Select container (right section - top right)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXX运动"
+Select container (right section)
+Add container
+Update container, style={left:0,top:60,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - middle left 1)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add container
+Update container, style={left:320,top:60,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - middle right 1)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add container
+Update container, style={left:0,top:120,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - middle left 2)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add container
+Update container, style={left:320,top:120,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - middle right 2)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add container
+Update container, style={left:0,top:180,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - bottom left)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add container
+Update container, style={left:320,top:180,width:300,height:60,backgroundColor:'#2ecc71',borderRadius:4}
+Select container (right section - bottom right)
+Add text
+Update text, style={left:10,top:10,width:280,height:40,fontSize:16,fontWeight:'bold',color:'#ffffff',textAlign:'center'}
+Update text, text="XXXXX"
+Select container (right section)
+Add img
+Update img, style={left:350,top:100,width:100,height:100,objectFit:'contain'}
+Update img, url="https://example.com/hand_icon.png"
+Select container
+Add container
+Update container, style={left:924,top:0,width:100,height:600,backgroundColor:'#ffffff',borderRadius:8,boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}
+Select container (right sidebar)
+Add img
+Update img, style={left:10,top:10,width:30,height:30,objectFit:'contain'}
+Update img, url="https://example.com/bed_icon.png"
+Select container (right sidebar)
+Add text
+Update text, style={left:40,top:10,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
+Update text, text="床头卡"
+Select container (right sidebar)
+Add img
+Update img, style={left:10,top:60,width:30,height:30,objectFit:'contain'}
+Update img, url="https://example.com/plus_icon.png"
+Select container (right sidebar)
+Add text
+Update text, style={left:40,top:60,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
+Update text, text="增援"
+Select container (right sidebar)
+Add img
+Update img, style={left:10,top:110,width:30,height:30,objectFit:'contain'}
+Update img, url="https://example.com/heart_icon.png"
+Select container (right sidebar)
+Add text
+Update text, style={left:40,top:110,width:50,height:30,fontSize:16,fontWeight:'bold',color:'#1a1a1a',textAlign:'center'}
+Update text, text="护理" 

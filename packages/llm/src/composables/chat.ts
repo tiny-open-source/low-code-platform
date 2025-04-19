@@ -1,5 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 import { SystemMessage } from '@langchain/core/messages';
+import { useLocalStorage } from '@vueuse/core';
 import { ref } from 'vue';
 import { generateID } from '../db';
 import { cleanUrl } from '../libs/clean-url';
@@ -45,7 +46,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   const setHistory = (value: ChatHistory) => {
     history.value = value;
   };
-
+  const selectModel = useLocalStorage('selectedModel', '');
   const stopStreamingRequest = () => {
     if (abortController) {
       abortController.abort();
@@ -56,8 +57,10 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   ) => {
     const url = await getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
+
     const ollama = await pageAssistModel({
-      model: 'deepseek-coder-v2:latest',
+      // 模型名字先写死，后续做成可配置
+      model: selectModel.value!,
       baseUrl: cleanUrl(url),
       keepAlive: undefined,
       temperature: 0.0,
@@ -97,7 +100,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         },
         {
           isBot: true,
-          name: 'deepseek-coder-v2:latest',
+          name: selectModel.value!,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -109,7 +112,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         ...messages.value,
         {
           isBot: true,
-          name: 'deepseek-coder-v2:latest',
+          name: selectModel.value!,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -128,10 +131,10 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
             type: 'text',
           },
         ],
-        model: 'deepseek-coder-v2:latest',
+        model: selectModel.value!,
       });
 
-      const applicationChatHistory = generateHistory(history.value, 'deepseek-coder-v2:latest');
+      const applicationChatHistory = generateHistory(history.value, selectModel.value!);
 
       if (prompt?.value) {
         applicationChatHistory.unshift(
@@ -242,7 +245,6 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
 
       setIsProcessing(false);
       setStreaming(false);
-      setStreaming(false);
     }
     catch (e) {
       console.error(e);
@@ -291,5 +293,13 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
     isProcessing,
     messages,
     history,
+    resetState: () => {
+      if (streaming.value)
+        stopStreamingRequest();
+      setMessages([]);
+      setHistory([]);
+      setStreaming(false);
+      setIsProcessing(false);
+    },
   };
 }

@@ -1,3 +1,6 @@
+import type { PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
+
 export default defineComponent({
   name: 'StatusIndicator',
   props: {
@@ -7,43 +10,36 @@ export default defineComponent({
     },
   },
   setup(props) {
-    return () => {
-      if (props.status === 'pending') {
-        return (
-          <div class="lc-llm-status-indicator">
-            <div class="lc-llm-status-indicator__container">
-              <div class="lc-llm-status-indicator__dot lc-llm-status-indicator__dot--pending"></div>
-              <p class="lc-llm-status-indicator__text">
-                正在搜索您的Ollama 🦙
-              </p>
-            </div>
-          </div>
-        );
+    const statusConfig = computed(() => {
+      switch (props.status) {
+        case 'pending':
+          return {
+            dotClass: 'lc-llm-status-indicator__dot--pending',
+            text: '正在搜索您的Ollama 🦙',
+          };
+        case 'success':
+          return {
+            dotClass: 'lc-llm-status-indicator__dot--success',
+            text: 'Ollama正在运行 🦙',
+          };
+        case 'error':
+        default:
+          return {
+            dotClass: 'lc-llm-status-indicator__dot--error',
+            text: '无法连接到Ollama 🦙',
+          };
       }
-      else if (props.status === 'success') {
-        return (
-          <div class="lc-llm-status-indicator">
-            <div class="lc-llm-status-indicator__container">
-              <div class="lc-llm-status-indicator__dot lc-llm-status-indicator__dot--success"></div>
-              <p class="lc-llm-status-indicator__text">
-                Ollama正在运行 🦙
-              </p>
-            </div>
-          </div>
-        );
-      }
-      else {
-        return (
-          <div class="lc-llm-status-indicator">
-            <div class="lc-llm-status-indicator__container">
-              <div class="lc-llm-status-indicator__dot lc-llm-status-indicator__dot--error"></div>
-              <p class="lc-llm-status-indicator__text">
-                无法连接到Ollama 🦙
-              </p>
-            </div>
-          </div>
-        );
-      }
-    };
+    });
+
+    return () => (
+      <div class="lc-llm-status-indicator">
+        <div class="lc-llm-status-indicator__container">
+          <div class={['lc-llm-status-indicator__dot', statusConfig.value.dotClass]}></div>
+          <p class="lc-llm-status-indicator__text">
+            {statusConfig.value.text}
+          </p>
+        </div>
+      </div>
+    );
   },
 });

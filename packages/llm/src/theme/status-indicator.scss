@@ -1,16 +1,22 @@
 .lc-llm-status-indicator {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
   text-wrap: nowrap;
-
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 50px;
   &__container {
     font-size: 0.875rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 25px;
+    border-width: 1px;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
   }
 
   &__dot {

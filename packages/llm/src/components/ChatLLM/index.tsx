@@ -1,9 +1,12 @@
+/** @format */
+
 import type { Services } from '@low-code/designer';
 import { NScrollbar } from 'naive-ui';
 import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import Messages from './ChatMessages';
+import Header from './Header';
 import TextAreaForm from './InputArea';
 import OllamaStatusIndicator from './OllamaStatusIndicator';
 
@@ -15,7 +18,8 @@ export default defineComponent({
     const textAreaFormRef = ref<InstanceType<typeof TextAreaForm>>();
 
     // Ollama 状态检查
-    const { check: checkOllamaStatus, status: ollamaStatus } = useOllamaStatus();
+    const { check: checkOllamaStatus, status: ollamaStatus }
+      = useOllamaStatus();
     onMounted(() => {
       (textAreaFormRef.value as any)?.focus();
       checkOllamaStatus();
@@ -26,9 +30,10 @@ export default defineComponent({
     });
 
     // 消息处理
-    const { onSubmit, messages, streaming, stopStreamingRequest } = useMessageOption({
-      prompt,
-    });
+    const { onSubmit, messages, streaming, stopStreamingRequest, resetState }
+      = useMessageOption({
+        prompt,
+      });
 
     // 处理消息更新
     watch(messages, () => {
@@ -66,9 +71,22 @@ export default defineComponent({
         message,
       });
     };
+    const handleNewChat = () => {
+      // 重制状态
+      resetState();
+      // 重新聚焦输入框
+      (textAreaFormRef.value as any)?.focus();
+    };
+    const handleSaveSettings = () => {
+      handleNewChat();
+    };
     return () => (
       <div class="lc-llm-chat-form">
-        <OllamaStatusIndicator status={ollamaStatus.value} />
+        <Header onNewChat={handleNewChat} onSaveSettings={handleSaveSettings}></Header>
+        <OllamaStatusIndicator
+          style={{ display: messages.value.length > 0 ? 'none' : 'flex' }}
+          status={ollamaStatus.value}
+        />
         {/* 消息区域 */}
         <NScrollbar class="lc-llm-chat-form__messages-container">
           <Messages messages={messages.value} />
@@ -81,7 +99,13 @@ export default defineComponent({
           ref={textAreaFormRef}
           onSubmit={handleSubmit}
           onStop={stopStreamingRequest}
-          status={ollamaStatus.value !== 'success' ? 'disabled' : streaming.value ? 'pending' : 'initial'}
+          status={
+            ollamaStatus.value !== 'success'
+              ? 'disabled'
+              : streaming.value
+                ? 'pending'
+                : 'initial'
+          }
           disabled={ollamaStatus.value !== 'success'}
         />
       </div>

@@ -1,4 +1,7 @@
+import { isCustomModel } from '../db/models';
+import { getCustomHeaders } from '../utils/clean-headers';
 import { ChatOllama } from './ChatOllama';
+import { CustomChatOpenAI } from './CustomChatOpenAI';
 
 export async function pageAssistModel({
   model,
@@ -39,6 +42,23 @@ export async function pageAssistModel({
   numThread?: number;
   useMlock?: boolean;
 }) {
+  const isCustom = isCustomModel(model);
+  if (isCustom) {
+    return new CustomChatOpenAI({
+      modelName: model,
+      openAIApiKey: 'sk-wqzwhlgzlqtpxkuyauddasdrikgckebavajsdfscqrxnzwld',
+      temperature,
+      topP,
+      maxTokens: numPredict,
+      configuration: {
+        apiKey: 'sk-wqzwhlgzlqtpxkuyauddasdrikgckebavajsdfscqrxnzwld',
+        baseURL: 'https://api.siliconflow.cn/v1',
+        defaultHeaders: getCustomHeaders({
+          headers: [],
+        }),
+      },
+    }) as any;
+  }
   return new ChatOllama({
     baseUrl,
     keepAlive,

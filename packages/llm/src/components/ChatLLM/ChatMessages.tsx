@@ -1,8 +1,10 @@
 import type { Message } from '@low-code/llm';
 import type { PropType } from 'vue';
+import { parseReasoning } from '@low-code/llm';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import { defineComponent } from 'vue';
+import ThinkingArea from './ThinkingArea';
 
 export default defineComponent({
   name: 'ChatMessages',
@@ -35,11 +37,19 @@ export default defineComponent({
         <div class="lc-llm-chat-messages__container">
           <div class="lc-llm-chat-messages__content">
             <span class={`lc-llm-chat-messages__name ${message.isBot ? 'lc-llm-chat-messages__name--bot' : 'lc-llm-chat-messages__name--user'}`}>
+
               {message.isBot ? message.name || 'Assistant' : 'You'}
             </span>
             <div class="lc-llm-chat-messages__body">
               {message.isBot
-                ? <div class="prose dark:prose-invert lc-llm-chat-messages__text" innerHTML={renderMarkdown(message.message)} />
+                ? parseReasoning(message.message).map((e, i) => {
+                    if (e.type === 'reasoning') {
+                      return (
+                        <ThinkingArea content={e.content} key={i} />
+                      );
+                    }
+                    return <div class="prose dark:prose-invert lc-llm-chat-messages__text" innerHTML={renderMarkdown(e.content)} />;
+                  })
                 : (
                     <p
                       class={`prose dark:prose-invert lc-llm-chat-messages__text lc-llm-chat-messages__text--user ${

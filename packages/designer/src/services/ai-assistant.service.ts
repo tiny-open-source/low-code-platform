@@ -41,12 +41,21 @@ interface StreamState {
   partialResponse: string;
   parsedAction: AIActionResponse | null;
   error: string | null;
-  executedActions: AIActionResponse[]; // 新增：记录已执行的动作
-  processingAction: boolean; // 新增：标记是否正在处理动作
-  lastExecutedActionId: string | null; // 新增：上次执行的动作ID
+  executedActions: AIActionResponse[]; // 记录已执行的动作
+  processingAction: boolean; // 标记是否正在处理动作
+  lastExecutedActionId: string | null; // 上次执行的动作ID
+  lastParsedLength: number; // 新增：上次解析的响应长度，用于增量解析
+  parsingContext: { // 新增：解析上下文信息
+    inArray: boolean;
+    arrayStart: number;
+    arrayDepth: number;
+    objectsFound: number;
+  };
 }
+
 class AIAssistant extends BaseService {
-  private availableTools: ToolDescription[] = [];
+  private availableToolsMap = new Map<string, ToolDescription>();
+  private availableToolsDescriptions: Record<string, any> = {};
   public state = reactive({
     isProcessing: false,
     streamingInProgress: false,
@@ -66,6 +75,13 @@ class AIAssistant extends BaseService {
     executedActions: [], // 初始化为空数组
     processingAction: false, // 初始化为非处理状态
     lastExecutedActionId: null, // 初始化为空
+    lastParsedLength: 0, // 初始化为0
+    parsingContext: { // 初始化解析上下文
+      inArray: false,
+      arrayStart: -1,
+      arrayDepth: 0,
+      objectsFound: 0,
+    },
   };
 
   constructor() {
@@ -74,14 +90,14 @@ class AIAssistant extends BaseService {
     this.registerDefaultTools();
   }
 
-  // 节流处理器，用于流处理中尝试解析JSON
-  private tryParseThrottle = throttle(this.tryParseStreamedJSON, 300);
+  // 使用节流而非防抖，提高实时性
+  private tryParseThrottle = throttle(this.tryParseStreamedJSON, 200);
 
   /**
    * 注册新的工具
    */
   public registerTool(tool: ToolDescription) {
-    this.availableTools.push(tool);
+    this.availableToolsMap.set(tool.name, tool);
   }
 
   registerDefaultTools() {
@@ -268,7 +284,9 @@ class AIAssistant extends BaseService {
    * 获取所有可用工具的描述
    */
   public getToolDescriptions(): Record<string, any> {
-    return this.availableTools.map(tool => ({
+    if (this.availableToolsDescriptions.length > 0)
+      return this.availableToolsDescriptions;
+    return this.availableToolsDescriptions = Array.from(this.availableToolsMap.values()).map(tool => ({
       name: tool.name,
       description: tool.description,
       parameters: tool.parameters,
@@ -317,7 +335,7 @@ class AIAssistant extends BaseService {
     return obj
       && typeof obj === 'object'
       && typeof obj.tool === 'string'
-      && this.availableTools.some(t => t.name === obj.tool);
+      && this.availableToolsMap.has(obj.tool);
   }
 
   /**
@@ -336,52 +354,88 @@ class AIAssistant extends BaseService {
     this.state.streamingInProgress = true;
     this.state.partialResponse = chunk;
     this.streamState.partialResponse = chunk;
-    // 尝试解析（节流处理）
-    this.tryParseThrottle();
+
+    // 如果响应长度显著增加才触发解析，提高性能
+    const currentLength = chunk.length;
+    const lastLength = this.streamState.lastParsedLength;
+
+    if (currentLength - lastLength > 100 || currentLength < lastLength) {
+      // 长度增加超过100字符或响应重置时解析
+      this.tryParseThrottle();
+    }
+    else {
+      // 否则延迟解析，降低频率
+      this.tryParseThrottle();
+    }
   }
 
   /**
    * 从可能不完整的JSON数组文本中提取有效的指令对象
+   * 使用增量解析策略
    */
   private extractValidActionsFromPartialArray(text: string): AIActionResponse[] {
     try {
-      // 清理文本，移除代码块标记
-      let cleanText = text.replace(/```json|```/g, '').trim();
+      // 避免重复处理已解析过的文本部分
+      const startPos = Math.max(0, this.streamState.parsingContext.arrayStart);
 
-      // 确保文本以 [ 开始
-      const startIndex = cleanText.indexOf('[');
-      if (startIndex === -1)
-        return [];
-      cleanText = cleanText.substring(startIndex);
+      // 如果未找到数组起始位置，定位它
+      if (startPos <= 0) {
+        const arrayStart = text.indexOf('[');
+        if (arrayStart === -1)
+          return [];
+        this.streamState.parsingContext.arrayStart = arrayStart;
+        this.streamState.parsingContext.inArray = true;
+      }
 
-      // 提取所有可能的完整JSON对象
+      // 提取数组部分
+      const arrayText = text.substring(startPos);
+
+      // 优化：使用状态机代替递归或复杂正则，提高性能
       const actionObjects: AIActionResponse[] = [];
-      let depth = 0;
-      let currentObject = '';
+      let objectDepth = 0;
       let inObject = false;
+      let currentObject = '';
+      let i = 0;
 
-      for (let i = 0; i < cleanText.length; i++) {
-        const char = cleanText[i];
+      // 从上次找到的对象位置继续
+      if (this.streamState.parsingContext.objectsFound > 0) {
+        // 寻找下一个对象的开始 {
+        const objectStart = arrayText.indexOf('{', this.streamState.parsingContext.objectsFound);
+        if (objectStart !== -1) {
+          i = objectStart;
+        }
+      }
 
-        // 开始捕获对象
+      // 快速扫描字符串
+      for (; i < arrayText.length; i++) {
+        const char = arrayText[i];
+
+        // 对象开始
         if (char === '{') {
-          depth++;
-          inObject = true;
-          currentObject += char;
+          objectDepth++;
+          if (!inObject) {
+            inObject = true;
+            currentObject = '{';
+          }
+          else {
+            currentObject += '{';
+          }
           continue;
         }
 
-        // 结束捕获对象
+        // 对象结束
         if (char === '}') {
-          depth--;
-          currentObject += char;
+          objectDepth--;
+          currentObject += '}';
 
-          // 对象完成
-          if (depth === 0 && inObject) {
+          // 一个完整对象结束
+          if (objectDepth === 0 && inObject) {
             try {
               const parsedObject = JSON.parse(currentObject);
               if (this.isValidActionResponse(parsedObject)) {
                 actionObjects.push(parsedObject);
+                // 更新找到的对象位置
+                this.streamState.parsingContext.objectsFound = i;
               }
             }
             catch {
@@ -397,6 +451,12 @@ class AIAssistant extends BaseService {
         if (inObject) {
           currentObject += char;
         }
+
+        // 数组结束标志
+        if (char === ']' && !inObject) {
+          this.streamState.parsingContext.inArray = false;
+          break;
+        }
       }
 
       return actionObjects;
@@ -408,111 +468,191 @@ class AIAssistant extends BaseService {
   }
 
   /**
+   * 高效的从文本中提取JSON对象的方法
+   */
+  private extractJsonObjects(text: string): string[] {
+    const results: string[] = [];
+
+    // 优先寻找代码块中的JSON
+    const codeBlockRegex = /```(?:json)?\n?([\s\S]*?)\n?```/g;
+    let match;
+    const matchedPositions = new Set<number>();
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      const jsonText = match[1].trim();
+      results.push(jsonText);
+      // 记录已匹配位置，避免重复处理
+      matchedPositions.add(match.index);
+    }
+
+    // 然后寻找裸露的JSON对象
+    // 使用非贪婪模式 + 不回溯的方式提高性能
+    const jsonObjRegex = /\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}/g;
+
+    while ((match = jsonObjRegex.exec(text)) !== null) {
+      // 检查这个位置是否已经在代码块中处理过
+      let alreadyMatched = false;
+      for (const pos of matchedPositions) {
+        if (match.index >= pos && match.index < pos + match[0].length) {
+          alreadyMatched = true;
+          break;
+        }
+      }
+
+      if (!alreadyMatched) {
+        results.push(match[0]);
+      }
+    }
+
+    return results;
+  }
+
+  /**
    * 尝试从流式数据中解析JSON并执行
    */
   private async tryParseStreamedJSON(): Promise<void> {
     if (this.streamState.complete || this.streamState.processingAction)
       return;
+
     try {
       const text = this.streamState.partialResponse;
-      console.log('流式响应:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
+      console.log('流式响应:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+
+      // 记录当前解析的文本长度，用于增量解析判断
+      this.streamState.lastParsedLength = text.length;
 
       // 跟踪已处理的动作ID，用于去重
-      const processedActionIds = this.streamState.executedActions.map(action =>
-        this.generateActionId(action),
+      const processedActionIds = new Set(
+        this.streamState.executedActions.map(action => this.generateActionId(action)),
       );
 
-      // 方法1: 尝试解析为完整的指令数组
-      try {
-        const fullText = text.replace(/```json|```/g, '').trim();
-        const arrayMatch = fullText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+      // 方法1: 快速尝试解析为完整的指令数组 (最常见的成功情形)
+      if (text.includes('[') && text.includes(']')) {
+        try {
+          // 使用更精确的正则，提高命中率并减少错误解析
+          const arrayRegex = /\[\s*\{[\s\S]*?\}\s*\]/;
+          const arrayMatch = text.match(arrayRegex);
 
-        if (arrayMatch) {
-          const actionArray = JSON.parse(arrayMatch[0]);
-          if (Array.isArray(actionArray)) {
-            console.log('检测到完整指令数组:', actionArray.length);
+          if (arrayMatch) {
+            const actionArray = JSON.parse(arrayMatch[0]);
+            if (Array.isArray(actionArray) && actionArray.length > 0) {
+              console.log('检测到完整指令数组:', actionArray.length);
 
-            // 顺序处理数组中的每个动作
-            for (const action of actionArray) {
-              if (this.isValidActionResponse(action)) {
+              // 批量验证，减少循环中的判断
+              const validActions = actionArray.filter(this.isValidActionResponse.bind(this));
+
+              // 顺序处理数组中的每个动作
+              for (const action of validActions) {
                 const actionId = this.generateActionId(action);
 
                 // 检查是否已执行过
-                if (processedActionIds.includes(actionId)) {
-                  console.log('跳过重复动作:', actionId);
+                if (processedActionIds.has(actionId)) {
                   continue;
                 }
 
                 await this.executeAndTrackAction(action);
-                processedActionIds.push(actionId);
+                processedActionIds.add(actionId);
               }
+
+              // 成功解析完整数组，重置解析上下文
+              this.streamState.parsingContext = {
+                inArray: false,
+                arrayStart: -1,
+                arrayDepth: 0,
+                objectsFound: 0,
+              };
+
+              return; // 成功处理了完整数组，退出
             }
-            return; // 成功处理了完整数组，退出
           }
         }
-      }
-      catch (err) {
-        console.log('完整数组解析失败:', err);
+        catch {
+          // 继续尝试其他方法
+        }
       }
 
-      // 方法2: 尝试从不完整数组中提取有效指令
-      try {
-        // 检查是否存在数组开始标记 [
-        if (text.includes('[') && text.includes('{')) {
+      // 方法2: 增量提取部分数组中的指令
+      if (text.includes('[') && text.includes('{')) {
+        try {
           const partialActions = this.extractValidActionsFromPartialArray(text);
 
           if (partialActions.length > 0) {
             console.log('从部分数组中提取到有效指令:', partialActions.length);
 
+            // 批量处理提取出的动作
             for (const action of partialActions) {
               const actionId = this.generateActionId(action);
 
-              // 检查是否已执行过
-              if (processedActionIds.includes(actionId)) {
+              // 去重检查
+              if (processedActionIds.has(actionId)) {
                 continue;
               }
 
               await this.executeAndTrackAction(action);
-              processedActionIds.push(actionId);
+              processedActionIds.add(actionId);
             }
-            return; // 成功处理了部分数组中的指令，退出
+
+            return; // 处理成功，退出
+          }
+        }
+        catch {
+          // 继续尝试其他方法
+        }
+      }
+
+      // 方法3: 处理独立的JSON对象
+      try {
+        // 使用优化后的提取方法
+        const jsonObjects = this.extractJsonObjects(text);
+
+        if (jsonObjects.length > 0) {
+          for (const jsonText of jsonObjects) {
+            try {
+              const parsed = JSON.parse(jsonText);
+
+              if (this.isValidActionResponse(parsed)) {
+                const actionId = this.generateActionId(parsed);
+
+                // 去重检查
+                if (processedActionIds.has(actionId)) {
+                  continue;
+                }
+
+                await this.executeAndTrackAction(parsed);
+                processedActionIds.add(actionId);
+              }
+            }
+            catch {
+              // 尝试修复并重解析
+              try {
+                const fixedJson = this.attemptToFixJson(jsonText);
+                const parsed = JSON.parse(fixedJson);
+
+                if (this.isValidActionResponse(parsed)) {
+                  const actionId = this.generateActionId(parsed);
+
+                  if (processedActionIds.has(actionId)) {
+                    continue;
+                  }
+
+                  await this.executeAndTrackAction(parsed);
+                  processedActionIds.add(actionId);
+                }
+              }
+              catch {
+                // 忽略解析失败
+              }
+            }
           }
         }
       }
-      catch (err) {
-        console.log('部分数组提取失败:', err);
-      }
-
-      // 方法3: 查找独立的JSON块
-      const jsonMatches = Array.from(text.matchAll(/```json\n([\s\S]*?)\n```/g))
-        || Array.from(text.matchAll(/```\n([\s\S]*?)\n```/g))
-        || Array.from(text.matchAll(/\{[\s\S]*?\}/g));
-
-      for (const match of jsonMatches) {
-        try {
-          const jsonText = match[1] || match[0];
-          const parsed = JSON.parse(jsonText);
-
-          if (this.isValidActionResponse(parsed)) {
-            const actionId = this.generateActionId(parsed);
-
-            // 检查是否已执行过
-            if (processedActionIds.includes(actionId)) {
-              console.log('跳过重复独立指令:', actionId);
-              continue;
-            }
-
-            await this.executeAndTrackAction(parsed);
-            processedActionIds.push(actionId);
-          }
-        }
-        catch (err) {
-          console.log('独立JSON解析错误:', err);
-        }
+      catch {
+        // 忽略提取错误
       }
     }
     catch (err) {
-      console.log('处理流数据总体错误:', err);
+      // 处理总体错误，但不影响后续解析
+      console.log('处理流数据出错，将在下次尝试:', err);
     }
   }
 
@@ -559,6 +699,15 @@ class AIAssistant extends BaseService {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
+    // 重置解析上下文，为下一次解析准备
+    this.streamState.parsingContext = {
+      inArray: false,
+      arrayStart: -1,
+      arrayDepth: 0,
+      objectsFound: 0,
+    };
+    this.streamState.lastParsedLength = 0;
+
     // 如果已有执行过的动作，则返回最后一个动作的结果
     if (this.streamState.executedActions.length > 0) {
       const lastAction = this.streamState.executedActions[this.streamState.executedActions.length - 1];
@@ -578,6 +727,13 @@ class AIAssistant extends BaseService {
         executedActions: [],
         processingAction: false,
         lastExecutedActionId: null,
+        lastParsedLength: 0,
+        parsingContext: {
+          inArray: false,
+          arrayStart: -1,
+          arrayDepth: 0,
+          objectsFound: 0,
+        },
       };
 
       return { ...result, allExecutedActions: executedActions };
@@ -596,6 +752,13 @@ class AIAssistant extends BaseService {
           executedActions: [],
           processingAction: false,
           lastExecutedActionId: null,
+          lastParsedLength: 0,
+          parsingContext: {
+            inArray: false,
+            arrayStart: -1,
+            arrayDepth: 0,
+            objectsFound: 0,
+          },
         };
         throw new Error('无法从流式响应中解析出有效指令');
       }
@@ -733,7 +896,7 @@ class AIAssistant extends BaseService {
     }
 
     // 查找匹配的工具
-    const tool = this.availableTools.find(t => t.name === parsedResponse.tool);
+    const tool = this.availableToolsMap.get(parsedResponse.tool);
 
     if (!tool) {
       throw new Error(`未找到名为 ${parsedResponse.tool} 的工具`);

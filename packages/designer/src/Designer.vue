@@ -18,7 +18,7 @@ import {
   CONTAINER_HIGHLIGHT_CLASS,
   ContainerHighlightType,
 } from '@low-code/stage';
-import { NDialogProvider, NMessageProvider } from 'naive-ui';
+import { NDialogProvider, NMessageProvider, NModalProvider } from 'naive-ui';
 import { onBeforeUnmount, provide, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -74,15 +74,14 @@ const props = withDefaults(
     containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS,
     containerHighlightDuration: 800,
     containerHighlightType: ContainerHighlightType.DEFAULT,
-  },
+  }
 );
 
 defineEmits(['propsPanelMounted']);
 
 const modelValue = defineModel<MApp | undefined>({ required: true });
 designerService.on('root-change', async (value) => {
-  if (!value)
-    return;
+  if (!value) return;
   const nodeId = designerService.get('node')?.id || props.defaultSelected;
   let node;
   if (nodeId) {
@@ -90,11 +89,9 @@ designerService.on('root-change', async (value) => {
   }
   if (node && node !== value) {
     await designerService.select(node.id);
-  }
-  else if (value.items?.length) {
+  } else if (value.items?.length) {
     await designerService.select(value.items[0]);
-  }
-  else if (value.id) {
+  } else if (value.id) {
     designerService.set('nodes', [value]);
     designerService.set('parent', null);
     designerService.set('page', null);
@@ -120,21 +117,21 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 watch(
   () => props.propsValues,
-  values => propsService.setPropsValues(values),
+  (values) => propsService.setPropsValues(values),
   {
     immediate: true,
-  },
+  }
 );
 watch(
   () => props.componentGroupList,
-  componentGroupList => componentListService.setList(componentGroupList),
+  (componentGroupList) => componentListService.setList(componentGroupList),
   {
     immediate: true,
-  },
+  }
 );
 watch(
   () => props.eventMethodList,
@@ -152,23 +149,23 @@ watch(
   },
   {
     immediate: true,
-  },
+  }
 );
 
 watch(
   () => props.propsConfigs,
-  configs => propsService.setPropsConfigs(configs),
+  (configs) => propsService.setPropsConfigs(configs),
   {
     immediate: true,
-  },
+  }
 );
 
 watch(
   () => props.stageRect,
-  stageRect => stageRect && uiService.set('stageRect', stageRect),
+  (stageRect) => stageRect && uiService.set('stageRect', stageRect),
   {
     immediate: true,
-  },
+  }
 );
 uiService.initColumnWidth();
 
@@ -220,45 +217,47 @@ defineExpose({
 <template>
   <NMessageProvider>
     <NDialogProvider>
-      <Framework>
-        <template #header>
-          <slot name="header">
-            <NavMenu :data="menu" />
-          </slot>
-        </template>
-        <template #sidebar>
-          <slot name="sidebar">
-            <Sidebar :data="sidebar">
-              <template #layer-panel-header>
-                <slot name="layer-panel-header" />
-              </template>
+      <NModalProvider>
+        <Framework>
+          <template #header>
+            <slot name="header">
+              <NavMenu :data="menu" />
+            </slot>
+          </template>
+          <template #sidebar>
+            <slot name="sidebar">
+              <Sidebar :data="sidebar">
+                <template #layer-panel-header>
+                  <slot name="layer-panel-header" />
+                </template>
 
-              <template #component-list-panel-header>
-                <slot name="component-list-panel-header" />
-              </template>
-            </Sidebar>
-          </slot>
-        </template>
-        <template #workspace>
-          <slot name="workspace">
-            <Workspace>
-              <template #stage>
-                <slot name="stage" />
-              </template>
-              <template #workspace-content>
-                <slot name="workspace-content" />
-              </template>
-            </Workspace>
-          </slot>
-        </template>
-        <template #props-panel>
-          <slot name="props-panel">
-            <PropsPanel
-              @mounted="(instance) => $emit('propsPanelMounted', instance)"
-            />
-          </slot>
-        </template>
-      </Framework>
+                <template #component-list-panel-header>
+                  <slot name="component-list-panel-header" />
+                </template>
+              </Sidebar>
+            </slot>
+          </template>
+          <template #workspace>
+            <slot name="workspace">
+              <Workspace>
+                <template #stage>
+                  <slot name="stage" />
+                </template>
+                <template #workspace-content>
+                  <slot name="workspace-content" />
+                </template>
+              </Workspace>
+            </slot>
+          </template>
+          <template #props-panel>
+            <slot name="props-panel">
+              <PropsPanel
+                @mounted="(instance) => $emit('propsPanelMounted', instance)"
+              />
+            </slot>
+          </template>
+        </Framework>
+      </NModalProvider>
     </NDialogProvider>
   </NMessageProvider>
 </template>
