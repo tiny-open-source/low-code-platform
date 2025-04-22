@@ -46,7 +46,8 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   const setHistory = (value: ChatHistory) => {
     history.value = value;
   };
-  const selectModel = useLocalStorage('selectedModel', '');
+  const settingValue = useLocalStorage<any>('formValue', {});
+  const selectModelValue = useLocalStorage<any>('selectModel', {});
   const stopStreamingRequest = () => {
     if (abortController) {
       abortController.abort();
@@ -60,7 +61,9 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
 
     const ollama = await pageAssistModel({
       // 模型名字先写死，后续做成可配置
-      model: selectModel.value!,
+      model: selectModelValue.value.value,
+      apiKey: settingValue.value.apiKey,
+      customBaseUrl: settingValue.value.customServiceProviderBaseUrl,
       baseUrl: cleanUrl(url),
       keepAlive: undefined,
       temperature: 0.0,
@@ -100,7 +103,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         },
         {
           isBot: true,
-          name: selectModel.value!,
+          name: settingValue.value.model,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -112,7 +115,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         ...messages.value,
         {
           isBot: true,
-          name: selectModel.value!,
+          name: settingValue.value.model,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -131,10 +134,10 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
             type: 'text',
           },
         ],
-        model: selectModel.value!,
+        model: settingValue.value.model,
       });
 
-      const applicationChatHistory = generateHistory(history.value, selectModel.value!);
+      const applicationChatHistory = generateHistory(history.value, settingValue.value.model);
 
       if (prompt?.value) {
         applicationChatHistory.unshift(

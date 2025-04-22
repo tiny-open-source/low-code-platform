@@ -1,8 +1,6 @@
 /** @format */
 
-import type {
-  SelectOption,
-} from 'naive-ui';
+import type { SelectOption } from 'naive-ui';
 import { EditOutlined, SettingOutlined } from '@vicons/antd';
 import {
   NButton,
@@ -20,8 +18,21 @@ import {
   useModal,
 } from 'naive-ui';
 import { defineComponent, ref } from 'vue';
+import { generateID } from '../../db/models';
+import { getAllOpenAIModels } from '../../libs/openai';
 import { getAllModels, getOllamaURL, setOllamaURL } from '../../service/ollama';
+import { OAI_API_PROVIDERS } from '../../utils/oai-api-providers';
+import { ProviderIcons } from '../ProviderIcon';
 
+interface FormValue {
+  ollamaUrl?: string;
+  model?: string;
+  modelId?: string;
+  customServiceProvider?: string;
+  customServiceProviderName?: string;
+  customServiceProviderBaseUrl?: string;
+  apiKey?: string;
+}
 export default defineComponent({
   name: 'Header',
   components: {
@@ -37,40 +48,74 @@ export default defineComponent({
     const message = useMessage();
     const formRef = ref<InstanceType<typeof NForm>>();
     const providerFormRef = ref<InstanceType<typeof NForm>>();
-    const selectedModel = useLocalStorage('selectedModel', '');
+    const settingValueStorage = useLocalStorage<FormValue>('formValue', {
+      ollamaUrl: getOllamaURL(),
+      model: void 0,
+      modelId: void 0,
+      customServiceProvider: void 0,
+      customServiceProviderName: void 0,
+      customServiceProviderBaseUrl: void 0,
+      apiKey: void 0,
+    });
+    const selectModelStorage = useLocalStorage<any>('selectModel', {});
     const handlePositiveClick = () => {
       emit('newChat');
     };
     const models = ref();
     watchEffect(async () => {
       models.value = await getAllModels();
+
+      if (settingValueStorage.value.customServiceProviderName) {
+        const openAiModels = await getAllOpenAIModels({
+          baseUrl: settingValueStorage.value.customServiceProviderBaseUrl!,
+          apiKey: settingValueStorage.value.apiKey,
+        });
+        models.value = [
+          ...models.value,
+          ...openAiModels.map(model => ({
+            name: model.id,
+            model: model.id,
+            label: model.id,
+            value: `${model.id}_${generateID()}`,
+            modified_at: '',
+            provider:
+              OAI_API_PROVIDERS.find(provider => provider.value === model.id)
+                ?.value || 'custom',
+            size: 0,
+            digest: '',
+            details: {
+              parent_model: '',
+              format: '',
+              family: '',
+              families: [],
+              parameter_size: '',
+              quantization_level: '',
+            },
+          })),
+        ];
+      }
     });
-    const rules = {
+    const settingRules = {
       ollamaUrl: {
         required: true,
         trigger: ['input', 'blur'],
         message: '请输入 Ollama URL',
       },
     };
-    const formValue = ref<{
-      ollamaUrl?: string;
-      model?: string;
-    }>({
-      ollamaUrl: getOllamaURL(),
-      model: selectedModel.value || void 0,
-    });
 
-    const formServiceProviderValue = ref<{
-      customServicePrivider?: string;
-      customServicePrividerName?: string;
-      customServicePrividerBaseUrl?: string;
-      apiKey?: string;
-    }>({
-      customServicePrivider: void 0,
-      customServicePrividerName: void 0,
-      customServicePrividerBaseUrl: void 0,
-      apiKey: void 0,
-    });
+    const settingProviderRules = {
+      customServiceProviderName: {
+        required: true,
+        trigger: ['input', 'blur'],
+        message: '请输入提供商名称',
+      },
+      customServiceProviderBaseUrl: {
+        required: true,
+        trigger: ['input', 'blur'],
+        message: '请输入基础URL',
+      },
+    };
+    const formValue = ref<FormValue>(settingValueStorage.value);
     const handleServiceProviderAdd = () => {
       modal.create({
         preset: 'dialog',
@@ -80,26 +125,24 @@ export default defineComponent({
             <NForm
               class="lc-llm-chat-header__settings-form"
               ref={providerFormRef}
-              rules={rules}
-              model={formServiceProviderValue.value}
+              rules={settingProviderRules}
+              model={formValue.value}
             >
-              <NFormItem label="服务提供商" path="customServicePrivider">
+              <NFormItem label="服务提供商" path="customServiceProvider">
                 <NSelect
-                  value={formServiceProviderValue.value.customServicePrivider}
-                  options={[
-                    {
-                      label: 'Custom',
-                      value: 'Custom',
-                    },
-                    {
-                      label: 'SiliconFlow',
-                      value: 'SiliconFlow',
-                    },
-                    {
-                      label: 'OpenAI',
-                      value: 'OpenAI',
-                    },
-                  ]}
+                  value={formValue.value.customServiceProvider}
+                  options={OAI_API_PROVIDERS}
+                  onUpdate:value={(e) => {
+                    const value = OAI_API_PROVIDERS.find(
+                      item => item.value === e,
+                    );
+                    formValue.value = {
+                      ...formValue.value,
+                      customServiceProvider: value?.value,
+                      customServiceProviderName: value?.label,
+                      customServiceProviderBaseUrl: value?.baseUrl,
+                    };
+                  }}
                   renderLabel={(option: SelectOption) => (
                     <div
                       style={{
@@ -109,49 +152,43 @@ export default defineComponent({
                       }}
                     >
                       <NIcon>
-                        <EditOutlined />
+                        <ProviderIcons
+                          provider={String(option.value)}
+                          className="size-5"
+                        />
                       </NIcon>
                       {option.label}
                     </div>
                   )}
-                  onChange={(value) => {
-                    formServiceProviderValue.value.customServicePrivider
-                      = value;
-                  }}
                 >
                 </NSelect>
               </NFormItem>
-              <NFormItem label="提供商名称" path="customServicePrividerName">
+              <NFormItem label="提供商名称" path="customServiceProviderName">
                 <NInput
-                  value={
-                    formServiceProviderValue.value.customServicePrividerName
-                  }
+                  value={formValue.value.customServiceProviderName}
                   placeholder="输入提供商名称"
                   onInput={(value) => {
-                    formServiceProviderValue.value.customServicePrividerName
-                      = value;
+                    formValue.value.customServiceProviderName = value;
                   }}
                 />
               </NFormItem>
-              <NFormItem label="基础 URL" path="customServicePrividerBaseUrl">
+              <NFormItem label="基础 URL" path="customServiceProviderBaseUrl">
                 <NInput
-                  value={
-                    formServiceProviderValue.value.customServicePrividerBaseUrl
-                  }
+                  value={formValue.value.customServiceProviderBaseUrl}
                   placeholder="输入 基础 URL"
                   onInput={(value) => {
                     formValue.value.ollamaUrl = value;
                   }}
                 />
               </NFormItem>
-              <NFormItem label="API 密钥" path="customServicePrividerBaseUrl">
+              <NFormItem label="API 密钥" path="apiKey">
                 <NInput
                   type="password"
                   showPasswordToggle
-                  value={formServiceProviderValue.value.apiKey}
+                  value={formValue.value.apiKey}
                   placeholder="输入 API 密钥"
                   onInput={(value) => {
-                    formServiceProviderValue.value.apiKey = value;
+                    formValue.value.apiKey = value;
                   }}
                 />
               </NFormItem>
@@ -186,7 +223,7 @@ export default defineComponent({
             <NForm
               class="lc-llm-chat-header__settings-form"
               ref={formRef}
-              rules={rules}
+              rules={settingRules}
               model={formValue.value}
             >
               <NFormItem label="Ollama URL" path="ollamaUrl">
@@ -230,6 +267,11 @@ export default defineComponent({
           const res = await formRef.value?.validate();
           if (!res?.warnings) {
             message.success('验证成功');
+            const selectedModel = models.value.find(
+              (model: any) => model.value === formValue.value.model,
+            );
+            selectModelStorage.value = selectedModel;
+            settingValueStorage.value = formValue.value;
           }
           else {
             console.log(res?.warnings);
@@ -237,7 +279,6 @@ export default defineComponent({
             return false;
           }
           setOllamaURL(formValue.value.ollamaUrl!);
-          selectedModel.value = formValue.value.model!;
           emit('saveSettings', formValue.value);
         },
         onNegativeClick: () => {

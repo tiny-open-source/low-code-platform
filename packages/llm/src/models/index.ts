@@ -5,6 +5,8 @@ import { CustomChatOpenAI } from './CustomChatOpenAI';
 
 export async function pageAssistModel({
   model,
+  apiKey,
+  customBaseUrl,
   baseUrl,
   keepAlive,
   temperature,
@@ -24,6 +26,8 @@ export async function pageAssistModel({
   useMlock,
 }: {
   model: string;
+  apiKey?: string;
+  customBaseUrl?: string;
   baseUrl: string;
   keepAlive?: string;
   temperature?: number;
@@ -44,15 +48,17 @@ export async function pageAssistModel({
 }) {
   const isCustom = isCustomModel(model);
   if (isCustom) {
+    const selectModelValue = useLocalStorage<any>('selectModel', {});
+
     return new CustomChatOpenAI({
-      modelName: model,
-      openAIApiKey: 'sk-wqzwhlgzlqtpxkuyauddasdrikgckebavajsdfscqrxnzwld',
+      modelName: selectModelValue.value.model,
+      openAIApiKey: apiKey,
       temperature,
       topP,
       maxTokens: numPredict,
       configuration: {
-        apiKey: 'sk-wqzwhlgzlqtpxkuyauddasdrikgckebavajsdfscqrxnzwld',
-        baseURL: 'https://api.siliconflow.cn/v1',
+        apiKey,
+        baseURL: customBaseUrl,
         defaultHeaders: getCustomHeaders({
           headers: [],
         }),
