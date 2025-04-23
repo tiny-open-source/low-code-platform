@@ -3,6 +3,7 @@ import { cleanUrl } from '../libs/clean-url';
 const DEFAULT_OLLAMA_URL = 'https://frp-web.hgyn23.cn';
 export function getOllamaURL() {
   const ollamaURL = localStorage.getItem('ollamaURL');
+
   if (!ollamaURL || ollamaURL.length === 0) {
     return DEFAULT_OLLAMA_URL;
   }

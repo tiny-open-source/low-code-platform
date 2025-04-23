@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
+import type { ModelParams } from '../models';
 import { SystemMessage } from '@langchain/core/messages';
-import { useLocalStorage } from '@vueuse/core';
 import { ref } from 'vue';
 import { generateID } from '../db';
 import { cleanUrl } from '../libs/clean-url';
@@ -10,6 +10,7 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { getOllamaURL } from '../service/ollama';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
+import { useLLMSettings, useModelConfig } from '../utils/storage';
 
 export interface Message {
   isBot: boolean;
@@ -28,70 +29,119 @@ export type ChatHistory = {
   image?: string;
   messageType?: string;
 }[];
+
+/**
+ * 创建聊天对话处理钩子
+ * @param options 选项配置
+ * @returns 聊天对话处理方法和状态
+ */
 export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRef<string> }) {
+  // 状态管理
   const streaming = ref(false);
+  const isProcessing = ref(false);
+  const messages = ref<Message[]>([]);
+  const history = ref<ChatHistory>([]);
+
+  // 配置存储
+  const llmSettings = useLLMSettings();
+  const modelConfig = useModelConfig();
+
+  // 控制器
+  let abortController: AbortController | undefined;
+
+  /**
+   * 设置流式传输状态
+   * @param value 状态值
+   */
   const setStreaming = (value: boolean) => {
     streaming.value = value;
   };
-  const isProcessing = ref(false);
+
+  /**
+   * 设置处理中状态
+   * @param value 状态值
+   */
   const setIsProcessing = (value: boolean) => {
     isProcessing.value = value;
   };
-  const messages = ref<Message[]>([]);
+
+  /**
+   * 更新消息列表
+   * @param message 消息列表
+   */
   const setMessages = (message: Message[]) => {
     messages.value = message;
   };
-  let abortController: AbortController | undefined;
-  const history = ref<ChatHistory>([]);
+
+  /**
+   * 更新历史记录
+   * @param value 历史记录
+   */
   const setHistory = (value: ChatHistory) => {
     history.value = value;
   };
-  const settingValue = useLocalStorage<any>('formValue', {});
-  const selectModelValue = useLocalStorage<any>('selectModel', {});
+
+  /**
+   * 停止流式请求
+   */
   const stopStreamingRequest = () => {
     if (abortController) {
       abortController.abort();
       abortController = undefined;
     }
   };
-  const normalChatMode = async (message: string, isRegenerate: boolean, messages: Ref<Message[]>, history: Ref<ChatHistory>, signal: AbortSignal,
+
+  /**
+   * 常规聊天模式处理
+   * @param message 消息内容
+   * @param isRegenerate 是否重新生成
+   * @param messages 消息状态
+   * @param history 历史记录状态
+   * @param signal 中断信号
+   */
+  const normalChatMode = async (
+    message: string,
+    isRegenerate: boolean,
+    messages: Ref<Message[]>,
+    history: Ref<ChatHistory>,
+    signal: AbortSignal,
   ) => {
     const url = await getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
 
-    const ollama = await pageAssistModel({
-      // 模型名字先写死，后续做成可配置
-      model: selectModelValue.value.value,
-      apiKey: settingValue.value.apiKey,
-      customBaseUrl: settingValue.value.customServiceProviderBaseUrl,
+    // 合并模型设置
+    const modelParams: ModelParams = {
+      // 使用模型配置
+      model: modelConfig.value.value,
+      apiKey: llmSettings.value.apiKey,
+      customBaseUrl: llmSettings.value.customServiceProviderBaseUrl,
       baseUrl: cleanUrl(url),
+      // 默认配置
       keepAlive: undefined,
       temperature: 0.0,
+      // 使用用户默认配置
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
-      numCtx: 8192, // 影响的是模型可以一次记住的最大 token 数量。
+      numCtx: 8192, // 影响的是模型可以一次记住的最大 token 数量
       seed: undefined,
-      numGpu:
-         userDefaultModelSettings?.numGpu,
-      numPredict: 4096, // 影响模型最大可以生成的 token 数量。
-      useMMap:
-        userDefaultModelSettings?.useMMap,
+      numGpu: userDefaultModelSettings?.numGpu,
+      numPredict: 4096, // 影响模型最大可以生成的 token 数量
+      useMMap: userDefaultModelSettings?.useMMap,
       minP: userDefaultModelSettings?.minP,
-      repeatLastN:
-       userDefaultModelSettings?.repeatLastN,
-      repeatPenalty:
-       userDefaultModelSettings?.repeatPenalty,
+      repeatLastN: userDefaultModelSettings?.repeatLastN,
+      repeatPenalty: userDefaultModelSettings?.repeatPenalty,
       tfsZ: userDefaultModelSettings?.tfsZ,
       numKeep: userDefaultModelSettings?.numKeep,
-      numThread:
-        userDefaultModelSettings?.numThread,
-      useMlock:
-       userDefaultModelSettings?.useMlock,
-    });
+      numThread: userDefaultModelSettings?.numThread,
+      useMlock: userDefaultModelSettings?.useMlock,
+    };
+
+    const ollama = await pageAssistModel(modelParams);
 
     let newMessage: Message[] = [];
     const generateMessageId = generateID();
 
+    // 准备消息数据
     if (!isRegenerate) {
       newMessage = [
         ...messages.value,
@@ -103,7 +153,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         },
         {
           isBot: true,
-          name: settingValue.value.model,
+          name: llmSettings.value.model!,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -115,7 +165,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         ...messages.value,
         {
           isBot: true,
-          name: settingValue.value.model,
+          name: llmSettings.value.model!,
           message: '▋',
           sources: [],
           id: generateMessageId,
@@ -123,10 +173,12 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
       ];
     }
     setMessages(newMessage);
+
     let fullText = '';
     let timetaken = 0;
 
     try {
+      // 格式化人类消息
       const humanMessage = await humanMessageFormatter({
         content: [
           {
@@ -134,11 +186,13 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
             type: 'text',
           },
         ],
-        model: settingValue.value.model,
+        model: llmSettings.value.model!,
       });
 
-      const applicationChatHistory = generateHistory(history.value, settingValue.value.model);
+      // 生成聊天历史
+      const applicationChatHistory = generateHistory(history.value, llmSettings.value.model!);
 
+      // 添加系统提示
       if (prompt?.value) {
         applicationChatHistory.unshift(
           new SystemMessage({
@@ -149,6 +203,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
 
       let generationInfo: any | undefined;
 
+      // 发起流式请求
       const chunks = await ollama.stream(
         [...applicationChatHistory, humanMessage],
         {
@@ -168,6 +223,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         },
       );
 
+      // 处理流式响应
       let count = 0;
       let reasoningStartTime: Date | null = null;
       let reasoningEndTime: Date | null = null;
@@ -191,6 +247,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
 
         fullText += chunk?.content;
 
+        // 计算推理时间
         if (isReasoningStarted(fullText) && !reasoningStartTime) {
           reasoningStartTime = new Date();
         }
@@ -206,9 +263,12 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
           timetaken = reasoningTime;
         }
 
+        // 更新界面
         if (count === 0) {
           setIsProcessing(true);
         }
+
+        // 更新消息内容
         setMessages(messages.value.map((message) => {
           if (message.id === generateMessageId) {
             return {
@@ -222,6 +282,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         count++;
       }
 
+      // 完成后更新最终消息
       setMessages(messages.value.map((message) => {
         if (message.id === generateMessageId) {
           return {
@@ -234,6 +295,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         return message;
       }));
 
+      // 更新历史记录
       setHistory([
         ...history.value,
         {
@@ -246,6 +308,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         },
       ]);
 
+      // 重置状态
       setIsProcessing(false);
       setStreaming(false);
     }
@@ -258,6 +321,11 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
       abortController = undefined;
     }
   };
+
+  /**
+   * 提交聊天消息
+   * @param options 提交选项
+   */
   const onSubmit = async ({
     message,
     isRegenerate = false,
@@ -271,6 +339,8 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   }) => {
     setStreaming(true);
     let signal: AbortSignal;
+
+    // 创建或使用控制器
     if (!controller) {
       abortController = new AbortController();
       signal = abortController.signal;
@@ -280,6 +350,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
       signal = controller.signal;
     }
 
+    // 处理消息
     await normalChatMode(
       message,
       isRegenerate,
