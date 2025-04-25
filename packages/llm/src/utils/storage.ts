@@ -16,6 +16,7 @@ export interface LLMSettings {
   customServiceProviderName?: string;
   customServiceProviderBaseUrl?: string;
   apiKey?: string;
+  prompt?: string;
 }
 
 export interface ModelSettings {
@@ -54,7 +55,7 @@ export interface ModelSettings {
 
 // 存储键名常量
 export const STORAGE_KEYS = {
-  FORM_SETTINGS: 'formValue',
+  FORM_SETTINGS: 'settingValue',
   SELECT_MODEL: 'selectModel',
   MODEL_SETTINGS: 'modelSettings',
 };
@@ -90,6 +91,7 @@ export function useLLMSettings() {
     customServiceProviderName: '',
     customServiceProviderBaseUrl: '',
     apiKey: '',
+    prompt: '',
   });
 }
 
