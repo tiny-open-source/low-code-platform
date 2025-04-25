@@ -17,6 +17,7 @@ export interface Message {
   name: string;
   message: string;
   sources: any[];
+  images?: string[];
   reasoning_time_taken?: number;
   id?: string;
   messageType?: string;
@@ -94,6 +95,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   /**
    * 常规聊天模式处理
    * @param message 消息内容
+   * @param image 图片内容
    * @param isRegenerate 是否重新生成
    * @param messages 消息状态
    * @param history 历史记录状态
@@ -101,6 +103,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
    */
   const normalChatMode = async (
     message: string,
+    image: string,
     isRegenerate: boolean,
     messages: Ref<Message[]>,
     history: Ref<ChatHistory>,
@@ -108,7 +111,11 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
   ) => {
     const url = await getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
+    console.log(image);
 
+    if (image.length > 0) {
+      image = `data:image/jpeg;base64,${image.split(',')[1]}`;
+    }
     // 合并模型设置
     const modelParams: ModelParams = {
       // 使用模型配置
@@ -149,6 +156,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
           isBot: false,
           name: 'You',
           message,
+          images: [image],
           sources: [],
         },
         {
@@ -179,7 +187,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
 
     try {
       // 格式化人类消息
-      const humanMessage = await humanMessageFormatter({
+      let humanMessage = await humanMessageFormatter({
         content: [
           {
             text: message,
@@ -188,9 +196,23 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         ],
         model: llmSettings.value.model!,
       });
-
+      if (image.length > 0) {
+        humanMessage = await humanMessageFormatter({
+          content: [
+            {
+              text: message,
+              type: 'text',
+            },
+            {
+              image_url: image,
+              type: 'image_url',
+            },
+          ],
+          model: llmSettings.value.model!,
+        });
+      }
       // 生成聊天历史
-      const applicationChatHistory = generateHistory(history.value, llmSettings.value.model!);
+      const applicationChatHistory = generateHistory(history.value, modelConfig.value.value);
 
       // 添加系统提示
       if (prompt?.value) {
@@ -301,6 +323,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
         {
           role: 'user',
           content: message,
+          image,
         },
         {
           role: 'assistant',
@@ -328,10 +351,12 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
    */
   const onSubmit = async ({
     message,
+    image,
     isRegenerate = false,
     controller,
   }: {
     message: string;
+    image: string;
     isRegenerate?: boolean;
     messages?: Ref<Message[]>;
     memory?: ChatHistory;
@@ -353,6 +378,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
     // 处理消息
     await normalChatMode(
       message,
+      image,
       isRegenerate,
       messages,
       history,

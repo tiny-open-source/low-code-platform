@@ -76,7 +76,43 @@
       width: 100%;
     }
   }
+  &__image-wrapper {
+    border-bottom: 1px solid #d1d5db;
+    position: relative;
+  }
+  &__image-wrapper-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 100%;
+    color: black;
 
+    &:hover {
+      background-color: #f3f4f6;
+    }
+  }
+
+  &__image-wrapper-close-button {
+    width: 20px;
+    height: 20px;
+  }
+  &__image {
+    border-radius: 20px;
+    max-height: 100px;
+    width: auto;
+  }
+  .hidden {
+    display: none;
+  }
+  .block {
+    display: block;
+  }
   &__input-container {
     width: 100%;
     display: flex;

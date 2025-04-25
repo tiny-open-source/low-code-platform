@@ -1,8 +1,16 @@
+/** @format */
+
 import type { PropType } from 'vue';
 import { useDynamicTextareaSize } from '@low-code/llm';
-import { EnterOutlined, QuestionCircleOutlined, StopOutlined } from '@vicons/antd';
-import { NButton, NIcon, NTooltip } from 'naive-ui';
+import {
+  EnterOutlined,
+  QuestionCircleOutlined,
+  StopOutlined,
+  CloseCircleOutlined as X,
+} from '@vicons/antd';
+import { NButton, NIcon, NImage, NTooltip } from 'naive-ui';
 import { defineComponent, ref } from 'vue';
+import { toBase64 } from '../../libs/to-base64';
 
 export default defineComponent({
   name: 'TextAreaForm',
@@ -20,7 +28,9 @@ export default defineComponent({
   setup(props, { emit, expose }) {
     const form = ref<HTMLFormElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
-    const message = ref(`Select page
+    const inputRef = ref<HTMLInputElement>();
+    const formValue = reactive({
+      message: `Select page
 Add container
 Update container, style={left:0,top:0,width:1024,height:600,backgroundColor:'#ffffff'}
 Select container
@@ -44,14 +54,17 @@ Update container, style={left:0,top:60,width:400,height:540,backgroundColor:'#ff
 Select container (left section)
 Add text
 Update text, style={left:10,top:10,width:380,height:30,fontSize:24,fontWeight:'bold',color:'#1a1a1a'}
-Update text, text="12床 孙思达"`);
+Update text, text="12床 孙思达"`,
+      image: '',
+    });
     // 文本框聚焦
     const focus = () => {
       textareaRef.value?.focus();
     };
     // 重置表单状态
     const resetFormState = () => {
-      message.value = '';
+      formValue.message = '';
+      formValue.image = '';
     };
     const handleSubmit = async (e: Event) => {
       if (props.status === 'disabled' || props.status === 'pending')
@@ -63,9 +76,12 @@ Update text, text="12床 孙思达"`);
         return;
       }
 
+      emit('submit', {
+        message: val.trim(),
+        image: formValue.image,
+      });
       resetFormState();
       focus();
-      emit('submit', val.trim());
     };
 
     // 键盘按键处理
@@ -85,25 +101,65 @@ Update text, text="12床 孙思达"`);
         if (!val || val.trim().length === 0) {
           return;
         }
-
+        emit('submit', {
+          message: val.trim(),
+          image: formValue.image,
+        });
         resetFormState();
         focus();
-        emit('submit', val.trim());
       }
     };
 
     const handleStop = () => {
       emit('stop');
     };
+
+    const onInputChange = async (e: any) => {
+      if (e instanceof File) {
+        const base64 = await toBase64(e);
+
+        formValue.image = base64;
+      }
+      else {
+        if (e.target?.files) {
+          const base64 = await toBase64(e.target.files[0]);
+          formValue.image = base64;
+        }
+      }
+    };
     expose({
       focus,
     });
     // 动态调整文本框大小
-    useDynamicTextareaSize(textareaRef, message, 150);
+    useDynamicTextareaSize(textareaRef, toRef(formValue, 'message'), 150);
 
     return () => (
       <div class="lc-llm-input-area">
         <div class="lc-llm-input-area__container">
+          <div
+            class={`lc-llm-input-area__image-wrapper ${
+              formValue.image === '' ? 'hidden' : 'block'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                formValue.image = '';
+                inputRef.value!.value = '';
+              }}
+              class="lc-llm-input-area__image-wrapper-button"
+            >
+              <X class="lc-llm-input-area__image-wrapper-close-button" />
+            </button>
+            {' '}
+            <NImage
+              objectFit="contain"
+              src={formValue.image}
+              alt="Uploaded Image"
+              previewDisabled
+              class="lc-llm-input-area__image"
+            />
+          </div>
           <div class="lc-llm-input-area__wrapper">
             <div class="lc-llm-input-area__form-container">
               <div class="lc-llm-input-area__form-wrapper">
@@ -116,9 +172,12 @@ Update text, text="12床 孙思达"`);
                     <input
                       id="file-upload"
                       name="file-upload"
+                      ref={inputRef}
                       type="file"
-                      class="sr-only"
+                      class="hidden"
                       accept="image/*"
+                      multiple={false}
+                      onChange={onInputChange}
                     />
                     <div class="lc-llm-input-area__input-container">
                       <textarea
@@ -130,7 +189,7 @@ Update text, text="12床 孙思达"`);
                         placeholder="提出你的要求"
                         style={{ minHeight: '30px' }}
                         onKeydown={handleKeyDown}
-                        v-model={message.value}
+                        v-model={formValue.message}
                       />
 
                       <div class="lc-llm-input-area__controls">
@@ -156,7 +215,24 @@ Update text, text="12床 孙思达"`);
                         </div>
 
                         <div class="lc-llm-input-area__button-group">
-                          <div class="ant-space-compact css-dev-only-do-not-override-xjks6i ant-space-compact-block ant-dropdown-button !justify-end !w-auto">
+                          <div>
+                            <NButton
+                              size="small"
+                              type="info"
+                              disabled={props.status === 'disabled'}
+                              onClick={() => inputRef.value?.click()}
+                              v-slots={{
+                                icon: () => (
+                                  <NIcon size="small">
+                                    <EnterOutlined />
+                                  </NIcon>
+                                ),
+                              }}
+                            >
+                              上传图片
+                            </NButton>
+                          </div>
+                          <div>
                             {!(props.status === 'pending')
                               ? (
                                   <NButton
@@ -172,11 +248,9 @@ Update text, text="12床 孙思达"`);
                                       ),
                                     }}
                                   >
-                                    {
-                                      props.status !== 'disabled'
-                                        ? '提交'
-                                        : '未连接'
-                                    }
+                                    {props.status !== 'disabled'
+                                      ? '提交'
+                                      : '未连接'}
                                   </NButton>
                                 )
                               : (
@@ -194,7 +268,7 @@ Update text, text="12床 孙思达"`);
                                   >
                                     停止
                                   </NButton>
-                                ) }
+                                )}
                           </div>
                         </div>
                       </div>
@@ -205,7 +279,6 @@ Update text, text="12床 孙思达"`);
             </div>
           </div>
         </div>
-        <p class="lc-llm-input-area__footer">注：大模型使用 deepseek-r1:14b， 仅供测试。</p>
       </div>
     );
   },

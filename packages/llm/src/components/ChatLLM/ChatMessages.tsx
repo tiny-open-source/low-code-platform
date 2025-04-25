@@ -3,6 +3,7 @@ import type { PropType } from 'vue';
 import { parseReasoning } from '@low-code/llm';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
+import { NImage } from 'naive-ui';
 import { defineComponent } from 'vue';
 import ThinkingArea from './ThinkingArea';
 
@@ -51,12 +52,17 @@ export default defineComponent({
                     return <div class="prose dark:prose-invert lc-llm-chat-messages__text" innerHTML={renderMarkdown(e.content)} />;
                   })
                 : (
-                    <p
-                      class={`prose dark:prose-invert lc-llm-chat-messages__text lc-llm-chat-messages__text--user ${
-                        message.messageType ? 'lc-llm-chat-messages__text--user-system' : ''}`}
-                    >
-                      {message.message}
-                    </p>
+                    <div>
+                      <div
+                        class={`prose dark:prose-invert lc-llm-chat-messages__text lc-llm-chat-messages__text--user ${
+                          message.messageType ? 'lc-llm-chat-messages__text--user-system' : ''}`}
+                      >
+                        {message.message}
+                      </div>
+                      {message.images?.[0]
+                        ? <NImage src={message.images[0]}></NImage>
+                        : null}
+                    </div>
                   )}
             </div>
           </div>

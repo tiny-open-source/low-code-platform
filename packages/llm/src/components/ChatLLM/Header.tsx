@@ -17,7 +17,7 @@ import {
   useMessage,
   useModal,
 } from 'naive-ui';
-import { defineComponent, ref, watchEffect } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { generateID } from '../../db/models';
 import { getAllOpenAIModels } from '../../libs/openai';
 import { getAllModels, getOllamaURL, setOllamaURL } from '../../service/ollama';
@@ -42,37 +42,43 @@ export default defineComponent({
     NCollapseItem,
   },
   props: {},
-  emits: ['newChat', 'saveSettings'],
-  setup(props, { emit }) {
+  emits: ['newChat', 'settingSave'],
+  async setup(props, { emit }) {
     const modal = useModal();
     const message = useMessage();
     const formRef = ref<InstanceType<typeof NForm>>();
     const providerFormRef = ref<InstanceType<typeof NForm>>();
-    const settingValueStorage = useLocalStorage<FormValue>('formValue', {
-      ollamaUrl: getOllamaURL(),
-      model: '',
-      modelId: '',
-      customServiceProvider: 'custom',
-      customServiceProviderName: '',
-      customServiceProviderBaseUrl: '',
-      apiKey: '',
-    }, {
-      mergeDefaults: true,
-    });
-    const formValue = ref<FormValue>(JSON.parse(JSON.stringify(settingValueStorage.value)));
-    console.log(formValue);
+    const settingValueStorage = useLocalStorage<FormValue>(
+      'formValue',
+      {
+        ollamaUrl: getOllamaURL(),
+        model: '',
+        modelId: '',
+        customServiceProvider: 'custom',
+        customServiceProviderName: '',
+        customServiceProviderBaseUrl: '',
+        apiKey: '',
+      },
+      {
+        mergeDefaults: true,
+      },
+    );
+    const formValue = ref<FormValue>(
+      JSON.parse(JSON.stringify(settingValueStorage.value)),
+    );
 
     const selectModelStorage = useLocalStorage<any>('selectModel', {});
     const handlePositiveClick = () => {
       emit('newChat');
     };
-    const models = ref<any[]>([]);
-    watchEffect(async () => {
-      try {
-        models.value = await getAllModels();
-        // 显式访问这些属性，确保它们被依赖收集系统跟踪
-        console.log(formValue.value);
-
+    const localModels = ref(await getAllModels());
+    const customModels = ref<any[]>([]);
+    const models = computed(() => {
+      return [...localModels.value, ...customModels.value];
+    });
+    watch(
+      [() => formValue.value.customServiceProviderBaseUrl, () => formValue.value.apiKey],
+      async () => {
         const baseUrl = formValue.value.customServiceProviderBaseUrl;
         const apiKey = formValue.value.apiKey;
         if (baseUrl && apiKey) {
@@ -80,36 +86,33 @@ export default defineComponent({
             baseUrl: formValue.value.customServiceProviderBaseUrl!,
             apiKey: formValue.value.apiKey,
           });
-          models.value = [
-            ...models.value,
-            ...openAiModels.map(model => ({
-              name: model.id,
-              model: model.id,
-              label: model.id,
-              value: `${model.id}_${generateID()}`,
-              modified_at: '',
-              provider:
-                OAI_API_PROVIDERS.find(
-                  provider => provider.value === model.id,
-                )?.value || 'custom',
-              size: 0,
-              digest: '',
-              details: {
-                parent_model: '',
-                format: '',
-                family: '',
-                families: [],
-                parameter_size: '',
-                quantization_level: '',
-              },
-            })),
-          ];
+          customModels.value = openAiModels.map(model => ({
+            name: model.id,
+            model: model.id,
+            label: model.id,
+            value: `${model.id}_${generateID()}`,
+            modified_at: '',
+            provider:
+              OAI_API_PROVIDERS.find(
+                provider => provider.value === model.id,
+              )?.value || 'custom',
+            size: 0,
+            digest: '',
+            details: {
+              parent_model: '',
+              format: '',
+              family: '',
+              families: [],
+              parameter_size: '',
+              quantization_level: '',
+            },
+          }));
         }
-      }
-      catch (err) {
-        console.log(err);
-      }
-    });
+      },
+      {
+        immediate: true,
+      },
+    );
     const settingRules = {
       ollamaUrl: {
         required: true,
@@ -201,7 +204,6 @@ export default defineComponent({
                   placeholder="输入 API 密钥"
                   onUpdateValue={(value) => {
                     formValue.value.apiKey = value;
-                    console.log('改变');
                   }}
                 />
               </NFormItem>
@@ -220,7 +222,6 @@ export default defineComponent({
           }
         },
         onNegativeClick: () => {
-          message.info('取消设置');
         },
         positiveText: '保存',
         negativeText: '取消',
@@ -249,7 +250,7 @@ export default defineComponent({
                 />
               </NFormItem>
 
-              <NFormItem label="选择模型" path="customServicePrivider">
+              <NFormItem label="选择模型" path="customServiceProvider">
                 <NSelect
                   value={formValue.value.model || void 0}
                   options={models.value}
@@ -292,10 +293,9 @@ export default defineComponent({
             return false;
           }
           setOllamaURL(formValue.value.ollamaUrl!);
-          emit('saveSettings', formValue.value);
+          emit('settingSave', formValue.value);
         },
         onNegativeClick: () => {
-          message.info('取消设置');
         },
         positiveText: '保存',
         negativeText: '取消',

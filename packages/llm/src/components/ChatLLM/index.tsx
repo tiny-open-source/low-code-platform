@@ -2,7 +2,7 @@
 
 import type { Services } from '@low-code/designer';
 import { NScrollbar } from 'naive-ui';
-import { defineComponent } from 'vue';
+import { defineComponent, Suspense } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import Messages from './ChatMessages';
@@ -53,10 +53,11 @@ export default defineComponent({
     });
 
     // 发送消息
-    const sendMessage = async ({ message }: { message: string }) => {
+    const sendMessage = async ({ message, image }: { message: string;image: string }) => {
       try {
         await onSubmit({
           message,
+          image,
         });
       }
       catch (error) {
@@ -66,9 +67,10 @@ export default defineComponent({
     };
 
     // 处理表单提交
-    const handleSubmit = async (message: string) => {
+    const handleSubmit = async ({ message, image }: { message: string; image: string }) => {
       await sendMessage({
         message,
+        image,
       });
     };
     const handleNewChat = () => {
@@ -82,7 +84,7 @@ export default defineComponent({
     };
     return () => (
       <div class="lc-llm-chat-form">
-        <Header onNewChat={handleNewChat} onSaveSettings={handleSaveSettings}></Header>
+        <Suspense><Header onNewChat={handleNewChat} onSettingSave={handleSaveSettings}></Header></Suspense>
         <OllamaStatusIndicator
           style={{ display: messages.value.length > 0 ? 'none' : 'flex' }}
           status={ollamaStatus.value}
