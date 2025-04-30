@@ -44,6 +44,7 @@ export async function getAllModels() {
     return json.models.map((model: any) => {
       return {
         ...model,
+        name: model.name,
         nickname: model.name,
         label: model.name,
         value: model.name,

@@ -6,6 +6,8 @@ export interface ModelConfig {
   value: string;
   provider?: string;
   label?: string;
+  customModelName: string;
+  name: string;
 }
 
 export interface LLMSettings {
@@ -67,7 +69,9 @@ export const STORAGE_KEYS = {
  * @returns 响应式存储对象
  */
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  return _useLocalStorage<T>(key, initialValue);
+  return _useLocalStorage<T>(key, initialValue, {
+    mergeDefaults: true,
+  });
 }
 
 /**

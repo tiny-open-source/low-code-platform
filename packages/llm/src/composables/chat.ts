@@ -119,7 +119,7 @@ export function useMessageOption({ prompt }: { prompt?: Ref<string> | ComputedRe
     // 合并模型设置
     const modelParams: ModelParams = {
       // 使用模型配置
-      model: modelConfig.value.value,
+      model: modelConfig.value.name,
       apiKey: llmSettings.value.apiKey,
       customBaseUrl: llmSettings.value.customServiceProviderBaseUrl,
       baseUrl: cleanUrl(url),

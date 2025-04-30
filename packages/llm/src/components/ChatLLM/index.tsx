@@ -2,12 +2,12 @@
 
 import type { Services } from '@low-code/designer';
 import { NScrollbar } from 'naive-ui';
-import { defineComponent, Suspense } from 'vue';
+import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
+import Header from './ChatHeader';
+import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
-import Header from './Header';
-import TextAreaForm from './InputArea';
 import OllamaStatusIndicator from './OllamaStatusIndicator';
 
 export default defineComponent({
@@ -79,12 +79,12 @@ export default defineComponent({
       // 重新聚焦输入框
       (textAreaFormRef.value as any)?.focus();
     };
-    const handleSaveSettings = () => {
+    const handleSettingSaved = () => {
       handleNewChat();
     };
     return () => (
       <div class="lc-llm-chat-form">
-        <Suspense><Header onNewChat={handleNewChat} onSettingSave={handleSaveSettings}></Header></Suspense>
+        <Header onNewChat={handleNewChat} onSettingSaved={handleSettingSaved} />
         <OllamaStatusIndicator
           style={{ display: messages.value.length > 0 ? 'none' : 'flex' }}
           status={ollamaStatus.value}
