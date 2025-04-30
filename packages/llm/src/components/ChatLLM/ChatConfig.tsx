@@ -43,7 +43,6 @@ export default defineComponent({
     const formValues = ref<formValues>(
       llmSettings.value,
     );
-    console.log('formValues', formValues);
 
     const modelConfig = useModelConfig(); // 已选大模型详细配置
     const localModels = ref<any[]>([]);
@@ -193,7 +192,7 @@ export default defineComponent({
           <NFormItem label="API 密钥" path="apiKey">
             <NInput
               type="password"
-              showPasswordToggle
+              showPasswordOn="click"
               value={formValues.value.apiKey || void 0}
               placeholder="输入 API 密钥"
               onUpdateValue={(value) => {
@@ -307,7 +306,7 @@ export default defineComponent({
         quaternary
         onClick={handleSetting}
         v-slots={{
-          icon: (
+          icon: () => (
             <NIcon>
               <SettingOutlined />
             </NIcon>

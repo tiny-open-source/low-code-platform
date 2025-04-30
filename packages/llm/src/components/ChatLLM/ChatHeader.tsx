@@ -23,7 +23,7 @@ export default defineComponent({
                   size="small"
                   quaternary
                   v-slots={{
-                    icon: (
+                    icon: () => (
                       <NIcon>
                         <SettingOutlined />
                       </NIcon>
