@@ -1,13 +1,11 @@
 .lc-llm-chat-form {
   height: 100%;
-  
   &__messages-container {
     height: 100%;
     width: 100%;
     flex: 1;
     position: relative;
   }
-  
   &__spacer {
     width: 100%;
     padding-bottom: 220px;

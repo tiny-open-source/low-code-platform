@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // @ts-nocheck
 import type { SideBarData } from '../../type';
-import { BlockOutlined, CheckSquareOutlined } from '@vicons/antd';
+import { BlockOutlined, CheckSquareOutlined, RobotOutlined } from '@vicons/antd';
 import { NTabPane, NTabs } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
+import AILayoutGenerator from '../../components/AILayoutGenerator.vue';
 import MIcon from '../../components/Icon.vue';
 import ComponentListPanel from './ComponentListPanel.vue';
 import LayerPanel from './LayerPanel.vue';
@@ -15,7 +16,7 @@ defineOptions({
 const props = withDefaults(defineProps<{
   data?: SideBarData;
 }>(), {
-  data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer'] }),
+  data: () => ({ type: 'tabs', status: '组件', items: ['component-list', 'layer', 'ai-layout'] }),
 });
 
 const activeTabName = ref(props.data?.status);
@@ -46,6 +47,14 @@ const dataConfigs = computed(() => {
           icon: CheckSquareOutlined,
           text: '已选组件',
           component: LayerPanel,
+          slots: {},
+        };
+      case 'ai-layout':
+        return {
+          type: 'component',
+          icon: RobotOutlined,
+          text: 'AI布局',
+          component: AILayoutGenerator,
           slots: {},
         };
       default:

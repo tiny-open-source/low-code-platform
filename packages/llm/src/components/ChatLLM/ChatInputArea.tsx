@@ -8,7 +8,7 @@ import {
   StopOutlined,
   CloseCircleOutlined as X,
 } from '@vicons/antd';
-import { NButton, NIcon, NImage, NTooltip } from 'naive-ui';
+import { NButton, NCheckbox, NCheckboxGroup, NIcon, NImage, NSpace, NTooltip } from 'naive-ui';
 import { defineComponent, ref } from 'vue';
 import { toBase64 } from '../../libs/to-base64';
 
@@ -137,28 +137,45 @@ Update text, text="12床 孙思达"`,
       <div class="lc-llm-input-area">
         <div class="lc-llm-input-area__container">
           <div
-            class={`lc-llm-input-area__image-wrapper ${
-              formValue.image === '' ? 'hidden' : 'block'
+            class={`lc-llm-input-area__header-wrapper ${
+              formValue.image === '' ? 'hidden' : ''
             }`}
           >
-            <button
-              type="button"
-              onClick={() => {
-                formValue.image = '';
-                inputRef.value!.value = '';
-              }}
-              class="lc-llm-input-area__image-wrapper-button"
-            >
-              <X class="lc-llm-input-area__image-wrapper-close-button" />
-            </button>
-            {' '}
-            <NImage
-              objectFit="contain"
-              src={formValue.image}
-              alt="Uploaded Image"
-              previewDisabled
-              class="lc-llm-input-area__image"
-            />
+            <div class="lc-llm-input-area__header-image">
+              <button
+                type="button"
+                onClick={() => {
+                  formValue.image = '';
+                  inputRef.value!.value = '';
+                }}
+                class="lc-llm-input-area__header-image-button"
+              >
+                <X class="lc-llm-input-area__header-image-close-button" />
+              </button>
+              {' '}
+              <NImage
+                src={formValue.image}
+                alt="Uploaded Image"
+                previewDisabled
+                class="lc-llm-input-area__header"
+              />
+            </div>
+            <div class="lc-llm-input-area__header-ref-image-info">
+              <div class="lc-llm-input-area__header-ref-image-info-title">
+                <span>选择要参考的内容:</span>
+              </div>
+              <div
+                class="lc-llm-input-area__header-ref-image-info-content"
+              >
+                <NCheckboxGroup size="small">
+                  <NSpace item-style="display: flex;">
+                    <NCheckbox value="1" label="布局结构" />
+                    <NCheckbox value="2" label="颜色样式" />
+                    <NCheckbox value="3" label="文案内容" />
+                  </NSpace>
+                </NCheckboxGroup>
+              </div>
+            </div>
           </div>
           <div class="lc-llm-input-area__wrapper">
             <div class="lc-llm-input-area__form-container">
@@ -186,7 +203,8 @@ Update text, text="12床 孙思达"`,
                         class="lc-llm-input-area__textarea"
                         rows="1"
                         tabindex="0"
-                        placeholder="提出你的要求"
+                        placeholder={`简单描述您想要的界面或功能
+支持上传截图作为参考`}
                         style={{ minHeight: '30px' }}
                         onKeydown={handleKeyDown}
                         v-model={formValue.message}
@@ -229,7 +247,7 @@ Update text, text="12床 孙思达"`,
                                 ),
                               }}
                             >
-                              上传图片
+                              图片
                             </NButton>
                           </div>
                           <div>
