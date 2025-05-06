@@ -1,7 +1,7 @@
 import type { ModelSettings } from '../utils/storage';
 import { isCustomModel } from '../db/models';
 import { getCustomHeaders } from '../utils/clean-headers';
-import { useModelConfig } from '../utils/storage';
+import { useMultiModelConfig } from '../utils/storage';
 import { ChatOllama } from './ChatOllama';
 import { CustomChatOpenAI } from './CustomChatOpenAI';
 
@@ -43,10 +43,10 @@ export async function pageAssistModel(params: ModelParams) {
 
   const isCustom = isCustomModel(model);
   if (isCustom) {
-    const selectModelValue = useModelConfig();
+    const selectModelValue = useMultiModelConfig();
 
     return new CustomChatOpenAI({
-      modelName: selectModelValue.value.model,
+      modelName: selectModelValue.value.mainModel!.model,
       openAIApiKey: apiKey,
       temperature,
       topP,

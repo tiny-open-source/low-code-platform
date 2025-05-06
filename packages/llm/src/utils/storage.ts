@@ -19,6 +19,7 @@ export interface LLMSettings {
   customServiceProviderBaseUrl?: string;
   apiKey?: string;
   prompt?: string;
+  visionEnabled?: boolean;
 }
 
 export interface ModelSettings {
@@ -55,10 +56,26 @@ export interface ModelSettings {
   useMlock?: boolean;
 }
 
+// 多模型配置接口
+export interface MultiModelConfig {
+  mainModel?: ModelConfig;
+  visionModel?: ModelConfig;
+  // 可扩展更多模型类型
+  [key: string]: ModelConfig | undefined;
+}
+
+// 多模型设置接口
+export interface MultiModelSettings {
+  mainModel?: LLMSettings;
+  visionModel?: LLMSettings;
+  // 可扩展更多模型类型
+  [key: string]: LLMSettings | undefined;
+}
+
 // 存储键名常量
 export const STORAGE_KEYS = {
-  FORM_SETTINGS: 'settingValue',
-  SELECT_MODEL: 'selectModel',
+  MULTI_MODEL_CONFIG: 'multiModelConfig',
+  MULTI_MODEL_SETTINGS: 'multiModelSettings',
   MODEL_SETTINGS: 'modelSettings',
 };
 
@@ -75,27 +92,40 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 }
 
 /**
- * 获取模型配置存储对象
- * @returns 模型配置存储
+ * 获取多模型配置存储对象
+ * @returns 多模型配置存储
  */
-export function useModelConfig() {
-  return useLocalStorage<ModelConfig>(STORAGE_KEYS.SELECT_MODEL, {} as ModelConfig);
+export function useMultiModelConfig() {
+  return useLocalStorage<MultiModelConfig>(STORAGE_KEYS.MULTI_MODEL_CONFIG, {});
 }
 
 /**
- * 获取LLM设置存储对象
- * @returns LLM设置存储
+ * 获取多模型设置存储对象
+ * @returns 多模型设置存储
  */
-export function useLLMSettings() {
-  return useLocalStorage<LLMSettings>(STORAGE_KEYS.FORM_SETTINGS, {
-    ollamaUrl: getOllamaURL(),
-    model: '',
-    modelId: '',
-    customServiceProvider: 'custom',
-    customServiceProviderName: '',
-    customServiceProviderBaseUrl: '',
-    apiKey: '',
-    prompt: '',
+export function useMultiModelSettings() {
+  return useLocalStorage<MultiModelSettings>(STORAGE_KEYS.MULTI_MODEL_SETTINGS, {
+    mainModel: {
+      ollamaUrl: getOllamaURL(),
+      model: '',
+      modelId: '',
+      customServiceProvider: 'custom',
+      customServiceProviderName: '',
+      customServiceProviderBaseUrl: '',
+      apiKey: '',
+      prompt: '',
+    },
+    visionModel: {
+      ollamaUrl: getOllamaURL(),
+      model: '',
+      modelId: '',
+      customServiceProvider: 'custom',
+      customServiceProviderName: '',
+      customServiceProviderBaseUrl: '',
+      apiKey: '',
+      prompt: '',
+      visionEnabled: false,
+    },
   });
 }
 

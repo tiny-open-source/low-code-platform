@@ -3,7 +3,7 @@ import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import aiAssistantService from '../../service/ai-assistant.service';
-import { useModelConfig } from '../../utils/storage';
+import { useMultiModelConfig } from '../../utils/storage';
 import Header from './ChatHeader';
 import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
@@ -19,7 +19,7 @@ export default defineComponent({
     const { check: checkOllamaStatus, status: ollamaStatus }
       = useOllamaStatus();
 
-    const modelConfig = useModelConfig();
+    const modelConfig = useMultiModelConfig();
 
     onMounted(() => {
       (textAreaFormRef.value as any)?.focus();
@@ -105,7 +105,7 @@ export default defineComponent({
           onSubmit={handleSubmit}
           onStop={stopStreamingRequest}
           status={
-            !modelConfig.value.model
+            !modelConfig.value.mainModel?.model
               ? 'disabled'
               : streaming.value
                 ? 'pending'
