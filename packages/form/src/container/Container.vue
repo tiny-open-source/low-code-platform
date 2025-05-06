@@ -249,6 +249,7 @@ async function onChangeHandler(v: FormValue, key?: string) {
 <style scoped>
 .lc-f-container ::v-deep(.n-form-item-blank){
   flex-wrap: wrap !important;
+  height: 100%;
 }
 .label-wrapper {
   display: inline-flex;

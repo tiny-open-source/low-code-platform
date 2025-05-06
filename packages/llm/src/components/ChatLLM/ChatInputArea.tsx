@@ -6,6 +6,7 @@ import {
   EnterOutlined,
   QuestionCircleOutlined,
   StopOutlined,
+  UploadOutlined,
   CloseCircleOutlined as X,
 } from '@vicons/antd';
 import { NButton, NCheckbox, NCheckboxGroup, NIcon, NImage, NSpace, NTooltip } from 'naive-ui';
@@ -15,14 +16,10 @@ import { toBase64 } from '../../libs/to-base64';
 export default defineComponent({
   name: 'TextAreaForm',
   props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    // initial: 正常状态
+    // ready: 正常状态
     // pending: ai正在输出
     // disabled: 输入框不可用
-    status: String as PropType<'initial' | 'pending' | 'disabled'>,
+    status: String as PropType<'ready' | 'pending' | 'disabled'>,
   },
   emits: ['submit', 'stop'],
   setup(props, { emit, expose }) {
@@ -205,7 +202,7 @@ Update text, text="12床 孙思达"`,
                         tabindex="0"
                         placeholder={`简单描述您想要的界面或功能
 支持上传截图作为参考`}
-                        style={{ minHeight: '30px' }}
+                        style={{ minHeight: '68px' }}
                         onKeydown={handleKeyDown}
                         v-model={formValue.message}
                       />
@@ -242,7 +239,7 @@ Update text, text="12床 孙思达"`,
                               v-slots={{
                                 icon: () => (
                                   <NIcon size="small">
-                                    <EnterOutlined />
+                                    <UploadOutlined />
                                   </NIcon>
                                 ),
                               }}

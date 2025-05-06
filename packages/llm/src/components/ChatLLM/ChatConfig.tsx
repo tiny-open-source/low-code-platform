@@ -7,6 +7,8 @@ import {
   NIcon,
   NInput,
   NSelect,
+  NTabPane,
+  NTabs,
   useMessage,
   useModal,
 } from 'naive-ui';
@@ -223,54 +225,63 @@ export default defineComponent({
       });
     };
     const renderSettings = () => (
-      <div class="lc-llm-chat-header__settings">
-        <NButton onClick={handleServiceProviderAdd}>添加提供商</NButton>
-        <NForm
-          class="lc-llm-chat-header__settings-form"
-          ref={formRef}
-          rules={settingRules}
-          model={formValues.value}
-        >
-          <NFormItem label="Ollama URL" path="ollamaUrl">
-            <NInput
-              value={formValues.value.ollamaUrl || void 0}
-              placeholder="输入 Ollama URL"
-              onUpdate:value={(value) => {
-                formValues.value.ollamaUrl = value;
-              }}
-            />
-          </NFormItem>
+      <NTabs type="line" animated>
+        <NTabPane name="main-model" tab="主模型">
+          <div class="lc-llm-chat-header__settings">
+            <NButton onClick={handleServiceProviderAdd}>添加提供商</NButton>
+            <NForm
+              class="lc-llm-chat-header__settings-form"
+              ref={formRef}
+              rules={settingRules}
+              model={formValues.value}
+            >
+              <NFormItem label="Ollama URL" path="ollamaUrl">
+                <NInput
+                  value={formValues.value.ollamaUrl || void 0}
+                  placeholder="输入 Ollama URL"
+                  onUpdate:value={(value) => {
+                    formValues.value.ollamaUrl = value;
+                  }}
+                />
+              </NFormItem>
 
-          <NFormItem label="选择模型" path="customServiceProvider">
-            <NSelect
-              value={formValues.value.model || void 0}
-              options={models.value}
-              loading={isFetchingModel.value}
-              renderLabel={(option: SelectOption) => (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
+              <NFormItem label="选择模型" path="customServiceProvider">
+                <NSelect
+                  value={formValues.value.model || void 0}
+                  options={models.value}
+                  loading={isFetchingModel.value}
+                  clearable
+                  renderLabel={(option: SelectOption) => (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <NIcon>
+                        <EditOutlined />
+                      </NIcon>
+                      {option.label}
+                    </div>
+                  )}
+                  onUpdate:value={(value) => {
+                    formValues.value.model = value;
                   }}
                 >
-                  <NIcon>
-                    <EditOutlined />
-                  </NIcon>
-                  {option.label}
-                </div>
-              )}
-              onUpdate:value={(value) => {
-                formValues.value.model = value;
-              }}
-            >
-            </NSelect>
-          </NFormItem>
-          <NFormItem label="系统提示词" path="prompt">
-            <NInput placeholder="请你扮演..." type="textarea" value={formValues.value.prompt || void 0} onUpdate:value={e => formValues.value.prompt = e} />
-          </NFormItem>
-        </NForm>
-      </div>
+                </NSelect>
+              </NFormItem>
+              <NFormItem label="系统提示词" path="prompt">
+                <NInput placeholder="请你扮演..." type="textarea" value={formValues.value.prompt || void 0} onUpdate:value={e => formValues.value.prompt = e} />
+              </NFormItem>
+            </NForm>
+          </div>
+        </NTabPane>
+        <NTabPane name="vision-model" tab="视觉识别模型">
+          Hey Jude
+        </NTabPane>
+      </NTabs>
+
     );
     const handleSetting = () => {
       modal.create({
@@ -282,7 +293,6 @@ export default defineComponent({
           if (!res?.warnings) {
             message.success('已保存');
             llmSettings.value = formValues.value; // 保存基础配置
-            console.log('🚀 ~ onPositiveClick: ~ formValues.value:', formValues.value);
             const model = models.value.find(
               (model: any) => model.value === formValues.value.model,
             );

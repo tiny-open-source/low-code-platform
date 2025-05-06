@@ -1,8 +1,6 @@
 import type { MNode } from '@low-code/schema';
+import { componentListService, designerService } from '@low-code/designer';
 import { cloneDeep, merge, throttle } from 'lodash-es';
-import BaseService from './base.service';
-import componentListService from './component-list.service';
-import designerService from './designer.service';
 /**
  * 大模型调用方法的响应结构
  */
@@ -53,7 +51,7 @@ interface StreamState {
   };
 }
 
-class AIAssistant extends BaseService {
+class AIAssistant {
   private availableToolsMap = new Map<string, ToolDescription>();
   private availableToolsDescriptions: Record<string, any> = {};
   public state = reactive({
@@ -85,8 +83,6 @@ class AIAssistant extends BaseService {
   };
 
   constructor() {
-    super([]);
-
     this.registerDefaultTools();
   }
 

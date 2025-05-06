@@ -39,6 +39,9 @@ export async function getAllModels() {
   try {
     const baseUrl = await getOllamaURL();
     const response = await fetch(`${cleanUrl(baseUrl)}/api/tags`);
+    if (response.status !== 200) {
+      return [];
+    }
     const json = await response.json();
 
     return json.models.map((model: any) => {

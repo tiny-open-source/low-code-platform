@@ -3,7 +3,6 @@ import type { Id, MApp, MContainer, MNode, MPage } from '@low-code/schema';
 import type StageCore from '@low-code/stage';
 import type { ContainerHighlightType, MoveableOptions } from '@low-code/stage';
 import type { Component } from 'vue';
-import type { AiAssistantService } from './services/ai-assistant.service';
 import type { ComponentListService } from './services/component-list.service';
 import type { DesignerService } from './services/designer.service';
 import type { HistoryService } from './services/history.service';
@@ -23,7 +22,6 @@ export interface Services {
   componentListService: ComponentListService;
   storageService: StorageService;
   stageOverlayService: StageOverlayService;
-  aiAssistantService?: AiAssistantService;
 }
 
 export interface StageOptions {

@@ -70,7 +70,7 @@ function changeHandler() {
 </script>
 
 <template>
-  <NTabs v-model:value="activeTabName" style="height: 100%;" pane-style="height: 100%" pane-wrapper-style="height: 100%" type="line" animated @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
+  <NTabs v-model:value="activeTabName" style="height: 100%;" pane-style="height: 100%" pane-wrapper-style="height: 100%;transform: translate(0);" type="line" animated @tab-click="(tab: any) => tabClickHandler(lForm, tab, props)">
     <template v-for="(tab, tabIndex) in tabs" :key="tabIndex">
       <NTabPane v-if="display(tab.display) && tabItems(tab).length" :tab="filter(tab.title)" :name="filter(tab.status) || tabIndex.toString()" display-directive="show:lazy">
         <NScrollbar style="padding-right: 20px;height: 100%">

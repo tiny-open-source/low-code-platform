@@ -15,8 +15,16 @@
     gap: 0.5rem;
     padding: 25px;
     border-width: 1px;
-    border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
   }
 
   &__dot {
@@ -26,6 +34,7 @@
 
     &--pending {
       background-color: #3b82f6; // blue-500
+      animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
     &--success {
@@ -41,9 +50,10 @@
 
   &__text {
     color: #111827; // gray-900
+    font-weight: 500;
     
     .dark & {
-      color: #9ca3af; // gray-400
+      color: #e5e7eb; // light gray in dark mode
     }
   }
 }

@@ -1,10 +1,9 @@
-/** @format */
-
-import type { Services } from '@low-code/designer';
 import { NScrollbar } from 'naive-ui';
 import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
+import aiAssistantService from '../../service/ai-assistant.service';
+import { useModelConfig } from '../../utils/storage';
 import Header from './ChatHeader';
 import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
@@ -13,20 +12,22 @@ import OllamaStatusIndicator from './OllamaStatusIndicator';
 export default defineComponent({
   name: 'l-form-llm-chat',
   setup() {
-    const services = inject<Services>('services');
     const divRef = ref<HTMLDivElement>();
     const textAreaFormRef = ref<InstanceType<typeof TextAreaForm>>();
 
     // Ollama 状态检查
     const { check: checkOllamaStatus, status: ollamaStatus }
       = useOllamaStatus();
+
+    const modelConfig = useModelConfig();
+
     onMounted(() => {
       (textAreaFormRef.value as any)?.focus();
       checkOllamaStatus();
     });
     // 构建提示语
     const prompt = computed(() => {
-      return services?.aiAssistantService?.generatePromptTemplate() || '';
+      return aiAssistantService?.generatePromptTemplate() || '';
     });
 
     // 消息处理
@@ -45,9 +46,9 @@ export default defineComponent({
       // 解析最新的机器人消息
       const latestMessage = messages.value[messages.value.length - 1];
       if (latestMessage && latestMessage.isBot) {
-        services?.aiAssistantService!.processStreamChunk(latestMessage.message);
+        aiAssistantService!.processStreamChunk(latestMessage.message);
         if (latestMessage.generationInfo) {
-          services?.aiAssistantService!.finalizeStream();
+          aiAssistantService!.finalizeStream();
         }
       }
     });
@@ -91,9 +92,11 @@ export default defineComponent({
         />
         {/* 消息区域 */}
         <NScrollbar class="lc-llm-chat-form__messages-container">
-          <Messages messages={messages.value} />
-          <div ref={divRef} />
-          <div class="lc-llm-chat-form__spacer"></div>
+          <div class="lc-llm-chat-form__messages-wrapper">
+            <Messages messages={messages.value} />
+            <div ref={divRef} />
+            <div class="lc-llm-chat-form__spacer"></div>
+          </div>
         </NScrollbar>
 
         {/* 输入区域 */}
@@ -102,13 +105,12 @@ export default defineComponent({
           onSubmit={handleSubmit}
           onStop={stopStreamingRequest}
           status={
-            ollamaStatus.value !== 'success'
+            !modelConfig.value.model
               ? 'disabled'
               : streaming.value
                 ? 'pending'
-                : 'initial'
+                : 'ready'
           }
-          disabled={ollamaStatus.value !== 'success'}
         />
       </div>
     );

@@ -1,10 +1,28 @@
 .lc-llm-chat-header {
   width: 100%;
-  padding: 10px;
+  padding: 12px 16px;
   display: flex;
   border-width: 1px;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.8);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .dark & {
+    background: rgba(31, 41, 55, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+  }
+
   &__container {
     display: flex;
     justify-content: space-between;
@@ -12,11 +30,13 @@
     text-wrap: nowrap;
     width: 100%;
   }
+
   &__settings {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 10px 0;
+    gap: 0.75rem;
+    padding: 12px 0;
+
     &-form {
       width: 100%;
     }

@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { watch } from 'vue';
+import { nextTick, onMounted, watch } from 'vue';
 
 export function useDynamicTextareaSize(
   textareaRef: Ref<HTMLTextAreaElement | undefined>,
@@ -11,15 +11,16 @@ export function useDynamicTextareaSize(
     nextTick(() => {
       const currentTextarea = textareaRef.value;
       if (currentTextarea) {
-      // Temporarily collapse the textarea to calculate the required height
+        // Temporarily collapse the textarea to calculate the required height
         currentTextarea.style.height = '0px';
         const contentHeight = currentTextarea.scrollHeight;
 
         if (maxHeight) {
-        // Set max-height and adjust overflow behavior if maxHeight is provided
+          // Set max-height and adjust overflow behavior if maxHeight is provided
           currentTextarea.style.maxHeight = `${maxHeight}px`;
           currentTextarea.style.overflowY
           = contentHeight > maxHeight ? 'scroll' : 'hidden';
+
           currentTextarea.style.height = `${Math.min(
             contentHeight,
             maxHeight,
@@ -39,5 +40,6 @@ export function useDynamicTextareaSize(
     setTextareaHeight();
   }, {
     immediate: true,
+    flush: 'post', // 确保在DOM更新后执行
   });
 }

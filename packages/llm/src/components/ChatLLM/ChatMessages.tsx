@@ -33,12 +33,11 @@ export default defineComponent({
       return md.render(content);
     };
 
-    return () => props.messages?.map(message => (
-      <div class="lc-llm-chat-messages__message">
+    return () => props.messages?.map((message, index) => (
+      <div class="lc-llm-chat-messages__message" key={index}>
         <div class="lc-llm-chat-messages__container">
           <div class="lc-llm-chat-messages__content">
             <span class={`lc-llm-chat-messages__name ${message.isBot ? 'lc-llm-chat-messages__name--bot' : 'lc-llm-chat-messages__name--user'}`}>
-
               {message.isBot ? message.name || 'Assistant' : 'You'}
             </span>
             <div class="lc-llm-chat-messages__body">
@@ -49,7 +48,7 @@ export default defineComponent({
                         <ThinkingArea content={e.content} key={i} />
                       );
                     }
-                    return <div class="prose dark:prose-invert lc-llm-chat-messages__text" innerHTML={renderMarkdown(e.content)} />;
+                    return <div class="prose dark:prose-invert lc-llm-chat-messages__text" key={i} innerHTML={renderMarkdown(e.content)} />;
                   })
                 : (
                     <div>
