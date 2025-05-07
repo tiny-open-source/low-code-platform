@@ -1,4 +1,5 @@
 import { useLocalStorage as _useLocalStorage } from '@vueuse/core';
+import mustache from 'mustache';
 import { getOllamaURL } from '../service/ollama';
 
 export interface ModelConfig {
@@ -145,4 +146,24 @@ export function useModelSettings() {
  */
 export function mergeModelSettings(baseSettings: ModelSettings = {}, overrideSettings: ModelSettings = {}): ModelSettings {
   return { ...baseSettings, ...overrideSettings };
+}
+
+/**
+ * 处理提示词模板
+ * @param template 提示词模板对象
+ * @param variables 变量值对象
+ * @returns 处理后的提示词字符串
+ */
+export function processPromptTemplate(template: string, variables: Record<string, string> = {}): string {
+  if (!template) {
+    return '';
+  }
+  try {
+    // 使用mustache库渲染模板，将变量替换为实际值
+    return mustache.render(template, variables);
+  }
+  catch (error) {
+    console.error('处理提示词模板时出错:', error);
+    return template; // 发生错误时返回原始模板
+  }
 }

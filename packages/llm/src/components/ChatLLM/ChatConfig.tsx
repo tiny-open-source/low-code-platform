@@ -1,8 +1,12 @@
 import type { SelectOption } from 'naive-ui';
 import type { LLMSettings } from '../../utils/storage';
 import { EditOutlined, EyeOutlined, SettingOutlined } from '@vicons/antd';
+import hljs from 'highlight.js';
+import MarkdownIt from 'markdown-it';
 import {
   NButton,
+  NCard,
+  NDivider,
   NForm,
   NFormItem,
   NIcon,
@@ -18,11 +22,12 @@ import {
 import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
 import { generateID } from '../../db/models';
 import { getAllOpenAIModels } from '../../libs/openai';
+import aiAssistantService from '../../service/ai-assistant.service';
 import { getAllModels, setOllamaURL } from '../../service/ollama';
 import { MODEL_TYPE_LABELS, ModelType } from '../../utils/constants';
 import { OAI_API_PROVIDERS } from '../../utils/oai-api-providers';
 import {
-
+  processPromptTemplate,
   useMultiModelConfig,
   useMultiModelSettings,
 } from '../../utils/storage';
@@ -48,6 +53,44 @@ export default defineComponent({
     // 多模型配置存储
     const multiModelSettings = useMultiModelSettings();
     const multiModelConfig = useMultiModelConfig();
+
+    // 初始化markdown解析器
+    const md = new MarkdownIt({
+      html: false,
+      linkify: true,
+      typographer: true,
+      highlight(str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          try {
+            return hljs.highlight(str, { language: lang }).value;
+          }
+          catch {}
+        }
+        return ''; // 使用默认转义
+      },
+    });
+
+    const renderMarkdown = (content: string) => {
+      return md.render(content);
+    };
+
+    const previewResult = ref('');
+    const variableValues = computed(() => {
+      // 获取当前项目上下文数据
+      const currentSchema = aiAssistantService.getCurrentProjectSchema();
+      const toolDescriptions = JSON.stringify(aiAssistantService.getToolDescriptions());
+      const canvasWidth = currentSchema.currentPage?.style?.width || '1024';
+      const canvasHeight = currentSchema.currentPage?.style?.height || '600';
+
+      // 准备变量值
+      const variableValues: Record<string, string> = {
+        currentSchema: JSON.stringify(currentSchema),
+        toolDescriptions,
+        canvasWidth: String(canvasWidth),
+        canvasHeight: String(canvasHeight),
+      };
+      return variableValues;
+    });
 
     // 创建表单值引用
     const formValues = ref<ModelFormValues>({
@@ -134,6 +177,7 @@ export default defineComponent({
           type: newTab as ModelType,
           ...(multiModelSettings.value[newTab as ModelType] || {}),
         };
+        previewResult.value = '';
       },
     );
 
@@ -267,6 +311,8 @@ export default defineComponent({
         const val = { ...formValues.value, type: undefined };
         // 保存设置到多模型配置
         multiModelSettings.value[modelType] = { ...val };
+        console.log(modelType);
+        console.log(val);
 
         // 保存模型到多模型配置
         if (model) {
@@ -319,6 +365,7 @@ export default defineComponent({
                     value={formValues.value.model || void 0}
                     options={models.value}
                     loading={isFetchingModel.value}
+                    filterable
                     clearable
                     renderLabel={(option: SelectOption) => (
                       <div
@@ -340,9 +387,37 @@ export default defineComponent({
                   >
                   </NSelect>
                 </NFormItem>
-                <NFormItem label="系统提示词" path="prompt">
-                  <NInput placeholder="请你扮演..." type="textarea" value={formValues.value.prompt || void 0} onUpdate:value={e => formValues.value.prompt = e} />
-                </NFormItem>
+                <NDivider />
+                <div class="prompt-template-config">
+                  <NFormItem label="系统提示词模板" path="prompt">
+                    <NInput
+                      type="textarea"
+                      value={formValues.value.prompt || void 0}
+                      placeholder="输入提示词模板，使用 {{变量名}} 作为变量占位符"
+                      rows={6}
+                      onUpdateValue={v => formValues.value!.prompt = v}
+                    />
+                  </NFormItem>
+                  <NButton
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      previewResult.value = processPromptTemplate(
+                        formValues.value!.prompt!,
+                        variableValues.value,
+                      );
+                    }}
+                  >
+                    预览
+                  </NButton>
+                  <NCard
+                    title="结果预览"
+                    size="small"
+                    style={{ marginTop: '16px' }}
+                  >
+                    <div style={{ whiteSpace: 'pre-wrap', margin: 0 }} innerHTML={renderMarkdown(previewResult.value)}></div>
+                  </NCard>
+                </div>
               </NForm>
             </NSpace>
           </div>
@@ -380,6 +455,7 @@ export default defineComponent({
                     value={formValues.value.model || void 0}
                     options={models.value}
                     loading={isFetchingModel.value}
+                    filterable
                     clearable
                     renderLabel={(option: SelectOption) => (
                       <div
@@ -409,14 +485,40 @@ export default defineComponent({
                   />
                 </NFormItem>
 
-                <NFormItem label="系统提示词" path="prompt">
-                  <NInput
-                    placeholder="请你分析这张图片..."
-                    type="textarea"
-                    value={formValues.value.prompt || void 0}
-                    onUpdate:value={e => formValues.value.prompt = e}
-                  />
-                </NFormItem>
+                <NDivider />
+
+                <NDivider />
+                <div class="prompt-template-config">
+
+                  <NFormItem label="系统提示词模板" path="prompt">
+                    <NInput
+                      type="textarea"
+                      value={formValues.value?.prompt || void 0}
+                      placeholder="输入提示词模板，使用 {{变量名}} 作为变量占位符"
+                      rows={6}
+                      onUpdateValue={v => formValues.value!.prompt = v}
+                    />
+                  </NFormItem>
+                  <NButton
+                    type="primary"
+                    size="small"
+                    onClick={() => {
+                      previewResult.value = processPromptTemplate(
+                        formValues.value!.prompt!,
+                        variableValues.value,
+                      );
+                    }}
+                  >
+                    预览
+                  </NButton>
+                  <NCard
+                    title="结果预览"
+                    size="small"
+                    style={{ marginTop: '16px' }}
+                  >
+                    <div style={{ whiteSpace: 'pre-wrap', margin: 0 }} innerHTML={renderMarkdown(previewResult.value)}></div>
+                  </NCard>
+                </div>
               </NForm>
             </NSpace>
           </div>
@@ -429,6 +531,9 @@ export default defineComponent({
       modal.create({
         preset: 'dialog',
         title: '模型配置',
+        style: {
+          width: '800px',
+        },
         content: renderSettings,
         onPositiveClick: async () => {
           // 保存当前配置
@@ -448,16 +553,6 @@ export default defineComponent({
       });
     };
 
-    // 获取已配置模型数量
-    const configuredModelsCount = computed(() => {
-      let count = 0;
-      if (multiModelConfig.value.mainModel && multiModelConfig.value.mainModel.model)
-        count++;
-      if (multiModelConfig.value.visionModel && multiModelConfig.value.visionModel.model)
-        count++;
-      return count;
-    });
-
     return () => (
       <NButton
         size="small"
@@ -470,9 +565,7 @@ export default defineComponent({
             </NIcon>
           ),
         }}
-      >
-        {configuredModelsCount.value > 0 ? `${configuredModelsCount.value}` : ''}
-      </NButton>
+      />
     );
   },
 });

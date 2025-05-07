@@ -3,7 +3,7 @@ import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import aiAssistantService from '../../service/ai-assistant.service';
-import { useMultiModelConfig } from '../../utils/storage';
+import { processPromptTemplate, useMultiModelConfig, useMultiModelSettings } from '../../utils/storage';
 import Header from './ChatHeader';
 import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
@@ -20,14 +20,39 @@ export default defineComponent({
       = useOllamaStatus();
 
     const modelConfig = useMultiModelConfig();
+    const modelSettings = useMultiModelSettings();
 
     onMounted(() => {
       (textAreaFormRef.value as any)?.focus();
       checkOllamaStatus();
     });
+
     // 构建提示语
     const prompt = computed(() => {
-      return aiAssistantService?.generatePromptTemplate() || '';
+      // 优先使用提示词模板
+      const currentModel = modelSettings.value.mainModel;
+      const promptTemplate = currentModel?.prompt;
+
+      if (promptTemplate) {
+        // 获取当前项目上下文数据
+        const currentSchema = aiAssistantService.getCurrentProjectSchema();
+        const toolDescriptions = JSON.stringify(aiAssistantService.getToolDescriptions());
+        const canvasWidth = currentSchema.currentPage?.style?.width || '1024';
+        const canvasHeight = currentSchema.currentPage?.style?.height || '600';
+
+        // 准备变量值
+        const variableValues: Record<string, string> = {
+          currentSchema: JSON.stringify(currentSchema),
+          toolDescriptions,
+          canvasWidth: String(canvasWidth),
+          canvasHeight: String(canvasHeight),
+        };
+
+        // 处理模板
+        return processPromptTemplate(promptTemplate, variableValues);
+      }
+
+      return currentModel?.prompt || '';
     });
 
     // 消息处理
