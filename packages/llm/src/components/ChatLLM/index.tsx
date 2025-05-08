@@ -36,7 +36,7 @@ export default defineComponent({
       if (promptTemplate) {
         // 获取当前项目上下文数据
         const currentSchema = aiAssistantService.getCurrentProjectSchema();
-        const toolDescriptions = JSON.stringify(aiAssistantService.getToolDescriptions());
+        const toolDescriptions = JSON.stringify(aiAssistantService.getActionDescriptions());
         const canvasWidth = currentSchema.currentPage?.style?.width || '1024';
         const canvasHeight = currentSchema.currentPage?.style?.height || '600';
 

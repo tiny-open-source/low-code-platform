@@ -5,19 +5,19 @@ import { cloneDeep, merge, throttle } from 'lodash-es';
  * 大模型调用方法的响应结构
  */
 interface AIActionResponse {
-  // 调用的工具名称
-  tool: string;
-  // 工具调用的参数
+  // 调用的动作名称
+  action: string;
+  // 动作调用的参数
   parameters: Record<string, any>;
-  // 调用工具的理由
+  // 调用动作的理由
   reasoning: string;
 }
 
 /**
- * 暴露给大模型的工具描述
+ * 暴露给大模型的动作描述
  */
-interface ToolDescription {
-  // 工具名称
+interface ActionDescription {
+  // 动作名称
   name: string;
   // 功能描述
   description: string;
@@ -52,8 +52,8 @@ interface StreamState {
 }
 
 class AIAssistant {
-  private availableToolsMap = new Map<string, ToolDescription>();
-  private availableToolsDescriptions: Record<string, any> = {};
+  private availableActionsMap = new Map<string, ActionDescription>();
+  private availableActionsDescriptions: Record<string, any> = {};
   public state = reactive({
     isProcessing: false,
     streamingInProgress: false,
@@ -83,22 +83,22 @@ class AIAssistant {
   };
 
   constructor() {
-    this.registerDefaultTools();
+    this.registerDefaultActions();
   }
 
   // 使用节流而非防抖，提高实时性
   private tryParseThrottle = throttle(this.tryParseStreamedJSON, 200);
 
   /**
-   * 注册新的工具
+   * 注册新的动作
    */
-  public registerTool(tool: ToolDescription) {
-    this.availableToolsMap.set(tool.name, tool);
+  public registerAction(action: ActionDescription) {
+    this.availableActionsMap.set(action.name, action);
   }
 
-  registerDefaultTools() {
-    // 添加节点工具
-    this.registerTool({
+  registerDefaultActions() {
+    // 添加节点动作
+    this.registerAction({
       name: 'addNode',
       description: 'Add a new node to the current container',
       parameters: {
@@ -109,7 +109,7 @@ class AIAssistant {
         },
         type: {
           type: 'string',
-          description: 'Type of the node to add',
+          description: 'Type of the node to add, e.g., "text", "button", "img", "qrcode", "overlay", "container"',
           required: true,
         },
         data: {
@@ -127,8 +127,8 @@ class AIAssistant {
         return { success: true };
       },
     });
-    // 删除节点工具
-    this.registerTool({
+    // 删除节点动作
+    this.registerAction({
       name: 'deleteNode',
       description: 'Delete a node from the current container',
       parameters: {
@@ -156,8 +156,8 @@ class AIAssistant {
         return { success: true };
       },
     });
-    // 选择节点工具
-    this.registerTool({
+    // 选择节点动作
+    this.registerAction({
       name: 'selectNode',
       description: 'Select a node with the specified ID',
       parameters: {
@@ -175,8 +175,8 @@ class AIAssistant {
         // return { success: true, selectedNode: { id: node.id, type: node.type } };
       },
     });
-    // 更新节点工具
-    this.registerTool({
+    // 更新节点动作
+    this.registerAction({
       name: 'updateNode',
       description: 'Update the configuration properties of a node with the specified ID',
       parameters: {
@@ -240,8 +240,8 @@ class AIAssistant {
         };
       },
     });
-    // 居中对齐工具
-    this.registerTool({
+    // 居中对齐动作
+    this.registerAction({
       name: 'alignCenter',
       description: 'Horizontally center-align the currently selected node or specified node',
       parameters: {
@@ -277,15 +277,15 @@ class AIAssistant {
   }
 
   /**
-   * 获取所有可用工具的描述
+   * 获取所有可用动作的描述
    */
-  public getToolDescriptions(): Record<string, any> {
-    if (this.availableToolsDescriptions.length > 0)
-      return this.availableToolsDescriptions;
-    return this.availableToolsDescriptions = Array.from(this.availableToolsMap.values()).map(tool => ({
-      name: tool.name,
-      description: tool.description,
-      parameters: tool.parameters,
+  public getActionDescriptions(): Record<string, any> {
+    if (this.availableActionsDescriptions.length > 0)
+      return this.availableActionsDescriptions;
+    return this.availableActionsDescriptions = Array.from(this.availableActionsMap.values()).map(action => ({
+      name: action.name,
+      description: action.description,
+      parameters: action.parameters,
     }));
   }
 
@@ -330,16 +330,16 @@ class AIAssistant {
   private isValidActionResponse(obj: any): obj is AIActionResponse {
     return obj
       && typeof obj === 'object'
-      && typeof obj.tool === 'string'
-      && this.availableToolsMap.has(obj.tool);
+      && typeof obj.action === 'string'
+      && this.availableActionsMap.has(obj.action);
   }
 
   /**
    * 生成动作的唯一标识
    */
   private generateActionId(action: AIActionResponse): string {
-    // 根据工具名称和参数生成唯一标识
-    return `${action.tool}-${JSON.stringify(action.parameters)}`;
+    // 根据动作名称和参数生成唯一标识
+    return `${action.action}-${JSON.stringify(action.parameters)}`;
   }
 
   /**
@@ -660,7 +660,7 @@ class AIAssistant {
     this.streamState.processingAction = true;
 
     try {
-      console.log('执行动作:', action.tool);
+      console.log('执行动作:', action.action);
       const result = await this.executeAction(action);
       console.log('动作执行结果:', result);
 
@@ -887,23 +887,23 @@ class AIAssistant {
    */
   private async executeAction(parsedResponse: AIActionResponse): Promise<any> {
     // 验证响应结构
-    if (!parsedResponse.tool) {
-      throw new Error('大模型响应缺少工具名称');
+    if (!parsedResponse.action) {
+      throw new Error('大模型响应缺少动作名称');
     }
 
-    // 查找匹配的工具
-    const tool = this.availableToolsMap.get(parsedResponse.tool);
+    // 查找匹配的动作
+    const action = this.availableActionsMap.get(parsedResponse.action);
 
-    if (!tool) {
-      throw new Error(`未找到名为 ${parsedResponse.tool} 的工具`);
+    if (!action) {
+      throw new Error(`未找到名为 ${parsedResponse.action} 的动作`);
     }
     console.log(parsedResponse);
 
-    // 调用工具处理函数
-    const result = await tool.handler(parsedResponse.parameters || {});
+    // 调用动作处理函数
+    const result = await action.handler(parsedResponse.parameters || {});
 
     this.state.lastResult = {
-      toolName: tool.name,
+      actionName: action.name,
       parameters: parsedResponse.parameters,
       result,
       reasoning: parsedResponse.reasoning,
