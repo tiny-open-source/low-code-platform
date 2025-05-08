@@ -4,11 +4,14 @@
   display: flex;
   border-width: 1px;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
   margin-bottom: 1rem;
   transition: all 0.3s ease;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 99;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
