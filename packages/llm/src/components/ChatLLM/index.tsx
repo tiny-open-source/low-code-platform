@@ -34,18 +34,9 @@ export default defineComponent({
       const promptTemplate = currentModel?.prompt;
 
       if (promptTemplate) {
-        // 获取当前项目上下文数据
-        const currentSchema = aiAssistantService.getCurrentProjectSchema();
-        const toolDescriptions = JSON.stringify(aiAssistantService.getActionDescriptions());
-        const canvasWidth = currentSchema.currentPage?.style?.width || '1024';
-        const canvasHeight = currentSchema.currentPage?.style?.height || '600';
-
         // 准备变量值
         const variableValues: Record<string, string> = {
-          currentSchema: JSON.stringify(currentSchema),
-          toolDescriptions,
-          canvasWidth: String(canvasWidth),
-          canvasHeight: String(canvasHeight),
+
         };
 
         // 处理模板
@@ -62,7 +53,7 @@ export default defineComponent({
       });
 
     // 处理消息更新
-    watch(messages, () => {
+    watch(messages, async () => {
       // 滚动到最新消息
       if (divRef.value) {
         divRef.value.scrollIntoView({ behavior: 'smooth' });
@@ -71,9 +62,16 @@ export default defineComponent({
       // 解析最新的机器人消息
       const latestMessage = messages.value[messages.value.length - 1];
       if (latestMessage && latestMessage.isBot) {
-        aiAssistantService!.processStreamChunk(latestMessage.message);
         if (latestMessage.generationInfo) {
-          aiAssistantService!.finalizeStream();
+          const toolResult = await aiAssistantService!.processResponse(latestMessage.message);
+
+          // 如果有工具执行结果，将其添加到新消息中
+          if (toolResult) {
+            await onSubmit({
+              message: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult),
+              image: '',
+            });
+          }
         }
       }
     });

@@ -27,31 +27,7 @@ export default defineComponent({
     const textareaRef = ref<HTMLTextAreaElement>();
     const inputRef = ref<HTMLInputElement>();
     const formValue = reactive({
-      message: `Select page
-Add container
-Update container, style={left:0,top:0,width:1024,height:600,backgroundColor:'#ffffff'}
-Select container
-Add container
-Update container, style={left:0,top:0,width:1024,height:60,backgroundColor:'#5e81f5'}
-Select container (header)
-Add text
-Update text, style={left:650,top:10,width:150,height:30,fontSize:18,fontWeight:'normal',color:'#ffffff',textAlign:'center'}
-Update text, text="2024-02-09"
-Select container (header)
-Add text
-Update text, style={left:800,top:10,width:100,height:30,fontSize:18,fontWeight:'normal',color:'#ffffff',textAlign:'center'}
-Update text, text="星期三"
-Select container (header)
-Add text
-Update text, style={left:900,top:10,width:100,height:30,fontSize:18,fontWeight:'normal',color:'#ffffff',textAlign:'center'}
-Update text, text="15:09:33"
-Select container
-Add container
-Update container, style={left:0,top:60,width:400,height:540,backgroundColor:'#ffffff',borderRadius:8,boxShadow:'0 2px 4px rgba(0,0,0,0.1)'}
-Select container (left section)
-Add text
-Update text, style={left:10,top:10,width:380,height:30,fontSize:24,fontWeight:'bold',color:'#1a1a1a'}
-Update text, text="12床 孙思达"`,
+      message: '',
       image: '',
     });
     // 文本框聚焦

@@ -22,7 +22,6 @@ import {
 import { computed, defineComponent, onBeforeMount, ref, watch } from 'vue';
 import { generateID } from '../../db/models';
 import { getAllOpenAIModels } from '../../libs/openai';
-import aiAssistantService from '../../service/ai-assistant.service';
 import { getAllModels, setOllamaURL } from '../../service/ollama';
 import { MODEL_TYPE_LABELS, ModelType } from '../../utils/constants';
 import { OAI_API_PROVIDERS } from '../../utils/oai-api-providers';
@@ -77,17 +76,9 @@ export default defineComponent({
     const previewResult = ref('');
     const variableValues = computed(() => {
       // 获取当前项目上下文数据
-      const currentSchema = aiAssistantService.getCurrentProjectSchema();
-      const toolDescriptions = JSON.stringify(aiAssistantService.getActionDescriptions());
-      const canvasWidth = currentSchema.currentPage?.style?.width || '1024';
-      const canvasHeight = currentSchema.currentPage?.style?.height || '600';
-
       // 准备变量值
       const variableValues: Record<string, string> = {
-        currentSchema: JSON.stringify(currentSchema),
-        toolDescriptions,
-        canvasWidth: String(canvasWidth),
-        canvasHeight: String(canvasHeight),
+
       };
       return variableValues;
     });
