@@ -21,6 +21,7 @@ class AIAssistant {
     isProcessing: false,
   });
 
+  private uploadedImageUrl: string | null = null;
   constructor() {
     this.registerDefaultTools();
   }
@@ -108,6 +109,28 @@ class AIAssistant {
         }).flat();
         if (list) {
           return list;
+        }
+        return null;
+      },
+    });
+    // 子模型列表
+    this.registerTool({
+      name: 'get_available_sub_models',
+      handler: async () => {
+        return [{
+          name: 'vision_model',
+          describe: '视觉模型',
+        }];
+      },
+    });
+    this.registerTool({
+      name: 'call_sub_model',
+      handler: async ({ model }: { model: string; params: any }) => {
+        if (model === 'vision_model') {
+          const { uploadedImageUrl } = this;
+          if (uploadedImageUrl) {
+            // return await this.callModel(uploadedImageUrl, params);
+          }
         }
         return null;
       },
