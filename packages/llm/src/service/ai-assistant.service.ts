@@ -141,7 +141,7 @@ class AIAssistant {
         else if (action === 'remove_node') {
           if (id) {
             const node = designerService.getNodeById(id);
-            if (node && node.items) {
+            if (node) {
               await designerService.remove(node as any);
             }
           }
@@ -221,9 +221,12 @@ class AIAssistant {
 
       // 尝试解析JSON值，如果失败则保留原始字符串
       try {
+        console.log('🚀 ~ AIAssistant ~ parseToolCall ~ paramValue:', paramValue);
         params[paramName] = JSON.parse(paramValue);
       }
       catch {
+        console.log('JSON.parse error', paramValue);
+
         params[paramName] = paramValue;
       }
     }

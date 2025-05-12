@@ -80,7 +80,7 @@ export default defineComponent({
     const sendMessage = async ({ message, image }: { message: string;image: string }) => {
       try {
         await onSubmit({
-          message,
+          message: `<user_query>${message}</user_query>`,
           image,
         });
       }
