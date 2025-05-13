@@ -10,7 +10,7 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { getOllamaURL } from '../service/ollama';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
-import { useMultiModelConfig, useMultiModelSettings } from '../utils/storage';
+import { useMultiModel, useMultiModelSettings } from '../utils/storage';
 
 export interface Message {
   isBot: boolean;
@@ -53,10 +53,11 @@ export interface ChatSubmitOptions {
 
 /**
  * 创建聊天对话处理钩子
- * @param options 选项配置
+ * @param model 模型配置
+ * @param options 模型选项
  * @returns 聊天对话处理方法和状态
  */
-export function useMessageOption(options: MessageOptions = {}) {
+export function useMessageOption(model: any, options: MessageOptions = {}) {
   // 提取选项参数
   const {
     prompt,
@@ -82,7 +83,7 @@ export function useMessageOption(options: MessageOptions = {}) {
 
   // 配置存储
   const llmSettings = useMultiModelSettings();
-  const modelConfig = useMultiModelConfig();
+  const models = useMultiModel();
 
   // 计算属性
   const currentModel = computed(() => llmSettings.value.mainModel?.model || 'unknown');
@@ -146,7 +147,7 @@ export function useMessageOption(options: MessageOptions = {}) {
     signal: AbortSignal,
     retainContext: boolean = true,
   ) => {
-    const url = await getOllamaURL();
+    const url = getOllamaURL();
     const userDefaultModelSettings = await getAllDefaultModelSettings();
 
     if (image && image.length > 0 && !image.startsWith('data:')) {
@@ -156,7 +157,7 @@ export function useMessageOption(options: MessageOptions = {}) {
     // 合并模型设置
     const modelParams: ModelParams = {
       // 使用模型配置
-      model: modelConfig.value.mainModel!.name,
+      model: models.value.mainModel!.name,
       apiKey: llmSettings.value.mainModel!.apiKey,
       customBaseUrl: llmSettings.value.mainModel!.customServiceProviderBaseUrl,
       baseUrl: cleanUrl(url),
@@ -251,7 +252,7 @@ export function useMessageOption(options: MessageOptions = {}) {
       }
 
       // 生成聊天历史
-      const applicationChatHistory = generateHistory(historyRef.value, modelConfig.value.mainModel!.value);
+      const applicationChatHistory = generateHistory(historyRef.value, models.value.mainModel!.value);
 
       // 添加系统提示
       if (prompt?.value) {

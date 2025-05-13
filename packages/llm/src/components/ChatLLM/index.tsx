@@ -3,7 +3,7 @@ import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import aiAssistantService from '../../service/ai-assistant.service';
-import { processPromptTemplate, useMultiModelConfig, useMultiModelSettings } from '../../utils/storage';
+import { processPromptTemplate, useMultiModel, useMultiModelSettings } from '../../utils/storage';
 import Header from './ChatHeader';
 import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
@@ -19,7 +19,7 @@ export default defineComponent({
     const { check: checkOllamaStatus, status: ollamaStatus }
       = useOllamaStatus();
 
-    const modelConfig = useMultiModelConfig();
+    const modelConfig = useMultiModel();
     const modelSettings = useMultiModelSettings();
 
     onMounted(() => {
@@ -76,8 +76,19 @@ export default defineComponent({
       }
     });
 
+    // 处理图片上传和分析
+    const processImage = async (image: string): Promise<string | null> => {
+      if (!image)
+        return null;
+
+      return null; // 如果模型支持图片，直接使用原图
+    };
     // 发送消息
     const sendMessage = async ({ message, image }: { message: string;image: string }) => {
+      if (image) {
+        await processImage(image);
+      }
+
       try {
         await onSubmit({
           message: `<user_query>${message}</user_query>`,

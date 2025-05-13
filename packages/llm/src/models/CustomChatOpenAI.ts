@@ -222,7 +222,7 @@ export class CustomChatOpenAI<
   azureOpenAIBasePath?: string;
 
   organization?: string;
-
+  // @ts-ignore
   protected client: OpenAIClient;
 
   protected clientConfig: ClientOptions;
@@ -526,6 +526,7 @@ export class CustomChatOpenAI<
       if (!delta) {
         continue;
       }
+      // @ts-ignore
       const chunk = _convertDeltaToMessageChunk(delta, defaultRole);
       defaultRole = delta.role ?? defaultRole;
       const newTokenIndices = {

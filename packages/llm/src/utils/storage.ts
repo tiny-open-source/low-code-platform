@@ -96,7 +96,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
  * 获取多模型配置存储对象
  * @returns 多模型配置存储
  */
-export function useMultiModelConfig() {
+export function useMultiModel() {
   return useLocalStorage<MultiModelConfig>(STORAGE_KEYS.MULTI_MODEL_CONFIG, {});
 }
 

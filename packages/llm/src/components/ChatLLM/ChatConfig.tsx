@@ -27,7 +27,7 @@ import { MODEL_TYPE_LABELS, ModelType } from '../../utils/constants';
 import { OAI_API_PROVIDERS } from '../../utils/oai-api-providers';
 import {
   processPromptTemplate,
-  useMultiModelConfig,
+  useMultiModel,
   useMultiModelSettings,
 } from '../../utils/storage';
 import { ProviderIcons } from '../ProviderIcon';
@@ -51,7 +51,7 @@ export default defineComponent({
 
     // 多模型配置存储
     const multiModelSettings = useMultiModelSettings();
-    const multiModelConfig = useMultiModelConfig();
+    const multiModelConfig = useMultiModel();
 
     // 初始化markdown解析器
     const md = new MarkdownIt({

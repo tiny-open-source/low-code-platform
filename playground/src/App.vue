@@ -5,7 +5,7 @@ import { parse as parseByWorker } from '@low-code/adapter';
 import { LowCodeDesigner } from '@low-code/designer';
 import { NodeType } from '@low-code/schema';
 import { asyncLoadJs } from '@low-code/utils';
-import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
+import { CodeOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
@@ -64,7 +64,6 @@ function parse(code: string) {
     (window as any).$message.error(`导入失败，${e.message}`);
   }
 }
-const llmOutputDSL = ref('');
 
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
@@ -99,17 +98,6 @@ window.onbeforeunload = function () {
   }
 };
 
-const dslSerialized = computed(() => {
-  return serialize(toRaw(dsl.value), {
-    space: 2,
-    unsafe: true,
-  }).replace(/"(\w+)":\s/g, '$1: ');
-});
-
-const dslEvaled = computed(() => {
-  // eslint-disable-next-line no-eval
-  return eval(`(${dslSerialized.value})`);
-});
 function save() {
   localStorage.setItem(
     'lowcodeDSL',

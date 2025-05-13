@@ -41,5 +41,8 @@
     "rimraf": "^6.0.1",
     "vite": "^6.3.2",
     "vue-tsc": "2.0.29"
+  },
+  "resolutions": {
+    "@langchain/core": "0.1.45"
   }
 }
