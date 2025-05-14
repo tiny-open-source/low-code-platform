@@ -45,7 +45,7 @@ export default defineComponent({
       e.preventDefault();
       const val = textareaRef.value?.value;
 
-      if (!val || val.trim().length === 0) {
+      if (!val || val.trim().length === 0 || !formValue.image) {
         return;
       }
 
@@ -71,7 +71,7 @@ export default defineComponent({
         const val = (e.target as HTMLTextAreaElement).value;
 
         // 验证消息内容
-        if (!val || val.trim().length === 0) {
+        if (!val || val.trim().length === 0 || !formValue.image) {
           return;
         }
         emit('submit', {

@@ -1,5 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 import type { ModelParams } from '../models';
+import type { ModelConfig } from '../utils/storage';
 import { SystemMessage } from '@langchain/core/messages';
 import { computed, reactive, toRefs } from 'vue';
 import { generateID } from '../db';
@@ -10,7 +11,6 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { getOllamaURL } from '../service/ollama';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
-import { useMultiModel, useMultiModelSettings } from '../utils/storage';
 
 export interface Message {
   isBot: boolean;
@@ -57,10 +57,9 @@ export interface ChatSubmitOptions {
  * @param options 模型选项
  * @returns 聊天对话处理方法和状态
  */
-export function useMessageOption(model: any, options: MessageOptions = {}) {
+export function useMessageOption(model: ComputedRef<ModelConfig>, options: MessageOptions = {}) {
   // 提取选项参数
   const {
-    prompt,
     initialMessages = [],
     initialHistory = [],
     onMessageUpdate,
@@ -81,12 +80,6 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
   // 提供状态的引用版本
   const { streaming, isProcessing, messages, history, lastError } = toRefs(chatState);
 
-  // 配置存储
-  const llmSettings = useMultiModelSettings();
-  const models = useMultiModel();
-
-  // 计算属性
-  const currentModel = computed(() => llmSettings.value.mainModel?.model || 'unknown');
   const hasMessages = computed(() => messages.value.length > 0);
 
   // 控制器
@@ -157,9 +150,9 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
     // 合并模型设置
     const modelParams: ModelParams = {
       // 使用模型配置
-      model: models.value.mainModel!.name,
-      apiKey: llmSettings.value.mainModel!.apiKey,
-      customBaseUrl: llmSettings.value.mainModel!.customServiceProviderBaseUrl,
+      model: model.value.name!,
+      apiKey: model.value!.apiKey,
+      customBaseUrl: model.value!.customServiceProviderBaseUrl,
       baseUrl: cleanUrl(url),
       // 默认配置
       keepAlive: undefined,
@@ -200,7 +193,7 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
           },
           {
             isBot: true,
-            name: llmSettings.value.mainModel!.model!,
+            name: model.value.model!,
             message: '▋',
             sources: [],
             id: generateMessageId,
@@ -212,7 +205,7 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
           ...messagesRef.value,
           {
             isBot: true,
-            name: llmSettings.value.mainModel!.model!,
+            name: model.value.model!,
             message: '▋',
             sources: [],
             id: generateMessageId,
@@ -232,7 +225,7 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
             type: 'text',
           },
         ],
-        model: llmSettings.value.mainModel!.model!,
+        model: model.value.model!,
       });
 
       if (image && image.length > 0) {
@@ -247,18 +240,18 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
               type: 'image_url',
             },
           ],
-          model: llmSettings.value.mainModel!.model!,
+          model: model.value!.model!,
         });
       }
 
       // 生成聊天历史
-      const applicationChatHistory = generateHistory(historyRef.value, models.value.mainModel!.value);
+      const applicationChatHistory = generateHistory(historyRef.value, model.value!.value!);
 
       // 添加系统提示
-      if (prompt?.value) {
+      if (model.value.prompt) {
         applicationChatHistory.unshift(
           new SystemMessage({
-            content: prompt?.value,
+            content: model.value.prompt,
           }),
         );
       }
@@ -416,7 +409,7 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
     retainContext = true,
   }: ChatSubmitOptions) => {
     if (!message.trim() && (!image || image.trim() === '')) {
-      return { success: false, error: new Error('消息内容不能为空') };
+      return { success: false, error: new Error('消息内容不能为空'), message: '' };
     }
 
     chatState.streaming = true;
@@ -487,8 +480,6 @@ export function useMessageOption(model: any, options: MessageOptions = {}) {
     messages,
     history,
     lastError,
-    // 计算属性
-    currentModel,
     hasMessages,
   };
 }

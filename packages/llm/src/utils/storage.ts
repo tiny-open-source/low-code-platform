@@ -1,26 +1,22 @@
+import type { ModelType } from './constants';
 import { useLocalStorage as _useLocalStorage } from '@vueuse/core';
 import mustache from 'mustache';
 import { getOllamaURL } from '../service/ollama';
 
 export interface ModelConfig {
-  model: string;
-  value: string;
+  model?: string;
+  value?: string;
   provider?: string;
   label?: string;
-  customModelName: string;
-  name: string;
-}
-
-export interface LLMSettings {
+  name?: string;
   ollamaUrl?: string;
-  model?: string;
-  modelId?: string;
   customServiceProvider?: string;
   customServiceProviderName?: string;
   customServiceProviderBaseUrl?: string;
   apiKey?: string;
   prompt?: string;
   visionEnabled?: boolean;
+  modelId?: string | number;
 }
 
 export interface ModelSettings {
@@ -59,25 +55,15 @@ export interface ModelSettings {
 
 // 多模型配置接口
 export interface MultiModelConfig {
-  mainModel?: ModelConfig;
-  visionModel?: ModelConfig;
+  [ModelType.MAIN]?: ModelConfig;
+  [ModelType.VISION]?: ModelConfig;
   // 可扩展更多模型类型
   [key: string]: ModelConfig | undefined;
-}
-
-// 多模型设置接口
-export interface MultiModelSettings {
-  mainModel?: LLMSettings;
-  visionModel?: LLMSettings;
-  // 可扩展更多模型类型
-  [key: string]: LLMSettings | undefined;
 }
 
 // 存储键名常量
 export const STORAGE_KEYS = {
   MULTI_MODEL_CONFIG: 'multiModelConfig',
-  MULTI_MODEL_SETTINGS: 'multiModelSettings',
-  MODEL_SETTINGS: 'modelSettings',
 };
 
 /**
@@ -97,18 +83,14 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
  * @returns 多模型配置存储
  */
 export function useMultiModel() {
-  return useLocalStorage<MultiModelConfig>(STORAGE_KEYS.MULTI_MODEL_CONFIG, {});
-}
-
-/**
- * 获取多模型设置存储对象
- * @returns 多模型设置存储
- */
-export function useMultiModelSettings() {
-  return useLocalStorage<MultiModelSettings>(STORAGE_KEYS.MULTI_MODEL_SETTINGS, {
+  return useLocalStorage<MultiModelConfig>(STORAGE_KEYS.MULTI_MODEL_CONFIG, {
     mainModel: {
       ollamaUrl: getOllamaURL(),
       model: '',
+      value: '',
+      provider: '',
+      label: '',
+      name: '',
       modelId: '',
       customServiceProvider: 'custom',
       customServiceProviderName: '',
@@ -119,23 +101,19 @@ export function useMultiModelSettings() {
     visionModel: {
       ollamaUrl: getOllamaURL(),
       model: '',
+      value: '',
+      provider: '',
+      label: '',
+      name: '',
       modelId: '',
       customServiceProvider: 'custom',
       customServiceProviderName: '',
       customServiceProviderBaseUrl: '',
       apiKey: '',
       prompt: '',
-      visionEnabled: false,
+      visionEnabled: true,
     },
   });
-}
-
-/**
- * 获取模型设置存储对象
- * @returns 模型设置存储
- */
-export function useModelSettings() {
-  return useLocalStorage<ModelSettings>(STORAGE_KEYS.MODEL_SETTINGS, {});
 }
 
 /**

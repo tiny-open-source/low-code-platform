@@ -3,7 +3,8 @@ import { defineComponent } from 'vue';
 import { useMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import aiAssistantService from '../../service/ai-assistant.service';
-import { processPromptTemplate, useMultiModel, useMultiModelSettings } from '../../utils/storage';
+import { ModelType } from '../../utils/constants';
+import { useMultiModel } from '../../utils/storage';
 import Header from './ChatHeader';
 import TextAreaForm from './ChatInputArea';
 import Messages from './ChatMessages';
@@ -19,38 +20,25 @@ export default defineComponent({
     const { check: checkOllamaStatus, status: ollamaStatus }
       = useOllamaStatus();
 
-    const modelConfig = useMultiModel();
-    const modelSettings = useMultiModelSettings();
-
+    const models = useMultiModel();
+    const activeModelType = ref<ModelType>(ModelType.MAIN);
     onMounted(() => {
       (textAreaFormRef.value as any)?.focus();
       checkOllamaStatus();
     });
-
-    // 构建提示语
-    const prompt = computed(() => {
-      // 优先使用提示词模板
-      const currentModel = modelSettings.value.mainModel;
-      const promptTemplate = currentModel?.prompt;
-
-      if (promptTemplate) {
-        // 准备变量值
-        const variableValues: Record<string, string> = {
-
-        };
-
-        // 处理模板
-        return processPromptTemplate(promptTemplate, variableValues);
+    const currentModel = computed(() => {
+      const model = models.value[activeModelType.value];
+      if (!model) {
+        throw new Error('模型未定义');
       }
-
-      return currentModel?.prompt || '';
-    });
-
+      return model;
+    },
+    );
     // 消息处理
     const { onSubmit, messages, streaming, stopStreamingRequest, resetState }
-      = useMessageOption({
-        prompt,
-      });
+      = useMessageOption(
+        currentModel,
+      );
 
     // 处理消息更新
     watch(messages, async () => {
@@ -77,22 +65,34 @@ export default defineComponent({
     });
 
     // 处理图片上传和分析
-    const processImage = async (image: string): Promise<string | null> => {
+    const processImage = async (message: string, image: string): Promise<string | undefined> => {
       if (!image)
-        return null;
-
-      return null; // 如果模型支持图片，直接使用原图
+        return;
+      // 如果有图片，切换到vision_model
+      activeModelType.value = ModelType.VISION;
+      try {
+        const response = await onSubmit({
+          message: `<user_image_query>${message || '开始分析'}</user_image_query>`,
+          image,
+        });
+        return response.message;
+      }
+      catch (error) {
+        console.error('发送消息失败:', error);
+        // 可以在这里添加错误提示
+      }
+      activeModelType.value = ModelType.MAIN;
     };
     // 发送消息
     const sendMessage = async ({ message, image }: { message: string;image: string }) => {
       if (image) {
-        await processImage(image);
+        await processImage(message, image);
       }
 
       try {
         await onSubmit({
           message: `<user_query>${message}</user_query>`,
-          image,
+          image: '',
         });
       }
       catch (error) {
@@ -139,7 +139,7 @@ export default defineComponent({
           onSubmit={handleSubmit}
           onStop={stopStreamingRequest}
           status={
-            !modelConfig.value.mainModel?.model
+            !models.value.mainModel?.model
               ? 'disabled'
               : streaming.value
                 ? 'pending'

@@ -1,5 +1,7 @@
 import type { SelectOption } from 'naive-ui';
-import type { LLMSettings } from '../../utils/storage';
+import type {
+  ModelConfig,
+} from '../../utils/storage';
 import { EditOutlined, EyeOutlined, SettingOutlined } from '@vicons/antd';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
@@ -28,12 +30,11 @@ import { OAI_API_PROVIDERS } from '../../utils/oai-api-providers';
 import {
   processPromptTemplate,
   useMultiModel,
-  useMultiModelSettings,
 } from '../../utils/storage';
 import { ProviderIcons } from '../ProviderIcon';
 
 // 模型表单值接口
-interface ModelFormValues extends LLMSettings {
+interface ModelFormValues extends ModelConfig {
   type: ModelType;
 }
 
@@ -50,7 +51,6 @@ export default defineComponent({
     const activeTab = ref<string>(ModelType.MAIN);
 
     // 多模型配置存储
-    const multiModelSettings = useMultiModelSettings();
     const multiModelConfig = useMultiModel();
 
     // 初始化markdown解析器
@@ -86,7 +86,7 @@ export default defineComponent({
     // 创建表单值引用
     const formValues = ref<ModelFormValues>({
       type: ModelType.MAIN,
-      ...(multiModelSettings.value.mainModel || {}),
+      ...(multiModelConfig.value.mainModel || {}),
     });
 
     // 本地和自定义模型
@@ -166,7 +166,7 @@ export default defineComponent({
       (newTab) => {
         formValues.value = {
           type: newTab as ModelType,
-          ...(multiModelSettings.value[newTab as ModelType] || {}),
+          ...(multiModelConfig.value[newTab as ModelType] || {}),
         };
         previewResult.value = '';
       },
@@ -301,13 +301,12 @@ export default defineComponent({
         );
         const val = { ...formValues.value, type: undefined };
         // 保存设置到多模型配置
-        multiModelSettings.value[modelType] = { ...val };
-        console.log(modelType);
-        console.log(val);
+        console.log(`model`, model);
+        console.log(`val`, val);
 
         // 保存模型到多模型配置
         if (model) {
-          multiModelConfig.value[modelType] = model;
+          multiModelConfig.value[modelType] = { ...val, ...model };
         }
 
         message.success(`${MODEL_TYPE_LABELS[modelType]}配置已保存`);
@@ -534,7 +533,7 @@ export default defineComponent({
             if (formValues.value.ollamaUrl) {
               setOllamaURL(formValues.value.ollamaUrl);
             }
-            emit('save', multiModelSettings.value);
+            emit('save', multiModelConfig.value);
             return true;
           }
           return false;
