@@ -75,20 +75,25 @@ export default defineComponent({
           message: `<user_image_query>${message || '开始分析'}</user_image_query>`,
           image,
         });
+        console.log('response.message:', response.message);
+
         return response.message;
       }
       catch (error) {
         console.error('发送消息失败:', error);
         // 可以在这里添加错误提示
       }
-      activeModelType.value = ModelType.MAIN;
     };
     // 发送消息
     const sendMessage = async ({ message, image }: { message: string;image: string }) => {
       if (image) {
-        await processImage(message, image);
+        const res = await processImage(message, image);
+        if (res) {
+          message = res;
+        }
       }
-
+      resetState();
+      activeModelType.value = ModelType.MAIN;
       try {
         await onSubmit({
           message: `<user_query>${message}</user_query>`,

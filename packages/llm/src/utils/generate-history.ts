@@ -14,6 +14,7 @@ export function generateHistory(messages: {
 }[], model: string) {
   const history = [];
   const isCustom = isCustomModel(model);
+  console.log('isCustom,', isCustom);
 
   for (const message of messages) {
     if (message.role === 'user') {
@@ -42,6 +43,8 @@ export function generateHistory(messages: {
           },
         ];
       }
+      console.log('content', content);
+
       history.push(
         new HumanMessage({
           content,

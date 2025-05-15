@@ -1,15 +1,12 @@
-import type { ModelSettings } from '../utils/storage';
+import type { ModelConfig, ModelSettings } from '../utils/storage';
 import { isCustomModel } from '../db/models';
+import { getOllamaURL } from '../service/ollama';
 import { getCustomHeaders } from '../utils/clean-headers';
-import { useMultiModel } from '../utils/storage';
 import { ChatOllama } from './ChatOllama';
 import { CustomChatOpenAI } from './CustomChatOpenAI';
 
 export interface ModelParams extends ModelSettings {
-  model: string;
-  apiKey?: string;
-  customBaseUrl?: string;
-  baseUrl: string;
+  model: ModelConfig;
 }
 
 /**
@@ -20,9 +17,6 @@ export interface ModelParams extends ModelSettings {
 export async function pageAssistModel(params: ModelParams) {
   const {
     model,
-    apiKey,
-    customBaseUrl,
-    baseUrl,
     keepAlive,
     temperature,
     topK,
@@ -41,19 +35,17 @@ export async function pageAssistModel(params: ModelParams) {
     useMlock,
   } = params;
 
-  const isCustom = isCustomModel(model);
+  const isCustom = isCustomModel(model.name!);
   if (isCustom) {
-    const selectModelValue = useMultiModel();
-
     return new CustomChatOpenAI({
-      modelName: selectModelValue.value.mainModel!.model,
-      openAIApiKey: apiKey,
+      modelName: model.model,
+      openAIApiKey: model.apiKey,
       temperature,
       topP,
       maxTokens: numPredict,
       configuration: {
-        apiKey,
-        baseURL: customBaseUrl,
+        apiKey: model.apiKey,
+        baseURL: model.customServiceProviderBaseUrl,
         defaultHeaders: getCustomHeaders({
           headers: [],
         }),
@@ -62,14 +54,14 @@ export async function pageAssistModel(params: ModelParams) {
   }
 
   return new ChatOllama({
-    baseUrl,
+    baseUrl: getOllamaURL(),
     keepAlive,
     temperature,
     topK,
     topP,
     numCtx,
     seed,
-    model,
+    model: model.model,
     numGpu,
     numPredict,
     useMMap,

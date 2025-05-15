@@ -44,13 +44,14 @@ export default defineComponent({
         return;
       e.preventDefault();
       const val = textareaRef.value?.value;
+      console.log(!val || val.trim().length === 0 || !formValue.image);
 
-      if (!val || val.trim().length === 0 || !formValue.image) {
+      if ((!val || val.trim().length === 0) && !formValue.image) {
         return;
       }
 
       emit('submit', {
-        message: val.trim(),
+        message: val?.trim() || '',
         image: formValue.image,
       });
       resetFormState();
@@ -71,11 +72,11 @@ export default defineComponent({
         const val = (e.target as HTMLTextAreaElement).value;
 
         // 验证消息内容
-        if (!val || val.trim().length === 0 || !formValue.image) {
+        if ((!val || val.trim().length === 0) && !formValue.image) {
           return;
         }
         emit('submit', {
-          message: val.trim(),
+          message: val?.trim() || '',
           image: formValue.image,
         });
         resetFormState();

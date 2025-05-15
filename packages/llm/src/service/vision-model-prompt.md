@@ -23,12 +23,8 @@ You may ONLY use the following CSS properties in your implementation:
 - Borders: borderTopLeftRadius, borderTopRightRadius, borderBottomRightRadius, borderBottomLeftRadius, borderTopWidth, borderTopStyle, borderTopColor, borderRightColor, borderRightWidth, borderRightStyle, borderRightColor, borderBottomWidth, borderBottomStyle, borderBottomColor, borderLeftStyle, borderLeftWidth, borderLeftColor, borderWidth, borderStyle, borderColor
 
 ## Response Format
-1. First, analyze the image and describe what you see
-2. Next, provide your implementation plan
-3. Then generate the complete HTML code with inline CSS styles
-4. Always wrap your code in ```html code blocks
-
-Remember to maintain proper indentation and add comments where necessary to explain your approach.
+Generate the complete HTML code with inline CSS styles directly without any explanations or analysis.
+Always write your response in English and wrap your code in ```html code blocks.
 
 ## Important Notes
 - Do not use any external libraries or frameworks

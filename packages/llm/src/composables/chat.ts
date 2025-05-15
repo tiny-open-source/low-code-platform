@@ -4,11 +4,9 @@ import type { ModelConfig } from '../utils/storage';
 import { SystemMessage } from '@langchain/core/messages';
 import { computed, reactive, toRefs } from 'vue';
 import { generateID } from '../db';
-import { cleanUrl } from '../libs/clean-url';
 import { isReasoningEnded, isReasoningStarted, mergeReasoningContent } from '../libs/reasoning';
 import { pageAssistModel } from '../models';
 import { getAllDefaultModelSettings } from '../service/model-settings';
-import { getOllamaURL } from '../service/ollama';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
 
@@ -140,7 +138,8 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     signal: AbortSignal,
     retainContext: boolean = true,
   ) => {
-    const url = getOllamaURL();
+    console.log('normalChatMode:', message);
+
     const userDefaultModelSettings = await getAllDefaultModelSettings();
 
     if (image && image.length > 0 && !image.startsWith('data:')) {
@@ -150,10 +149,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     // 合并模型设置
     const modelParams: ModelParams = {
       // 使用模型配置
-      model: model.value.name!,
-      apiKey: model.value!.apiKey,
-      customBaseUrl: model.value!.customServiceProviderBaseUrl,
-      baseUrl: cleanUrl(url),
+      model: model.value,
       // 默认配置
       keepAlive: undefined,
       temperature: 0.0,
@@ -225,7 +221,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
             type: 'text',
           },
         ],
-        model: model.value.model!,
+        model: model.value.name!,
       });
 
       if (image && image.length > 0) {
@@ -240,12 +236,12 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
               type: 'image_url',
             },
           ],
-          model: model.value!.model!,
+          model: model.value!.name!,
         });
       }
 
       // 生成聊天历史
-      const applicationChatHistory = generateHistory(historyRef.value, model.value!.value!);
+      const applicationChatHistory = generateHistory(historyRef.value, model.value.name!);
 
       // 添加系统提示
       if (model.value.prompt) {
@@ -369,6 +365,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       chatState.isProcessing = false;
       chatState.streaming = false;
       chatState.lastError = null;
+      console.log('到这了');
 
       return {
         success: true,
@@ -426,7 +423,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     }
 
     // 处理消息
-    return await normalChatMode(
+    const res = await normalChatMode(
       message,
       image,
       isRegenerate,
@@ -435,6 +432,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       signal,
       retainContext,
     );
+    return res;
   };
 
   /**
