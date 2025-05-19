@@ -365,7 +365,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       chatState.isProcessing = false;
       chatState.streaming = false;
       chatState.lastError = null;
-      console.log('到这了');
 
       return {
         success: true,

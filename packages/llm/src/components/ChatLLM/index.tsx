@@ -40,7 +40,7 @@ export default defineComponent({
         currentModel,
       );
 
-    // 处理消息更新
+    // 处理消息更新，增强自动化工作流
     watch(messages, async () => {
       // 滚动到最新消息
       if (divRef.value) {
@@ -51,18 +51,27 @@ export default defineComponent({
       const latestMessage = messages.value[messages.value.length - 1];
       if (latestMessage && latestMessage.isBot) {
         if (latestMessage.generationInfo) {
-          const toolResult = await aiAssistantService!.processResponse(latestMessage.message);
+          try {
+            console.log('最新消息:', latestMessage);
 
-          // 如果有工具执行结果，将其添加到新消息中
-          if (toolResult) {
-            await onSubmit({
-              message: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult),
-              image: '',
-            });
+            const toolResult = await aiAssistantService!.processResponse(latestMessage.message);
+
+            // 如果有工具执行结果，将其添加到新消息中
+            if (toolResult) {
+              // 延迟很短时间再发送，确保UI状态正确更新
+              await new Promise(resolve => setTimeout(resolve, 50));
+              await onSubmit({
+                message: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult),
+                image: '',
+              });
+            }
+          }
+          catch (error) {
+            console.error('工具执行失败:', error);
           }
         }
       }
-    });
+    }, { deep: true });
 
     // 处理图片上传和分析
     const processImage = async (message: string, image: string): Promise<string | undefined> => {
@@ -90,9 +99,9 @@ export default defineComponent({
         const res = await processImage(message, image);
         if (res) {
           message = res;
+          resetState();
         }
       }
-      resetState();
       activeModelType.value = ModelType.MAIN;
       try {
         await onSubmit({

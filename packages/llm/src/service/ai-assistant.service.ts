@@ -1,7 +1,7 @@
 import type { AddMNode } from '@low-code/designer';
 import type { MNode } from 'packages/schema/types';
 import { componentListService, designerService } from '@low-code/designer';
-import { merge } from 'lodash-es';
+import { cloneDeep, merge } from 'lodash-es';
 
 interface ToolDescription {
   // 工具名称
@@ -15,10 +15,27 @@ interface ParsedToolCall {
   params: Record<string, any>;
 }
 
+// Use lodash to remove empty properties recursively
+function removeEmpty(obj: any) {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
+      delete obj[key];
+    }
+    else if (typeof obj[key] === 'object' && Object.keys(obj[key]).length > 0) {
+      removeEmpty(obj[key]); // Recursively clean nested objects
+      if (Object.keys(obj[key]).length === 0) {
+        delete obj[key]; // Remove empty objects
+      }
+    }
+  });
+  return obj;
+}
 class AIAssistant {
   private availableActionsMap = new Map<string, ToolDescription>();
   public state = reactive({
     isProcessing: false,
+    lastToolName: '', // 新增：记录最后调用的工具名
+    lastToolResult: null as any, // 新增：记录最后一次工具执行结果
   });
 
   private uploadedImageUrl: string | null = null;
@@ -80,22 +97,14 @@ class AIAssistant {
     });
     // 根据id获取节点配置
     this.registerTool({
-      name: 'get_node_by_id',
+      name: 'get_node_structure',
       handler: async ({ id }: { id: string }) => {
         const node = designerService.getNodeById(id);
         if (node) {
-          return node;
-        }
-        return null;
-      },
-    });
-    // 获取节点树
-    this.registerTool({
-      name: 'get_page_dsl_structure',
-      handler: async () => {
-        const root = designerService.get('root');
-        if (root) {
-          return root;
+          // Create a deep clone of the node to avoid modifying the original
+          const cleanNode = cloneDeep(node);
+
+          return removeEmpty(cleanNode);
         }
         return null;
       },
@@ -144,7 +153,9 @@ class AIAssistant {
             const node = designerService.getNodeById(id);
             if (node && node.items) {
               const newNode = await designerService.add(config!, node as any);
-              return newNode;
+              const cleanNode = cloneDeep(newNode);
+
+              return removeEmpty(cleanNode);
             }
             return 'error: "节点不存在"';
           }
@@ -153,11 +164,13 @@ class AIAssistant {
             const page = designerService.get('page');
             if (node && node.items) {
               const newNode = await designerService.add(config!, node as any);
-              return newNode;
+              const cleanNode = cloneDeep(newNode);
+              return removeEmpty(cleanNode);
             }
             else {
               const newNode = await designerService.add(config!, page as any);
-              return newNode;
+              const cleanNode = cloneDeep(newNode);
+              return removeEmpty(cleanNode);
             }
           }
         }
@@ -198,16 +211,69 @@ class AIAssistant {
       console.log('[tool]', parsedTool);
       if (parsedTool) {
         this.state.isProcessing = true;
-        const result = await this.executeTool(parsedTool.toolName, parsedTool.params);
-        this.state.isProcessing = false;
+        this.state.lastToolName = parsedTool.toolName;
 
-        // 返回工具执行结果，可以附加到消息中
-        return JSON.stringify(result);
+        // 对工具调用结果进行格式化
+        try {
+          const result = await this.executeTool(parsedTool.toolName, parsedTool.params);
+          this.state.lastToolResult = result;
+
+          // 根据不同的工具类型进行不同的格式处理
+          let formattedResult: any = result;
+
+          // 如果结果是 do_action 的返回，增加更多上下文信息以帮助AI理解
+          if (parsedTool.toolName === 'do_action') {
+            const { action, id, config } = parsedTool.params;
+            if (action === 'add_node' && result && typeof result === 'object') {
+              formattedResult = {
+                status: 'success',
+                action: 'add_node',
+                node: result,
+                message: `节点已成功添加，ID: ${result.id}, 类型: ${result.type || config?.type}`,
+              };
+            }
+            else if (action === 'update_node') {
+              formattedResult = {
+                status: 'success',
+                action: 'update_node',
+                nodeId: id,
+                message: `节点 ${id} 已成功更新`,
+              };
+            }
+            else if (action === 'remove_node') {
+              formattedResult = {
+                status: 'success',
+                action: 'remove_node',
+                removedNodeId: id,
+                message: `节点 ${id} 已成功删除`,
+              };
+            }
+          }
+
+          this.state.isProcessing = false;
+
+          // 格式化返回结果，使其易于AI理解
+          const jsonResult = JSON.stringify(formattedResult, null, 2);
+          return jsonResult;
+        }
+        catch (error: any) {
+          this.state.isProcessing = false;
+          const errorMessage = {
+            status: 'error',
+            tool: parsedTool.toolName,
+            error: error.message || '执行失败',
+          };
+          return JSON.stringify(errorMessage);
+        }
       }
     }
-    catch (error) {
+    catch (error: any) {
       console.error('处理工具调用失败:', error);
       this.state.isProcessing = false;
+      return JSON.stringify({
+        status: 'error',
+        error: error.message || '处理工具调用失败',
+      });
     }
 
     return null;
@@ -244,7 +310,6 @@ class AIAssistant {
 
       // 尝试解析JSON值，如果失败则保留原始字符串
       try {
-        console.log('🚀 ~ AIAssistant ~ parseToolCall ~ paramValue:', paramValue);
         params[paramName] = JSON.parse(paramValue);
       }
       catch {
