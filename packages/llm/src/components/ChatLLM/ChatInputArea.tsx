@@ -27,7 +27,7 @@ export default defineComponent({
     const textareaRef = ref<HTMLTextAreaElement>();
     const inputRef = ref<HTMLInputElement>();
     const formValue = reactive({
-      message: '',
+      message: '画一个中国象棋棋盘',
       image: '',
     });
     // 文本框聚焦

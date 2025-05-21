@@ -83,7 +83,6 @@ class StageDragResize extends EventEmitter {
   public select(el: HTMLElement, event?: MouseEvent): void {
     const oldTarget = this.target;
     this.target = el;
-
     if (!this.moveable || this.target !== oldTarget) {
       this.init(el);
       this.moveableHelper = MoveableHelper.create({
@@ -91,6 +90,7 @@ class StageDragResize extends EventEmitter {
         useRender: false,
         createAuto: true,
       });
+
       this.initMoveable();
     }
     else {
@@ -171,12 +171,19 @@ class StageDragResize extends EventEmitter {
       .on('scaleEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
         const frame = this.moveableHelper?.getFrame(e.target);
-        this.emit('update', {
-          el: this.target,
-          style: {
-            transform: frame?.get('transform'),
-          },
-        });
+        if (this.target && frame) {
+          this.emit('update', {
+            data: [
+              {
+                el: this.target,
+                style: {
+                  transform: frame.get('transform'),
+                },
+              },
+            ],
+            parentEl: null,
+          });
+        }
       });
   }
 
@@ -198,14 +205,23 @@ class StageDragResize extends EventEmitter {
         this.target.style.transform = frame?.toCSSObject().transform || '';
       })
       .on('rotateEnd', (e) => {
+        if (this.dragStatus === StageDragStatus.ING) {
+          const frame = this.moveableHelper?.getFrame(e.target);
+          if (this.target && frame) {
+            this.emit('update', {
+              data: [
+                {
+                  el: this.target,
+                  style: {
+                    transform: frame?.get('transform'),
+                  },
+                },
+              ],
+              parentEl: null,
+            });
+          }
+        }
         this.dragStatus = StageDragStatus.END;
-        const frame = this.moveableHelper?.getFrame(e.target);
-        this.emit('update', {
-          el: this.target,
-          style: {
-            transform: frame?.get('transform'),
-          },
-        });
       });
   }
 
@@ -563,6 +579,7 @@ class StageDragResize extends EventEmitter {
         center: isAbsolute,
         middle: isAbsolute,
       },
+
       elementSnapDirections: {
         top: isAbsolute,
         right: isAbsolute,

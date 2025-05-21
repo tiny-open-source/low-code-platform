@@ -60,15 +60,15 @@ export function useStage(stageOptions: StageOptions = {}) {
     editorService.multiSelect(els.map(el => el.id));
   });
 
-  stage.on('update', (ev: UpdateEventData) => {
-    if (ev.parentEl) {
-      for (const data of ev.data) {
-        editorService.moveToContainer({ id: data.el.id, style: data.style }, ev.parentEl.id);
+  stage.on('update', (evt: UpdateEventData) => {
+    if (evt.parentEl) {
+      for (const data of evt.data) {
+        editorService.moveToContainer({ id: data.el.id, style: data.style }, evt.parentEl.id);
       }
       return;
     }
 
-    editorService.update(ev.data.map(data => ({ id: data.el.id, style: data.style })));
+    editorService.update(evt.data.map(data => ({ id: data.el.id, style: data.style })));
   });
 
   stage.on('sort', (ev: SortEventData) => {

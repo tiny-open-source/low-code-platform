@@ -73,14 +73,15 @@ const props = withDefaults(
     containerHighlightClassName: CONTAINER_HIGHLIGHT_CLASS,
     containerHighlightDuration: 800,
     containerHighlightType: ContainerHighlightType.DEFAULT,
-  }
+  },
 );
 
 defineEmits(['propsPanelMounted']);
 
 const modelValue = defineModel<MApp | undefined>({ required: true });
 designerService.on('root-change', async (value) => {
-  if (!value) return;
+  if (!value)
+    return;
   const nodeId = designerService.get('node')?.id || props.defaultSelected;
   let node;
   if (nodeId) {
@@ -88,9 +89,11 @@ designerService.on('root-change', async (value) => {
   }
   if (node && node !== value) {
     await designerService.select(node.id);
-  } else if (value.items?.length) {
+  }
+  else if (value.items?.length) {
     await designerService.select(value.items[0]);
-  } else if (value.id) {
+  }
+  else if (value.id) {
     designerService.set('nodes', [value]);
     designerService.set('parent', null);
     designerService.set('page', null);
@@ -115,21 +118,21 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 watch(
   () => props.propsValues,
-  (values) => propsService.setPropsValues(values),
+  values => propsService.setPropsValues(values),
   {
     immediate: true,
-  }
+  },
 );
 watch(
   () => props.componentGroupList,
-  (componentGroupList) => componentListService.setList(componentGroupList),
+  componentGroupList => componentListService.setList(componentGroupList),
   {
     immediate: true,
-  }
+  },
 );
 watch(
   () => props.eventMethodList,
@@ -147,23 +150,23 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
   () => props.propsConfigs,
-  (configs) => propsService.setPropsConfigs(configs),
+  configs => propsService.setPropsConfigs(configs),
   {
     immediate: true,
-  }
+  },
 );
 
 watch(
   () => props.stageRect,
-  (stageRect) => stageRect && uiService.set('stageRect', stageRect),
+  stageRect => stageRect && uiService.set('stageRect', stageRect),
   {
     immediate: true,
-  }
+  },
 );
 uiService.initColumnWidth();
 

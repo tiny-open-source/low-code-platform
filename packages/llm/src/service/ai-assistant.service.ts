@@ -53,11 +53,20 @@ class AIAssistant {
   registerDefaultTools() {
     // 获取页面宽高
     this.registerTool({
-      name: 'get_page_size',
-      handler: async () => {
-        const page = designerService.get('page');
-        const { width = '1024', height = '600' } = page!.style! || {} as Record<string, any>;
-        return { width, height };
+      name: 'get_node_size',
+      handler: async ({ id }: { id?: string }) => {
+        if (id) {
+          const node = designerService.getNodeById(id);
+          if (node) {
+            const { width = '1024', height = '600' } = node.style || {} as Record<string, any>;
+            return { width, height };
+          }
+        }
+        else {
+          const page = designerService.get('page');
+          const { width = '1024', height = '600' } = page!.style! || {} as Record<string, any>;
+          return { width, height };
+        }
       },
     });
     // 获取可用节点配置
@@ -98,8 +107,14 @@ class AIAssistant {
     // 根据id获取节点配置
     this.registerTool({
       name: 'get_node_structure',
-      handler: async ({ id }: { id: string }) => {
-        const node = designerService.getNodeById(id);
+      handler: async ({ id }: { id?: string }) => {
+        let node = null;
+        if (!id) {
+          node = designerService.get('page');
+        }
+        else {
+          node = designerService.getNodeById(id);
+        }
         if (node) {
           // Create a deep clone of the node to avoid modifying the original
           const cleanNode = cloneDeep(node);
@@ -157,7 +172,7 @@ class AIAssistant {
 
               return removeEmpty(cleanNode);
             }
-            return 'error: "节点不存在"';
+            return 'error: "node not found"';
           }
           else {
             const node = designerService.get('node');
@@ -229,7 +244,7 @@ class AIAssistant {
                 status: 'success',
                 action: 'add_node',
                 node: result,
-                message: `节点已成功添加，ID: ${result.id}, 类型: ${result.type || config?.type}`,
+                message: `ID: ${result.id}, type: ${result.type || config?.type}`,
               };
             }
             else if (action === 'update_node') {
@@ -237,7 +252,7 @@ class AIAssistant {
                 status: 'success',
                 action: 'update_node',
                 nodeId: id,
-                message: `节点 ${id} 已成功更新`,
+                message: `ID: ${id} has been updated`,
               };
             }
             else if (action === 'remove_node') {
@@ -245,7 +260,7 @@ class AIAssistant {
                 status: 'success',
                 action: 'remove_node',
                 removedNodeId: id,
-                message: `节点 ${id} 已成功删除`,
+                message: `ID: ${id} has been removed`,
               };
             }
           }
