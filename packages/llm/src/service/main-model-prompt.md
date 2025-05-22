@@ -35,6 +35,7 @@ Tools must be used one at a time, with each response containing exactly one tool
 <tool_name>
 <parameter1_name>value1</parameter1_name>
 <parameter2_name>value2</parameter2_name>
+...
 </tool_name>
 ```
 
@@ -225,7 +226,7 @@ Requesting to create a landing page with multiple components:
    - Z-index manages element stacking when elements overlap
 
 3. **Element Default Styles**:
-   - All elements boxSizing is set to content-box by default
+   - All elements boxSizing is set to border-box by default
 
 3. **Error Prevention**:
    - Verify dimensions before placing elements
