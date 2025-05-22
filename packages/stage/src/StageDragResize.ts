@@ -164,9 +164,9 @@ class StageDragResize extends EventEmitter {
         if (!this.target || !this.dragEl)
           return;
         this.dragStatus = StageDragStatus.ING;
-        this.moveableHelper?.onScale(e);
         const frame = this.moveableHelper?.getFrame(e.target);
-        this.target.style.transform = frame?.toCSSObject().transform || '';
+        frame?.set('transform', e.drag.transform);
+        this.target.style.transform = e.target.style.transform = frame?.toCSSObject().transform || '';
       })
       .on('scaleEnd', (e) => {
         this.dragStatus = StageDragStatus.END;
@@ -200,13 +200,14 @@ class StageDragResize extends EventEmitter {
         if (!this.target || !this.dragEl)
           return;
         this.dragStatus = StageDragStatus.ING;
-        this.moveableHelper?.onRotate(e);
         const frame = this.moveableHelper?.getFrame(e.target);
-        this.target.style.transform = frame?.toCSSObject().transform || '';
+        frame?.set('transform', e.drag.transform);
+        this.target.style.transform = e.target.style.transform = frame?.toCSSObject().transform || '';
       })
       .on('rotateEnd', (e) => {
         if (this.dragStatus === StageDragStatus.ING) {
           const frame = this.moveableHelper?.getFrame(e.target);
+
           if (this.target && frame) {
             this.emit('update', {
               data: [
@@ -275,8 +276,7 @@ class StageDragResize extends EventEmitter {
           this.ghostEl.style.top = `${frame.top + e.beforeTranslate[1]}px`;
           return;
         }
-
-        this.moveableHelper?.onDrag(e);
+        e.target.style.transform = e.transform;
 
         this.target.style.left = `${frame.left + e.beforeTranslate[0]}px`;
         this.target.style.top = `${frame.top + e.beforeTranslate[1]}px`;
@@ -314,14 +314,6 @@ class StageDragResize extends EventEmitter {
       });
   }
 
-  // 使用 requestAnimationFrame 优化拖拽动画
-  private updatePosition(x: number, y: number) {
-    requestAnimationFrame(() => {
-      this.target!.style.left = `${x}px`;
-      this.target!.style.top = `${y}px`;
-    });
-  }
-
   private bindResizeEvent(): void {
     if (!this.moveable)
       throw new Error('moveable 未初始化');
@@ -357,7 +349,12 @@ class StageDragResize extends EventEmitter {
           this.dragEl.style.height = `${height}px`;
         }
         else {
-          this.moveableHelper?.onResize(e);
+          // 蒙层拖拽方框
+          e.target.style.width = `${e.width}px`;
+          e.target.style.height = `${e.height}px`;
+          e.target.style.transform = e.drag.transform;
+
+          // 真实被拖拽的节点
           this.target.style.left = `${frame.left + beforeTranslate[0]}px`;
           this.target.style.top = `${frame.top + beforeTranslate[1]}px`;
         }
