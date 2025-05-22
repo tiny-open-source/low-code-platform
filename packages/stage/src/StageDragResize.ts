@@ -374,7 +374,7 @@ class StageDragResize extends EventEmitter {
     const { top } = this.ghostEl.getBoundingClientRect();
     const { top: oriTop } = this.target.getBoundingClientRect();
     const deltaTop = top - oriTop;
-    if (Math.abs(deltaTop) >= this.target.clientHeight / 2) {
+    if (Math.abs(deltaTop) >= this.target.offsetHeight / 2) {
       if (deltaTop > 0) {
         this.emit('sort', down(deltaTop, this.target));
       }
@@ -405,8 +405,8 @@ class StageDragResize extends EventEmitter {
 
     let left = calcValueByFontsize(doc, offset.left);
     let top = calcValueByFontsize(doc, offset.top);
-    const width = calcValueByFontsize(doc, this.target.clientWidth);
-    const height = calcValueByFontsize(doc, this.target.clientHeight);
+    const width = calcValueByFontsize(doc, this.target.offsetWidth);
+    const height = calcValueByFontsize(doc, this.target.offsetHeight);
 
     if (parentEl && this.mode === Mode.ABSOLUTE && this.dragEl) {
       const [translateX, translateY] = this.moveableHelper?.getFrame(this.dragEl).properties.transform.translate.value;
@@ -463,6 +463,7 @@ class StageDragResize extends EventEmitter {
     if (typeof this.core.config.updateDragEl === 'function') {
       this.core.config.updateDragEl(this.dragEl, el);
     }
+
     this.moveableOptions = this.getOptions({
       target: this.dragEl,
     });

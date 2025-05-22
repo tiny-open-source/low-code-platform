@@ -245,8 +245,8 @@ export default class StageMultiDragResize extends EventEmitter {
         const offset = { left: targetItem.offsetLeft, top: targetItem.offsetTop };
         const left = calcValueByFontsize(doc, offset.left);
         const top = calcValueByFontsize(doc, offset.top);
-        const width = calcValueByFontsize(doc, targetItem.clientWidth);
-        const height = calcValueByFontsize(doc, targetItem.clientHeight);
+        const width = calcValueByFontsize(doc, targetItem.offsetWidth);
+        const height = calcValueByFontsize(doc, targetItem.offsetHeight);
         return {
           el: targetItem,
           style: isResize ? { left, top, width, height } : { left, top },
