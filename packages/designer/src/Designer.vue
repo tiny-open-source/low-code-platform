@@ -18,7 +18,7 @@ import {
   CONTAINER_HIGHLIGHT_CLASS,
   ContainerHighlightType,
 } from '@low-code/stage';
-import { NDialogProvider, NMessageProvider } from 'naive-ui';
+import { NDialogProvider, NMessageProvider, NModalProvider } from 'naive-ui';
 import { onBeforeUnmount, provide, toRaw, watch } from 'vue';
 import Framework from './layouts/Framework.vue';
 import NavMenu from './layouts/NavMenu.vue';
@@ -218,45 +218,47 @@ defineExpose({
 <template>
   <NMessageProvider>
     <NDialogProvider>
-      <Framework>
-        <template #header>
-          <slot name="header">
-            <NavMenu :data="menu" />
-          </slot>
-        </template>
-        <template #sidebar>
-          <slot name="sidebar">
-            <Sidebar :data="sidebar">
-              <template #layer-panel-header>
-                <slot name="layer-panel-header" />
-              </template>
+      <NModalProvider>
+        <Framework>
+          <template #header>
+            <slot name="header">
+              <NavMenu :data="menu" />
+            </slot>
+          </template>
+          <template #sidebar>
+            <slot name="sidebar">
+              <Sidebar :data="sidebar">
+                <template #layer-panel-header>
+                  <slot name="layer-panel-header" />
+                </template>
 
-              <template #component-list-panel-header>
-                <slot name="component-list-panel-header" />
-              </template>
-            </Sidebar>
-          </slot>
-        </template>
-        <template #workspace>
-          <slot name="workspace">
-            <Workspace>
-              <template #stage>
-                <slot name="stage" />
-              </template>
-              <template #workspace-content>
-                <slot name="workspace-content" />
-              </template>
-            </Workspace>
-          </slot>
-        </template>
-        <template #props-panel>
-          <slot name="props-panel">
-            <PropsPanel
-              @mounted="(instance) => $emit('propsPanelMounted', instance)"
-            />
-          </slot>
-        </template>
-      </Framework>
+                <template #component-list-panel-header>
+                  <slot name="component-list-panel-header" />
+                </template>
+              </Sidebar>
+            </slot>
+          </template>
+          <template #workspace>
+            <slot name="workspace">
+              <Workspace>
+                <template #stage>
+                  <slot name="stage" />
+                </template>
+                <template #workspace-content>
+                  <slot name="workspace-content" />
+                </template>
+              </Workspace>
+            </slot>
+          </template>
+          <template #props-panel>
+            <slot name="props-panel">
+              <PropsPanel
+                @mounted="(instance) => $emit('propsPanelMounted', instance)"
+              />
+            </slot>
+          </template>
+        </Framework>
+      </NModalProvider>
     </NDialogProvider>
   </NMessageProvider>
 </template>

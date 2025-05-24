@@ -5,11 +5,10 @@ import { parse as parseByWorker } from '@low-code/adapter';
 import { LowCodeDesigner } from '@low-code/designer';
 import { NodeType } from '@low-code/schema';
 import { asyncLoadJs } from '@low-code/utils';
-import { CodeOutlined, FireOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
+import { CodeOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
 import { ThemeColorConfig } from '../theme.config';
-import ChatLLM from './components/ChatLLM';
 import DeviceGroup from './components/DeviceGroup';
 import GlobalMessageSetup from './components/GlobalMessageSetup';
 import ImportDSL from './components/Import';
@@ -20,7 +19,6 @@ import { defaultDSLConfig } from './configs/dsl';
 const colorRef = ref(ThemeColorConfig);
 const previewVisible = ref(false);
 const importDialogVisible = ref(false);
-const aiPanelVisible = ref(false);
 const designer = ref<InstanceType<typeof LowCodeDesigner>>();
 const dsl = ref(defaultDSLConfig as any);
 const defaultSelectedId = computed(() => dsl.value?.items?.[0]?.id);
@@ -66,7 +64,6 @@ function parse(code: string) {
     (window as any).$message.error(`导入失败，${e.message}`);
   }
 }
-const llmOutputDSL = ref('');
 
 function moveableOptions(core?: StageCore): MoveableOptions {
   const options: MoveableOptions = {};
@@ -101,17 +98,6 @@ window.onbeforeunload = function () {
   }
 };
 
-const dslSerialized = computed(() => {
-  return serialize(toRaw(dsl.value), {
-    space: 2,
-    unsafe: true,
-  }).replace(/"(\w+)":\s/g, '$1: ');
-});
-
-const dslEvaled = computed(() => {
-  // eslint-disable-next-line no-eval
-  return eval(`(${dslSerialized.value})`);
-});
 function save() {
   localStorage.setItem(
     'lowcodeDSL',
@@ -146,14 +132,6 @@ const menu: MenuBarData = {
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
   right: [
     '/',
-    {
-      type: 'button',
-      text: '使用AI优化',
-      icon: FireOutlined,
-      handler: async () => {
-        aiPanelVisible.value = true;
-      },
-    },
     {
       type: 'button',
       text: '导入',
@@ -227,11 +205,11 @@ const menu: MenuBarData = {
             <DeviceGroup v-model="stageRectStr" class="device-group" />
           </template>
         </LowCodeDesigner>
-        <ChatLLM
-          v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl) => llmOutputDSL = dsl" @save="() => {
+        <!-- <l-form-llm-chat
+          v-model:show="aiPanelVisible" :code="dslSerialized" @update:code="(dsl: any) => llmOutputDSL = dsl" @save="() => {
             dsl = dslEvaled;
           }"
-        />
+        /> -->
         <Preview v-if="designer?.designerService.get('page')" v-model:show="previewVisible" :src="`${VITE_RUNTIME_PATH}/page/index.html?localPreview=1&page=${designer?.designerService.get('page')?.id}`" />
         <ImportDSL v-model:show="importDialogVisible" @save="parse" />
         <GlobalMessageSetup />

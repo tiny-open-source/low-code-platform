@@ -122,17 +122,21 @@ class App extends EventEmitter {
   }
 
   private processTransform(value: Record<string, string>): string {
-    const values = Object.entries(value)
-      .map(([transformKey, transformValue]) => {
-        if (!transformValue.trim())
-          return '';
-        if (transformKey === 'rotate' && isNumber(transformValue)) {
-          transformValue = `${transformValue}deg`;
-        }
-        return `${transformKey}(${transformValue})`;
-      })
-      .join(' ');
-    return values.trim() ? 'none' : values;
+    if (!value)
+      return 'none';
+
+    const transform = Object.entries(value).map(([transformKey, transformValue]) => {
+      if (!transformValue.trim())
+        return '';
+      if (transformKey === 'rotate' && isNumber(transformValue)) {
+        transformValue = `${transformValue}deg`;
+      }
+
+      return `${transformKey}(${transformValue})`;
+    });
+
+    const values = transform.join(' ');
+    return !values.trim() ? 'none' : values;
   }
 
   private convertToPx(key: string, value: any): string {

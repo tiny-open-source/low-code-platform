@@ -115,6 +115,7 @@ const menuData = reactive<(MenuButton | MenuComponent)[]>([
   },
   {
     type: 'button',
+    display: () => allowPaste.value && !isPage(node.value),
     text: '替换为...',
     icon: markRaw(CopyOutlined),
     items: getSubMenuData.value,

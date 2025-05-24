@@ -26,6 +26,7 @@ watch(stage, (stage) => {
     stage.on('dblclick', async (event: MouseEvent) => {
       const el
         = (await stage?.getElementFromPoint(event)) || null;
+
       stageOverlayService.openOverlay(el);
     });
   }

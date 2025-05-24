@@ -4,6 +4,7 @@ import {
   HumanMessage,
 
 } from '@langchain/core/messages';
+import { isCustomModel } from '../db/models';
 import { removeReasoning } from '../libs/reasoning';
 
 export function generateHistory(messages: {
@@ -11,10 +12,10 @@ export function generateHistory(messages: {
   content: string;
   image?: string;
 }[], model: string) {
-  console.log(model);
   const history = [];
+  const isCustom = isCustomModel(model);
+  console.log('isCustom,', isCustom);
 
-  const isCustom = false;
   for (const message of messages) {
     if (message.role === 'user') {
       let content: MessageContent = isCustom
@@ -42,6 +43,8 @@ export function generateHistory(messages: {
           },
         ];
       }
+      console.log('content', content);
+
       history.push(
         new HumanMessage({
           content,
