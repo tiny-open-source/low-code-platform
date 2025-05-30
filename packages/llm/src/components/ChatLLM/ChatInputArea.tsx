@@ -216,28 +216,47 @@ export default defineComponent({
     const renderControlButtons = () => (
       <div class="lc-llm-input-area__button-group">
         {speechHandler.supported.value && (
-          <NButton
-            size="small"
-            type="tertiary"
-            disabled={props.status === 'disabled'}
-            onClick={speechHandler.toggleSpeechRecognition}
+          <NTooltip
+            trigger="hover"
             v-slots={{
-              icon: () => speechHandler.isListening.value
-                ? <NIcon size="small" color="#f56c6c" style="opacity: 0.8;"><AudioMutedOutlined /></NIcon>
-                : <NIcon size="small"><AudioOutlined /></NIcon>,
+              trigger: () => (
+                <NButton
+                  size="small"
+                  type="tertiary"
+                  disabled={props.status === 'disabled'}
+                  onClick={speechHandler.toggleSpeechRecognition}
+                  v-slots={{
+                    icon: () => speechHandler.isListening.value
+                      ? <NIcon size="small" color="#f56c6c" style="opacity: 0.8;"><AudioMutedOutlined /></NIcon>
+                      : <NIcon size="small"><AudioOutlined /></NIcon>,
+                  }}
+                />
+              ),
             }}
-          />
+          >
+            语音转文本
+          </NTooltip>
+
         )}
 
-        <NButton
-          size="small"
-          type="tertiary"
-          disabled={props.status === 'disabled'}
-          onClick={() => inputRef.value?.click()}
+        <NTooltip
+          trigger="hover"
           v-slots={{
-            icon: () => <NIcon size="small"><FileImageOutlined /></NIcon>,
+            trigger: () => (
+              <NButton
+                size="small"
+                type="tertiary"
+                disabled={props.status === 'disabled'}
+                onClick={() => inputRef.value?.click()}
+                v-slots={{
+                  icon: () => <NIcon size="small"><FileImageOutlined /></NIcon>,
+                }}
+              />
+            ),
           }}
-        />
+        >
+          上传图片
+        </NTooltip>
 
         {props.status !== 'pending'
           ? (

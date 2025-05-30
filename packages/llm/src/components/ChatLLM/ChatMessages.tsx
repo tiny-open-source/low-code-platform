@@ -16,7 +16,7 @@ export default defineComponent({
     // 初始化markdown解析器
     const md = new MarkdownIt({
       html: false,
-      linkify: true,
+      linkify: false,
       typographer: true,
       highlight(str, lang) {
         if (lang && hljs.getLanguage(lang)) {
