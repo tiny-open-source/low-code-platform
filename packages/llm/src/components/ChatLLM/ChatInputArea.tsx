@@ -159,7 +159,7 @@ export default defineComponent({
     const { formValue, resetFormState } = useFormState();
 
     const focus = () => textareaRef.value?.focus();
-    const submitForm = () => form.value?.submit();
+    const submitForm = () => form.value?.dispatchEvent(new Event('submit'));
 
     const { handleSubmit, handleKeyDown } = useFormSubmit(
       props,

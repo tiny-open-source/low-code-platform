@@ -91,7 +91,24 @@ export function useSpeechRecognition(props: SpeechRecognitionProps = {}): Speech
     liveTranscript.value = '';
     lastTranscriptRef.value = '';
   };
+  const stop = () => {
+    if (!listening.value || !supported.value)
+      return;
 
+    if (silenceTimer.value) {
+      clearTimeout(silenceTimer.value);
+      silenceTimer.value = null;
+    }
+
+    if (recognition.value) {
+      recognition.value.onresult = () => {};
+      recognition.value.onend = () => {};
+      recognition.value.onerror = () => {};
+      listening.value = false;
+      recognition.value.stop();
+    }
+    onEnd();
+  };
   const processResult = (
     event: SpeechRecognitionEvent,
     shouldAutoStop: boolean,
@@ -104,24 +121,6 @@ export function useSpeechRecognition(props: SpeechRecognitionProps = {}): Speech
 
     onResult(transcript);
 
-    const stop = () => {
-      if (!listening.value || !supported.value)
-        return;
-
-      if (silenceTimer.value) {
-        clearTimeout(silenceTimer.value);
-        silenceTimer.value = null;
-      }
-
-      if (recognition.value) {
-        recognition.value.onresult = () => {};
-        recognition.value.onend = () => {};
-        recognition.value.onerror = () => {};
-        listening.value = false;
-        recognition.value.stop();
-      }
-      onEnd();
-    };
     // Reset silence timer if transcript changed
     if (shouldAutoStop && transcript !== lastTranscriptRef.value) {
       lastTranscriptRef.value = transcript;

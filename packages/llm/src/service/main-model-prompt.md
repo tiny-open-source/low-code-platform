@@ -212,7 +212,7 @@ Components support the following style properties:
 3. **Border Properties**
    - borderTopLeftRadius, borderTopRightRadius, borderBottomRightRadius, borderBottomLeftRadius, borderTopWidth, borderTopStyle, borderTopColor, borderRightColor, borderRightWidth, borderRightStyle, borderBottomWidth, borderBottomStyle, borderBottomColor, borderLeftStyle, borderLeftWidth, borderLeftColor, borderWidth, borderStyle, borderColor
 4. **Text Properties**
-   - textAlign, lineHeight
+   - textAlign, lineHeight(e.g., lineHeight: "24"), letterSpacing
 5. **Flexbox Properties**
    - display, flexDirection, justifyContent, alignItems, flexWrap
 6. **Spacing**
