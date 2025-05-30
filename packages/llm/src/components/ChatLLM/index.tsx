@@ -39,7 +39,6 @@ export default defineComponent({
       = useMessageOption(
         currentModel,
       );
-
     // 处理消息更新，增强自动化工作流
     watch(messages, async () => {
       // 滚动到最新消息
