@@ -21,6 +21,9 @@ function useFormState() {
     image: '',
   });
 
+  // 添加连续对话模式状态
+  const continuousMode = ref(false);
+
   const resetFormState = () => {
     formValue.message = '';
     formValue.image = '';
@@ -28,6 +31,7 @@ function useFormState() {
 
   return {
     formValue,
+    continuousMode,
     resetFormState,
   };
 }
@@ -86,11 +90,54 @@ function useFormSubmit(props: any, emit: any, formValue: any, resetFormState: ()
 }
 
 // 语音识别逻辑
-function useSpeechHandler(textareaRef: any, submitForm: () => void) {
+function useSpeechHandler(textareaRef: any, submitForm: () => void, continuousMode: any, props: any) {
   const speechRecognition = useSpeechRecognition({
     autoStop: true,
     autoStopTimeout: 2000,
-    onEnd: submitForm,
+    // 根据连续模式决定是否自动提交并重启
+    onEnd: () => {
+      if (continuousMode.value) {
+        // 检查是否在等待大模型回复中
+        if (props.status === 'pending') {
+          // 如果正在回复中，延迟提交直到回复完成
+          const waitForResponse = () => {
+            if (props.status !== 'pending') {
+              submitForm();
+              // 重新启动语音识别
+              setTimeout(() => {
+                if (continuousMode.value && !speechRecognition.isListening.value) {
+                  speechRecognition.resetTranscript();
+                  speechRecognition.start({
+                    continuous: true,
+                    lang: 'zh-CN',
+                  });
+                }
+              }, 1000);
+            }
+            else {
+              // 继续等待
+              setTimeout(waitForResponse, 500);
+            }
+          };
+          waitForResponse();
+        }
+        else {
+          // 立即提交当前消息
+          submitForm();
+
+          // 延迟重新启动语音识别，实现连续对话
+          setTimeout(() => {
+            if (continuousMode.value && !speechRecognition.isListening.value && props.status !== 'pending') {
+              speechRecognition.resetTranscript();
+              speechRecognition.start({
+                continuous: true,
+                lang: 'zh-CN',
+              });
+            }
+          }, 1000); // 增加到1000ms，给大模型响应时间
+        }
+      }
+    },
   });
 
   const toggleSpeechRecognition = () => {
@@ -98,6 +145,12 @@ function useSpeechHandler(textareaRef: any, submitForm: () => void) {
       speechRecognition.stop();
     }
     else {
+      // 检查是否可以启动语音识别
+      if (props.status === 'pending') {
+        // 如果正在等待回复，先停止连续模式或提示用户等待
+        return;
+      }
+
       speechRecognition.resetTranscript();
       speechRecognition.start({
         continuous: true,
@@ -105,6 +158,29 @@ function useSpeechHandler(textareaRef: any, submitForm: () => void) {
       });
     }
   };
+
+  // 当连续模式关闭时，停止语音识别
+  watch(continuousMode, (newValue) => {
+    if (!newValue && speechRecognition.isListening.value) {
+      speechRecognition.stop();
+    }
+  });
+
+  // 监听props.status变化，处理回复完成后的重启
+  watch(() => props.status, (newStatus, oldStatus) => {
+    // 当从pending状态变为ready状态时，如果开启了连续模式，重启语音识别
+    if (oldStatus === 'pending' && newStatus === 'ready' && continuousMode.value && !speechRecognition.isListening.value) {
+      setTimeout(() => {
+        if (continuousMode.value && !speechRecognition.isListening.value) {
+          speechRecognition.resetTranscript();
+          speechRecognition.start({
+            continuous: true,
+            lang: 'zh-CN',
+          });
+        }
+      }, 500);
+    }
+  });
 
   watch(speechRecognition.transcript, (transcript) => {
     if (speechRecognition.isListening.value) {
@@ -156,7 +232,7 @@ export default defineComponent({
     const inputRef = ref<HTMLInputElement>();
 
     // 组合式函数
-    const { formValue, resetFormState } = useFormState();
+    const { formValue, continuousMode, resetFormState } = useFormState();
 
     const focus = () => textareaRef.value?.focus();
     const submitForm = () => form.value?.dispatchEvent(new Event('submit'));
@@ -169,7 +245,7 @@ export default defineComponent({
       focus,
     );
 
-    const speechHandler = useSpeechHandler(textareaRef, submitForm);
+    const speechHandler = useSpeechHandler(textareaRef, submitForm, continuousMode, props);
     const { handleFileChange, clearImage } = useFileUpload(formValue, inputRef);
 
     // 动态调整文本框大小
@@ -216,27 +292,51 @@ export default defineComponent({
     const renderControlButtons = () => (
       <div class="lc-llm-input-area__button-group">
         {speechHandler.supported.value && (
-          <NTooltip
-            trigger="hover"
-            v-slots={{
-              trigger: () => (
-                <NButton
-                  size="small"
-                  type="tertiary"
-                  disabled={props.status === 'disabled'}
-                  onClick={speechHandler.toggleSpeechRecognition}
-                  v-slots={{
-                    icon: () => speechHandler.isListening.value
-                      ? <NIcon size="small" color="#f56c6c" style="opacity: 0.8;"><AudioMutedOutlined /></NIcon>
-                      : <NIcon size="small"><AudioOutlined /></NIcon>,
-                  }}
-                />
-              ),
-            }}
-          >
-            语音转文本
-          </NTooltip>
+          <div class="lc-llm-input-area__speech-controls">
+            <NTooltip
+              trigger="hover"
+              v-slots={{
+                trigger: () => (
+                  <NButton
+                    size="small"
+                    type="tertiary"
+                    disabled={props.status === 'disabled'}
+                    onClick={speechHandler.toggleSpeechRecognition}
+                    class={speechHandler.isListening.value ? 'lc-llm-speech-active' : ''}
+                    v-slots={{
+                      icon: () => speechHandler.isListening.value
+                        ? <NIcon size="small" color="#f56c6c" style="opacity: 0.8;"><AudioMutedOutlined /></NIcon>
+                        : <NIcon size="small"><AudioOutlined /></NIcon>,
+                    }}
+                  />
+                ),
+              }}
+            >
+              {speechHandler.isListening.value
+                ? '点击停止录音'
+                : props.status === 'pending'
+                  ? '等待回复中...'
+                  : '语音转文本'}
+            </NTooltip>
 
+            <NTooltip
+              trigger="hover"
+              v-slots={{
+                trigger: () => (
+                  <NCheckbox
+                    size="small"
+                    v-model:checked={continuousMode.value}
+                    disabled={props.status === 'disabled'}
+                    style="margin-left: 8px; font-size: 12px;"
+                  >
+                    连续对话
+                  </NCheckbox>
+                ),
+              }}
+            >
+              开启后语音识别完成会自动发送消息，大模型回复完成后自动继续监听
+            </NTooltip>
+          </div>
         )}
 
         <NTooltip
@@ -314,11 +414,16 @@ export default defineComponent({
                   <p>使用提示：</p>
                   <p>- 按Enter发送消息</p>
                   <p>- Shift+Enter换行</p>
+                  {speechHandler.supported.value && (
+                    <>
+                      <p>- 点击麦克风开始语音输入</p>
+                      <p>- 开启连续对话可自动发送语音消息</p>
+                    </>
+                  )}
                 </div>
               ),
             }}
-          </NTooltip
-          >
+          </NTooltip>
 
           {renderControlButtons()}
         </div>

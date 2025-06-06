@@ -308,6 +308,15 @@ export default defineComponent({
         if (model) {
           multiModelConfig.value[modelType] = { ...val, ...model };
         }
+        else {
+          // 如果没有选择模型，则只保存配置
+          multiModelConfig.value[modelType] = {
+            ...val,
+            label: '',
+            name: '',
+            value: '',
+          };
+        }
 
         message.success(`${MODEL_TYPE_LABELS[modelType]}配置已保存`);
         return true;
@@ -321,7 +330,7 @@ export default defineComponent({
 
     // 渲染设置界面
     const renderSettings = () => (
-      <NTabs type="line" animated value={activeTab.value} onUpdateValue={value => activeTab.value = value}>
+      <NTabs type="segment" animated value={activeTab.value} onUpdateValue={value => activeTab.value = value}>
         <NTabPane
           name={ModelType.MAIN}
           tab={(
@@ -521,6 +530,7 @@ export default defineComponent({
       modal.create({
         preset: 'dialog',
         title: '模型配置',
+        type: 'default',
         style: {
           width: '800px',
         },
