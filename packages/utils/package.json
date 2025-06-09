@@ -18,7 +18,8 @@
   "dependencies": {
     "@low-code/schema": "workspace:^",
     "dayjs": "^1.11.13",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "promise-worker": "^2.0.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",

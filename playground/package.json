@@ -13,7 +13,6 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@low-code/adapter": "workspace:^",
     "@low-code/designer": "workspace:^",
     "@low-code/form": "workspace:^",
     "@low-code/llm": "workspace:^",
