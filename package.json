@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.1.1",
   "private": true,
-  "packageManager": "pnpm@10.11.1+sha512.e519b9f7639869dc8d5c3c5dfef73b3f091094b0a006d7317353c72b124e80e1afd429732e28705ad6bfa1ee879c1fce46c128ccebd3192101f43dd67c667912",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev": "turbo dev",
     "build": "pnpm build:dts && node scripts/build.mjs",
@@ -18,25 +18,30 @@
   "devDependencies": {
     "@antfu/eslint-config": "4.1.1",
     "@rollup/plugin-alias": "^5.1.1",
-    "@types/node": "^20.17.30",
+    "@types/node": "^20.19.0",
     "@unocss/eslint-plugin": "^65.5.0",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "eslint": "^9.24.0",
-    "lint-staged": "^15.5.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "eslint": "^9.28.0",
+    "lint-staged": "^15.5.2",
     "minimist": "^1.2.8",
-    "nbump": "^2.1.0",
+    "nbump": "^2.1.2",
     "npm-run-all2": "^7.0.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.40.0",
+    "rollup": "^4.42.0",
     "rollup-plugin-dts": "^6.2.1",
     "shx": "^0.3.4",
-    "simple-git-hooks": "^2.12.1",
-    "turbo": "^2.5.0",
+    "simple-git-hooks": "^2.13.0",
+    "turbo": "^2.5.4",
     "typescript": "5.6.2",
-    "vite": "^6.3.2",
-    "vitest": "^3.1.1",
-    "vue": "^3.5.13",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.2",
+    "vue": "^3.5.16",
     "vue-tsc": "2.0.29"
+  },
+  "pnpm": {
+    "overrides": {
+      "@bufbuild/protobuf": "^2.5.0"
+    }
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
