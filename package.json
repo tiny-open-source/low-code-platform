@@ -5,6 +5,7 @@
   "private": true,
   "packageManager": "pnpm@10.12.1",
   "scripts": {
+    "bootstrap": "pnpm install && pnpm build",
     "dev": "turbo dev",
     "build": "pnpm build:dts && node scripts/build.mjs",
     "build:dts": "pnpm --filter \"@low-code/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf temp",
