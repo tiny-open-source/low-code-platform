@@ -79,6 +79,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
   const { streaming, isProcessing, messages, history, lastError } = toRefs(chatState);
 
   const hasMessages = computed(() => messages.value.length > 0);
+  const responseCompleted = computed(() => !streaming.value && !isProcessing.value); // 使用计算属性表示响应完成
 
   // 控制器
   let abortController: AbortController | undefined;
@@ -106,6 +107,13 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     }
     onHistoryUpdate?.(chatState.history);
   };
+  /**
+   * 重置流式状态
+   */
+  const resetStreamingState = () => {
+    chatState.streaming = false;
+    chatState.isProcessing = false;
+  };
 
   /**
    * 停止流式请求
@@ -114,8 +122,8 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     if (abortController) {
       abortController.abort();
       abortController = undefined;
-      chatState.streaming = false;
-      chatState.isProcessing = false;
+      // 统一重置状态的方法
+      resetStreamingState();
     }
   };
 
@@ -374,8 +382,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     }
     catch (e) {
       console.error('Chat error:', e);
-      chatState.isProcessing = false;
-      chatState.streaming = false;
       chatState.lastError = e instanceof Error ? e : new Error(String(e));
 
       // 调用错误回调
@@ -389,6 +395,9 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       };
     }
     finally {
+      // 统一处理响应结束
+      chatState.isProcessing = false;
+      chatState.streaming = false;
       abortController = undefined;
     }
   };
@@ -447,8 +456,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     if (!keepHistory) {
       chatState.history = [];
     }
-    chatState.streaming = false;
-    chatState.isProcessing = false;
+    resetStreamingState();
     chatState.lastError = null;
   };
 
@@ -474,6 +482,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     // 状态
     streaming,
     isProcessing,
+    responseCompleted, // 计算属性，表示响应是否完成
     messages,
     history,
     lastError,
