@@ -1,14 +1,20 @@
+/**
+ * 增强的工具调用处理组合函数
+ * 支持标准的工具调用流程：模型输出 → 工具执行 → 结果返回给模型 → 最终响应
+ */
+
 import type { ComputedRef, Ref } from 'vue';
-import type { ModelParams } from '../models';
 import type { ModelConfig } from '../utils/storage';
-import { SystemMessage } from '@langchain/core/messages';
+import { AIMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
 import { computed, reactive, toRefs } from 'vue';
 import { generateID } from '../db';
-import { isReasoningEnded, isReasoningStarted, mergeReasoningContent } from '../libs/reasoning';
+import { mergeReasoningContent } from '../libs/reasoning';
 import { pageAssistModel } from '../models';
 import { getAllDefaultModelSettings } from '../service/model-settings';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
+import { toolCallDebugger } from '../utils/tool-call-diagnostics';
+import { defaultToolHandlers, ToolCallAggregator } from '../utils/tool-handler';
 
 export interface Message {
   isBot: boolean;
@@ -50,12 +56,9 @@ export interface ChatSubmitOptions {
 }
 
 /**
- * 创建聊天对话处理钩子
- * @param model 模型配置
- * @param options 模型选项
- * @returns 聊天对话处理方法和状态
+ * 增强的聊天处理钩子，支持完整的工具调用流程
  */
-export function useMessageOption(model: ComputedRef<ModelConfig>, options: MessageOptions = {}) {
+export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, options: MessageOptions = {}) {
   // 提取选项参数
   const {
     initialMessages = [],
@@ -66,27 +69,25 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     maxHistoryLength = 100,
   } = options;
 
-  // 状态管理 - 使用响应式对象统一管理状态
+  // 状态管理
   const chatState = reactive({
     streaming: false,
     isProcessing: false,
     messages: initialMessages as Message[],
     history: initialHistory as ChatHistory,
     lastError: null as Error | null,
+    toolCallInProgress: false, // 新增：工具调用进行中状态
   });
 
-  // 提供状态的引用版本
-  const { streaming, isProcessing, messages, history, lastError } = toRefs(chatState);
+  const { streaming, isProcessing, messages, history, lastError, toolCallInProgress } = toRefs(chatState);
 
   const hasMessages = computed(() => messages.value.length > 0);
-  const responseCompleted = computed(() => !streaming.value && !isProcessing.value); // 使用计算属性表示响应完成
+  const responseCompleted = computed(() => !streaming.value && !isProcessing.value && !toolCallInProgress.value);
 
-  // 控制器
   let abortController: AbortController | undefined;
 
   /**
    * 更新消息列表
-   * @param newMessages 消息列表
    */
   const setMessages = (newMessages: Message[]) => {
     chatState.messages = newMessages;
@@ -95,10 +96,8 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
 
   /**
    * 更新历史记录
-   * @param value 历史记录
    */
   const setHistory = (value: ChatHistory) => {
-    // 限制历史记录长度
     if (maxHistoryLength && value.length > maxHistoryLength) {
       chatState.history = value.slice(-maxHistoryLength);
     }
@@ -107,12 +106,14 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     }
     onHistoryUpdate?.(chatState.history);
   };
+
   /**
    * 重置流式状态
    */
   const resetStreamingState = () => {
     chatState.streaming = false;
     chatState.isProcessing = false;
+    chatState.toolCallInProgress = false;
   };
 
   /**
@@ -122,22 +123,275 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     if (abortController) {
       abortController.abort();
       abortController = undefined;
-      // 统一重置状态的方法
       resetStreamingState();
     }
   };
 
   /**
-   * 常规聊天模式处理
-   * @param message 消息内容
-   * @param image 图片内容
-   * @param isRegenerate 是否重新生成
-   * @param messages 消息状态
-   * @param history 历史记录状态
-   * @param signal 中断信号
-   * @param retainContext 保持上下文不清空
+   * 定义可用的工具配置
    */
-  const normalChatMode = async (
+  const getAvailableTools = () => [
+    {
+      type: 'function',
+      function: {
+        name: 'get_weather',
+        description: 'Get weather of a location, the user should supply a location first',
+        parameters: {
+          type: 'object',
+          properties: {
+            location: {
+              type: 'string',
+              description: 'The city and state, e.g. San Francisco, CA',
+            },
+          },
+          required: ['location'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'get_location',
+        description: 'Get user\'s current location',
+        parameters: {
+          type: 'object',
+          properties: {},
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'get_time',
+        description: 'Get current time',
+        parameters: {
+          type: 'object',
+          properties: {},
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'calculate',
+        description: 'Perform mathematical calculations',
+        parameters: {
+          type: 'object',
+          properties: {
+            expression: {
+              type: 'string',
+              description: 'Mathematical expression to evaluate, e.g. 2 + 3 * 4',
+            },
+          },
+          required: ['expression'],
+        },
+      },
+    },
+  ];
+
+  /**
+   * 执行多轮工具调用流程，支持工具链
+   */
+  const executeToolCallFlow = async (
+    ollama: any,
+    messages: any[],
+    signal: AbortSignal,
+    generateMessageId: string,
+    messagesRef: Ref<Message[]>,
+  ) => {
+    let fullText = '';
+    let generationInfo: any | undefined;
+    let conversationMessages = [...messages];
+    let toolCallRound = 0;
+    const maxToolCallRounds = 10; // 防止无限循环
+
+    console.log('🚀 开始多轮工具调用流程');
+
+    // 工具调用循环，支持多步工具链
+    while (toolCallRound < maxToolCallRounds) {
+      toolCallRound++;
+      console.log(`🎯 第 ${toolCallRound} 轮：请求模型决策`);
+
+      const toolCallAggregator = new ToolCallAggregator(defaultToolHandlers);
+      let roundText = '';
+
+      // 向模型请求决策或最终回复
+      const response = await ollama.stream(
+        conversationMessages,
+        {
+          signal,
+          tools: getAvailableTools(),
+          callbacks: [
+            {
+              handleLLMEnd(output: any): any {
+                try {
+                  generationInfo = output?.generations?.[0][0]?.generationInfo;
+                }
+                catch (e) {
+                  console.error('handleLLMEnd error', e);
+                }
+              },
+            },
+          ],
+        },
+      );
+
+      // 处理响应
+      for await (const chunk of response) {
+        console.log(`📦 第 ${toolCallRound} 轮 chunk:`, chunk);
+
+        // 处理推理内容
+        if (chunk?.additional_kwargs?.reasoning_content) {
+          const reasoningContent = mergeReasoningContent(
+            roundText,
+            chunk?.additional_kwargs?.reasoning_content as string || '',
+          );
+          roundText = reasoningContent;
+        }
+
+        // 聚合工具调用信息
+        if (chunk?.additional_kwargs?.tool_calls) {
+          const chunkToolCalls = chunk.additional_kwargs.tool_calls;
+          console.log(`🔧 第 ${toolCallRound} 轮接收到工具调用块:`, chunkToolCalls);
+          toolCallAggregator.processToolCallChunks(chunkToolCalls);
+        }
+
+        // 处理常规内容
+        roundText += chunk?.content || '';
+
+        // 实时更新界面
+        const displayText = toolCallRound === 1 ? `${fullText}${roundText}` : `${fullText}\n\n${roundText}`;
+        setMessages(messagesRef.value.map((msg) => {
+          if (msg.id === generateMessageId) {
+            return {
+              ...msg,
+              message: `${displayText}▋`,
+            };
+          }
+          return msg;
+        }));
+      }
+
+      // 累积文本内容
+      if (toolCallRound === 1) {
+        fullText += roundText;
+      }
+      else {
+        fullText += `\n\n${roundText}`;
+      }
+
+      // 检查是否有工具调用需要执行
+      const readyToolCalls = toolCallAggregator.getReadyToolCalls();
+
+      if (readyToolCalls.length > 0) {
+        console.log(`🛠️ 第 ${toolCallRound} 轮：执行 ${readyToolCalls.length} 个工具调用`);
+        chatState.toolCallInProgress = true;
+
+        // 更新界面，显示工具调用状态
+        setMessages(messagesRef.value.map((msg) => {
+          if (msg.id === generateMessageId) {
+            return {
+              ...msg,
+              message: `${fullText}\n\n🔧 正在执行第 ${toolCallRound} 轮工具调用...`,
+            };
+          }
+          return msg;
+        }));
+
+        // 执行工具调用
+        const toolResults = await toolCallAggregator.executeReadyToolCalls();
+        console.log(`✅ 第 ${toolCallRound} 轮工具调用完成:`, toolResults);
+
+        if (toolResults.length > 0) {
+          // 验证工具调用数据的完整性
+          for (const tc of readyToolCalls) {
+            // 使用诊断工具进行详细检查
+            toolCallDebugger.logToolCall(tc, '🔍');
+
+            if (!tc.id || tc.id === '') {
+              console.error('❌ 工具调用缺少有效的 ID:', tc);
+              throw new Error(`工具调用 ${tc.function.name} 缺少有效的 ID`);
+            }
+            if (!tc.function.name || tc.function.name === '') {
+              console.error('❌ 工具调用缺少函数名:', tc);
+              throw new Error(`工具调用缺少函数名`);
+            }
+            try {
+              JSON.parse(tc.function.arguments);
+            }
+            catch {
+              console.error('❌ 工具调用参数不是有效的 JSON:', tc);
+              throw new Error(`工具调用 ${tc.function.name} 的参数不是有效的 JSON`);
+            }
+          }
+
+          // 构建工具调用和结果消息
+          const toolCallMessages = [];
+
+          // 添加助手的工具调用消息
+          const aiMessage = new AIMessage({
+            content: roundText,
+            additional_kwargs: {
+              tool_calls: readyToolCalls.map(tc => ({
+                id: tc.id,
+                type: 'function' as const,
+                function: {
+                  name: tc.function.name,
+                  arguments: tc.function.arguments,
+                },
+              })),
+            },
+          });
+
+          console.log('🔍 构建的 AIMessage:', aiMessage);
+
+          // 使用诊断工具检查消息
+          toolCallDebugger.logMessage(aiMessage, '🤖');
+
+          toolCallMessages.push(aiMessage);
+
+          // 添加工具执行结果
+          for (const { toolCall, result } of toolResults) {
+            const toolMessage = new ToolMessage(result, toolCall.id, toolCall.function.name);
+
+            console.log('🔍 构建的 ToolMessage:', toolMessage);
+
+            // 使用诊断工具检查消息
+            toolCallDebugger.logMessage(toolMessage, '🛠️');
+
+            toolCallMessages.push(toolMessage);
+          }
+
+          // 更新对话上下文，为下一轮做准备
+          conversationMessages = [
+            ...conversationMessages,
+            ...toolCallMessages,
+          ];
+
+          console.log(`📝 第 ${toolCallRound} 轮工具调用完成，准备下一轮，当前消息数: ${conversationMessages.length}`);
+        }
+      }
+      else {
+        // 没有工具调用，说明模型已经生成了最终回复
+        console.log(`🎉 第 ${toolCallRound} 轮：模型生成最终回复，工具调用流程结束`);
+        break;
+      }
+    }
+
+    if (toolCallRound >= maxToolCallRounds) {
+      console.warn('⚠️ 工具调用轮数达到上限，强制结束');
+      fullText += '\n\n⚠️ 工具调用轮数达到上限，可能存在循环调用问题。';
+    }
+
+    chatState.toolCallInProgress = false;
+
+    return { finalText: fullText, generationInfo };
+  };
+
+  /**
+   * 标准工具调用流程处理
+   */
+  const processWithToolCalls = async (
     message: string,
     image: string = '',
     isRegenerate: boolean = false,
@@ -146,7 +400,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     signal: AbortSignal,
     retainContext: boolean = true,
   ) => {
-    console.log('normalChatMode:', message);
+    console.log('🚀 开始标准工具调用流程:', message);
 
     const userDefaultModelSettings = await getAllDefaultModelSettings();
 
@@ -154,20 +408,17 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       image = `data:image/jpeg;base64,${image.split(',')[1]}`;
     }
 
-    // 合并模型设置
-    const modelParams: ModelParams = {
-      // 使用模型配置
+    // 模型参数配置
+    const modelParams = {
       model: model.value,
-      // 默认配置
       keepAlive: undefined,
       temperature: 0.0,
-      // 使用用户默认配置
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
-      numCtx: 8192, // 影响的是模型可以一次记住的最大 token 数量
+      numCtx: 4096,
       seed: undefined,
       numGpu: userDefaultModelSettings?.numGpu,
-      numPredict: 4096, // 影响模型最大可以生成的 token 数量
+      numPredict: 4096,
       useMMap: userDefaultModelSettings?.useMMap,
       minP: userDefaultModelSettings?.minP,
       repeatLastN: userDefaultModelSettings?.repeatLastN,
@@ -180,7 +431,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
 
     try {
       const ollama = await pageAssistModel(modelParams);
-
       const generateMessageId = generateID();
 
       // 准备消息数据
@@ -218,10 +468,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       }
       setMessages(newMessage);
 
-      let fullText = '';
-      let timetaken = 0;
-
-      // 格式化人类消息
+      // 格式化消息和历史
       let humanMessage = await humanMessageFormatter({
         content: [
           {
@@ -248,10 +495,8 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
         });
       }
 
-      // 生成聊天历史
       const applicationChatHistory = generateHistory(historyRef.value, model.value.name!);
 
-      // 添加系统提示
       if (model.value.prompt) {
         applicationChatHistory.unshift(
           new SystemMessage({
@@ -260,98 +505,14 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
         );
       }
 
-      let generationInfo: any | undefined;
-
-      // 发起流式请求
-      const chunks = await ollama.stream(
+      // 执行完整的工具调用流程
+      const finalResult = await executeToolCallFlow(
+        ollama,
         [...applicationChatHistory, humanMessage],
-        {
-          signal,
-          callbacks: [
-            {
-              handleLLMEnd(output: any): any {
-                try {
-                  generationInfo = output?.generations?.[0][0]?.generationInfo;
-                }
-                catch (e) {
-                  console.error('handleLLMEnd error', e);
-                }
-              },
-            },
-          ],
-        },
+        signal,
+        generateMessageId,
+        messagesRef,
       );
-
-      // 处理流式响应
-      let count = 0;
-      let reasoningStartTime: Date | null = null;
-      let reasoningEndTime: Date | null = null;
-      let apiReasoning: boolean = false;
-
-      for await (const chunk of chunks) {
-        if (chunk?.additional_kwargs?.reasoning_content) {
-          const reasoningContent = mergeReasoningContent(
-            fullText,
-            chunk?.additional_kwargs?.reasoning_content as string || '',
-          );
-          fullText = reasoningContent;
-          apiReasoning = true;
-        }
-        else {
-          if (apiReasoning) {
-            fullText += '</think>';
-            apiReasoning = false;
-          }
-        }
-
-        fullText += chunk?.content || '';
-
-        // 计算推理时间
-        if (isReasoningStarted(fullText) && !reasoningStartTime) {
-          reasoningStartTime = new Date();
-        }
-
-        if (
-          reasoningStartTime
-          && !reasoningEndTime
-          && isReasoningEnded(fullText)
-        ) {
-          reasoningEndTime = new Date();
-          const reasoningTime = reasoningEndTime.getTime() - reasoningStartTime.getTime();
-          timetaken = reasoningTime;
-        }
-
-        // 更新界面
-        if (count === 0) {
-          chatState.isProcessing = true;
-        }
-
-        // 更新消息内容
-        setMessages(messagesRef.value.map((msg) => {
-          if (msg.id === generateMessageId) {
-            return {
-              ...msg,
-              message: `${fullText}▋`,
-              reasoning_time_taken: timetaken,
-            };
-          }
-          return msg;
-        }));
-        count++;
-      }
-
-      // 完成后更新最终消息
-      setMessages(messagesRef.value.map((msg) => {
-        if (msg.id === generateMessageId) {
-          return {
-            ...msg,
-            message: fullText,
-            generationInfo,
-            reasoning_time_taken: timetaken,
-          };
-        }
-        return msg;
-      }));
 
       // 更新历史记录
       if (retainContext) {
@@ -364,7 +525,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
           },
           {
             role: 'assistant',
-            content: fullText,
+            content: finalResult.finalText,
           },
         ]);
       }
@@ -372,19 +533,19 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       // 重置状态
       chatState.isProcessing = false;
       chatState.streaming = false;
+      chatState.toolCallInProgress = false;
       chatState.lastError = null;
 
       return {
         success: true,
-        message: fullText,
-        generationInfo,
+        message: finalResult.finalText,
+        generationInfo: finalResult.generationInfo,
       };
     }
     catch (e) {
-      console.error('Chat error:', e);
+      console.error('工具调用流程错误:', e);
       chatState.lastError = e instanceof Error ? e : new Error(String(e));
 
-      // 调用错误回调
       if (onError && chatState.lastError) {
         onError(chatState.lastError);
       }
@@ -395,16 +556,13 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       };
     }
     finally {
-      // 统一处理响应结束
-      chatState.isProcessing = false;
-      chatState.streaming = false;
+      resetStreamingState();
       abortController = undefined;
     }
   };
 
   /**
    * 提交聊天消息
-   * @param options 提交选项
    */
   const onSubmit = async ({
     message,
@@ -420,7 +578,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     chatState.streaming = true;
     let signal: AbortSignal;
 
-    // 创建或使用控制器
     if (!controller) {
       abortController = new AbortController();
       signal = abortController.signal;
@@ -430,8 +587,7 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
       signal = controller.signal;
     }
 
-    // 处理消息
-    const res = await normalChatMode(
+    const res = await processWithToolCalls(
       message,
       image,
       isRegenerate,
@@ -445,7 +601,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
 
   /**
    * 重置状态
-   * @param keepHistory 是否保留历史记录
    */
   const resetState = (keepHistory: boolean = false) => {
     if (chatState.streaming) {
@@ -462,7 +617,6 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
 
   /**
    * 添加系统消息
-   * @param content 系统消息内容
    */
   const addSystemMessage = (content: string) => {
     setHistory([
@@ -482,7 +636,8 @@ export function useMessageOption(model: ComputedRef<ModelConfig>, options: Messa
     // 状态
     streaming,
     isProcessing,
-    responseCompleted, // 计算属性，表示响应是否完成
+    toolCallInProgress, // 新增
+    responseCompleted,
     messages,
     history,
     lastError,

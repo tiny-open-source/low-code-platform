@@ -1,6 +1,6 @@
 import { NScrollbar } from 'naive-ui';
 import { defineComponent } from 'vue';
-import { useMessageOption } from '../../composables/chat';
+import { useEnhancedMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
 import aiAssistantService from '../../service/ai-assistant.service';
 import { ModelType } from '../../utils/constants';
@@ -36,7 +36,7 @@ export default defineComponent({
     );
     // 消息处理
     const { onSubmit, messages, streaming, stopStreamingRequest, resetState }
-      = useMessageOption(
+      = useEnhancedMessageOption(
         currentModel,
       );
     // 处理消息更新，增强自动化工作流
@@ -104,7 +104,7 @@ export default defineComponent({
       activeModelType.value = ModelType.MAIN;
       try {
         await onSubmit({
-          message: `<user_query>${message}</user_query>`,
+          message,
           image: '',
         });
       }

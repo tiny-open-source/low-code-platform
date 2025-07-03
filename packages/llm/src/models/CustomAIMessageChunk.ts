@@ -36,12 +36,17 @@ export class CustomAIMessageChunk {
       if (merged[key] === undefined) {
         merged[key] = value;
       }
-      else if (typeof merged[key] === 'string') {
+      else if (typeof merged[key] === 'string' && typeof value === 'string') {
         merged[key] = (merged[key] as string) + value;
+      }
+      else if (Array.isArray(merged[key]) && Array.isArray(value)) {
+        merged[key] = [...(merged[key] as unknown[]), ...value];
       }
       else if (
         !Array.isArray(merged[key])
         && typeof merged[key] === 'object'
+        && !Array.isArray(value)
+        && typeof value === 'object'
       ) {
         merged[key] = this._mergeAdditionalKwargs(
           merged[key] as NonNullable<BaseMessageFields['additional_kwargs']>,
@@ -50,7 +55,7 @@ export class CustomAIMessageChunk {
       }
       else {
         throw new TypeError(
-          `additional_kwargs[${key}] already exists in this message chunk.`,
+          `additional_kwargs[${key}] already exists in this message chunk and cannot be merged.`,
         );
       }
     }
@@ -66,4 +71,16 @@ export class CustomAIMessageChunk {
       ),
     });
   }
+}
+
+function isAiMessageChunkFields(value: unknown): value is BaseMessageFields {
+  if (typeof value !== 'object' || value == null)
+    return false;
+  return 'content' in value && typeof value.content === 'string';
+}
+
+export function isAiMessageChunkFieldsList(
+  value: unknown[],
+): value is BaseMessageFields[] {
+  return value.length > 0 && value.every(x => isAiMessageChunkFields(x));
 }

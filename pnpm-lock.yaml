@@ -6427,7 +6427,7 @@ snapshots:
 
   '@langchain/openai@0.0.34(ws@8.18.3)':
     dependencies:
-      '@langchain/core': 0.1.63(openai@4.104.0(ws@8.18.3)(zod@3.25.70))
+      '@langchain/core': 0.2.36(openai@4.104.0(ws@8.18.3)(zod@3.25.70))
       js-tiktoken: 1.0.20
       openai: 4.104.0(ws@8.18.3)(zod@3.25.70)
       zod: 3.25.70
