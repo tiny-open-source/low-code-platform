@@ -12,7 +12,7 @@
     "@low-code/schema": "workspace:^",
     "@low-code/utils": "workspace:^",
     "qrcode": "^1.5.4",
-    "vue": "^3.5.16"
+    "vue": "^3.5.17"
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.5"
