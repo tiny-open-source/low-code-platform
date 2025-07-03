@@ -2,7 +2,6 @@ import { NScrollbar } from 'naive-ui';
 import { defineComponent } from 'vue';
 import { useEnhancedMessageOption } from '../../composables/chat';
 import { useOllamaStatus } from '../../composables/ollama';
-import aiAssistantService from '../../service/ai-assistant.service';
 import { ModelType } from '../../utils/constants';
 import { useMultiModel } from '../../utils/storage';
 import Header from './ChatHeader';
@@ -52,18 +51,6 @@ export default defineComponent({
         if (latestMessage.generationInfo) {
           try {
             console.log('最新消息:', latestMessage);
-
-            const toolResult = await aiAssistantService!.processResponse(latestMessage.message);
-
-            // 如果有工具执行结果，将其添加到新消息中
-            if (toolResult) {
-              // 延迟很短时间再发送，确保UI状态正确更新
-              await new Promise(resolve => setTimeout(resolve, 50));
-              await onSubmit({
-                message: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult),
-                image: '',
-              });
-            }
           }
           catch (error) {
             console.error('工具执行失败:', error);
@@ -105,7 +92,7 @@ export default defineComponent({
       try {
         await onSubmit({
           message,
-          image: '',
+          image,
         });
       }
       catch (error) {

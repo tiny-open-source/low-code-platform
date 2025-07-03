@@ -5,11 +5,11 @@
   "private": true,
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "scripts": {
-    "bootstrap": "pnpm install && pnpm build",
     "dev": "turbo dev",
     "build": "pnpm build:dts && node scripts/build.mjs",
     "build:dts": "pnpm --filter \"@low-code/cli\" build && tsc -p tsconfig.build-browser.json && vue-tsc --declaration --emitDeclarationOnly --project tsconfig.build-vue.json && rollup -c rollup.dts.config.js && rimraf .temp",
     "build:playground": "turbo build --filter=runtime-vue3 && turbo build --filter=playground",
+    "bootstrap": "pnpm install && pnpm build",
     "lint": "turbo lint",
     "clean:top": "rimraf --glob */**/dist */**/entry-dist */dist coverage dwt*",
     "clean:modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",

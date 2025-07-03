@@ -386,7 +386,35 @@ export default defineComponent({
             )}
       </div>
     );
-
+    const getExamplePrompt = () => {
+      const examples = [
+        '画一面国旗',
+        '制作一张海报',
+        '设计一个登录界面',
+        '生成一个产品介绍页面',
+        '加入一个二维码',
+        '添加一个按钮',
+        '把xx元素放大一点',
+        '把xx元素缩小一点',
+        '把xx元素移动到左边',
+        '把xx元素移动到右边',
+        '把xx元素移动到上面',
+        '把xx元素移动到下面',
+        '把xx元素居中对齐',
+        '把xx元素对齐到左边',
+        '把xx元素对齐到右边',
+        '把xx元素放到xx容器里面',
+        '把xx元素放到xx容器外面',
+        '把xx元素放到xx容器的左边',
+        '把xx元素放到xx容器的右边',
+        '把xx元素放到xx容器的上面',
+        '把xx元素放到xx容器的下面',
+        '把xx元素放到xx容器的中间',
+        '给xx元素添加一些阴影',
+        '给画布一个蓝色背景',
+      ];
+      return examples[Math.floor(Math.random() * examples.length)];
+    };
     const renderTextarea = () => (
       <div class="lc-llm-input-area__input-container">
         <textarea
@@ -395,7 +423,7 @@ export default defineComponent({
           class="lc-llm-input-area__textarea"
           rows="1"
           tabindex="0"
-          placeholder={`简单描述您想要的界面或功能，例如：画一面国旗\n支持上传截图作为参考`}
+          placeholder={`描述你想让ai做什么，例如：${getExamplePrompt()}\n支持上传截图作为参考`}
           style={{ minHeight: '68px' }}
           onKeydown={handleKeyDown}
           v-model={formValue.message}
