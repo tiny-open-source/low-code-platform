@@ -10,6 +10,7 @@ import { computed, reactive, toRefs } from 'vue';
 import { generateID } from '../db';
 import { mergeReasoningContent } from '../libs/reasoning';
 import { pageAssistModel } from '../models';
+import mcpCanvasTools from '../service/mcp-canvas-tools';
 import { getAllDefaultModelSettings } from '../service/model-settings';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
@@ -128,68 +129,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
   };
 
   /**
-   * 定义可用的工具配置
-   */
-  const getAvailableTools = () => [
-    {
-      type: 'function',
-      function: {
-        name: 'get_weather',
-        description: 'Get weather of a location, the user should supply a location first',
-        parameters: {
-          type: 'object',
-          properties: {
-            location: {
-              type: 'string',
-              description: 'The city and state, e.g. San Francisco, CA',
-            },
-          },
-          required: ['location'],
-        },
-      },
-    },
-    {
-      type: 'function',
-      function: {
-        name: 'get_location',
-        description: 'Get user\'s current location',
-        parameters: {
-          type: 'object',
-          properties: {},
-        },
-      },
-    },
-    {
-      type: 'function',
-      function: {
-        name: 'get_time',
-        description: 'Get current time',
-        parameters: {
-          type: 'object',
-          properties: {},
-        },
-      },
-    },
-    {
-      type: 'function',
-      function: {
-        name: 'calculate',
-        description: 'Perform mathematical calculations',
-        parameters: {
-          type: 'object',
-          properties: {
-            expression: {
-              type: 'string',
-              description: 'Mathematical expression to evaluate, e.g. 2 + 3 * 4',
-            },
-          },
-          required: ['expression'],
-        },
-      },
-    },
-  ];
-
-  /**
    * 执行多轮工具调用流程，支持工具链
    */
   const executeToolCallFlow = async (
@@ -220,7 +159,7 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
         conversationMessages,
         {
           signal,
-          tools: getAvailableTools(),
+          tools: mcpCanvasTools.getToolDefinitions(),
           callbacks: [
             {
               handleLLMEnd(output: any): any {
