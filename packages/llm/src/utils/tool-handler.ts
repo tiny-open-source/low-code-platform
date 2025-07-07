@@ -143,7 +143,10 @@ export class ToolCallAggregator {
       }
 
       const result = await handler(args);
-      console.log(`✅ 工具执行结果:`, result);
+      if (typeof result !== 'string') {
+        return JSON.stringify(result); // 确保返回字符串格式
+      }
+      console.log(`✅ 工具执行结果:`, JSON.stringify(result));
       return result;
     }
     catch (error) {
@@ -198,47 +201,3 @@ export class ToolCallAggregator {
     }));
   }
 }
-
-/**
- * 默认工具处理函数
- */
-export const defaultToolHandlers: ToolCallHandler = {
-  get_weather: async (args: { location: string }) => {
-    const { location } = args;
-    // 模拟天气查询
-    const weatherData = {
-      北京: '晴天，温度25°C，湿度60%',
-      上海: '多云，温度28°C，湿度70%',
-      广州: '雨天，温度30°C，湿度80%',
-      深圳: '晴天，温度32°C，湿度65%',
-    };
-
-    const weather = weatherData[location as keyof typeof weatherData] || `${location}的天气：晴天，温度25°C`;
-    return `🌤️ ${weather}`;
-  },
-
-  get_location: async () => {
-    // 模拟获取用户位置
-    const locations = ['北京', '上海', '广州', '深圳'];
-    const randomLocation = locations[Math.floor(Math.random() * locations.length)];
-    return `📍 您当前的位置是：${randomLocation}`;
-  },
-
-  // 可以添加更多工具处理函数
-  get_time: async () => {
-    const now = new Date();
-    return `🕐 当前时间：${now.toLocaleString('zh-CN')}`;
-  },
-
-  calculate: async (args: { expression: string }) => {
-    try {
-      // 简单的数学计算（生产环境中应该使用更安全的计算方法）
-      // eslint-disable-next-line no-eval
-      const result = eval(args.expression);
-      return `🧮 计算结果：${args.expression} = ${result}`;
-    }
-    catch (error) {
-      return `❌ 计算错误：${error}`;
-    }
-  },
-};

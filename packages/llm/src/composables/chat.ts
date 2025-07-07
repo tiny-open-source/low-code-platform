@@ -15,7 +15,7 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
 import { toolCallDebugger } from '../utils/tool-call-diagnostics';
-import { defaultToolHandlers, ToolCallAggregator } from '../utils/tool-handler';
+import { ToolCallAggregator } from '../utils/tool-handler';
 
 export interface Message {
   isBot: boolean;
@@ -145,13 +145,13 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     const maxToolCallRounds = 10; // 防止无限循环
 
     console.log('🚀 开始多轮工具调用流程');
+    const toolCallAggregator = new ToolCallAggregator(mcpCanvasTools.getTools());
 
     // 工具调用循环，支持多步工具链
     while (toolCallRound < maxToolCallRounds) {
       toolCallRound++;
       console.log(`🎯 第 ${toolCallRound} 轮：请求模型决策`);
 
-      const toolCallAggregator = new ToolCallAggregator(defaultToolHandlers);
       let roundText = '';
 
       // 向模型请求决策或最终回复
@@ -290,6 +290,7 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
           toolCallMessages.push(aiMessage);
 
           // 添加工具执行结果
+          console.log('🚀 ~ useEnhancedMessageOption ~ toolResults:', toolResults);
           for (const { toolCall, result } of toolResults) {
             const toolMessage = new ToolMessage(result, toolCall.id, toolCall.function.name);
 

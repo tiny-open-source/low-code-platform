@@ -29,8 +29,13 @@ export class MCPCanvasTools {
   /**
    * 获取所有可用工具的定义
    */
-  public getToolDefinitions(): Record<string, MCPToolDefinition> {
-    return MCP_CANVAS_TOOLS;
+  public getToolDefinitions(): { type: string; function: MCPToolDefinition }[] {
+    return Object.values(MCP_CANVAS_TOOLS).map((tool) => {
+      return {
+        type: 'function',
+        function: tool,
+      };
+    });
   }
 
   /**
@@ -187,8 +192,25 @@ export class MCPCanvasTools {
     return this.executeTool(() => mcpCanvasToolsService.redo());
   }
 
-  // ========== 通用工具调用接口 ==========
+  public getTools(): Record<string, (args: any) => Promise<any> | any> {
+    return {
+      addComponent: this.addComponent.bind(this),
+      removeComponent: this.removeComponent.bind(this),
+      updateComponent: this.updateComponent.bind(this),
+      selectComponent: this.selectComponent.bind(this),
+      moveComponent: this.moveComponent.bind(this),
+      copyComponent: this.copyComponent.bind(this),
+      pasteComponent: this.pasteComponent.bind(this),
+      alignCenter: this.alignCenter.bind(this),
+      getComponentInfo: this.getComponentInfo.bind(this),
+      getCanvasState: this.getCanvasState.bind(this),
+      getPageStructure: this.getPageStructure.bind(this),
+      undo: this.undo.bind(this),
+      redo: this.redo.bind(this),
+    };
+  }
 
+  // ========== 通用工具调用接口 ==========
   /**
    * 通用工具调用方法
    * 支持通过工具名称和参数动态调用任何工具
