@@ -104,6 +104,7 @@ function _convertDeltaToMessageChunk(
   delta: Record<string, any>,
   defaultRole?: OpenAIRoleEnum,
 ) {
+  console.log('🚀 ~ delta:', delta);
   const role = delta.role ?? defaultRole;
   const content = delta.content ?? '';
   const reasoning_content: string | undefined | null

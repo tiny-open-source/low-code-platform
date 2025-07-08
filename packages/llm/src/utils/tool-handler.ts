@@ -42,8 +42,11 @@ export class ToolCallAggregator {
    * @returns 是否有完整的工具调用可以执行
    */
   processToolCallChunks(toolCallChunks: any[]): boolean {
+    console.log('🔧 开始处理工具调用块:', toolCallChunks);
+
     for (const toolCall of toolCallChunks) {
       const index = toolCall.index || 0;
+      console.log(`📝 处理索引 ${index} 的工具调用块:`, toolCall);
 
       // 初始化或获取当前工具调用
       if (!this.toolCalls[index]) {
@@ -55,6 +58,7 @@ export class ToolCallAggregator {
             arguments: toolCall.function?.arguments || '',
           },
         };
+        console.log(`✨ 初始化工具调用 ${index}:`, this.toolCalls[index]);
       }
       else {
         const current = this.toolCalls[index]!;
@@ -62,20 +66,32 @@ export class ToolCallAggregator {
         // 累积函数参数
         if (toolCall.function?.arguments) {
           current.function.arguments += toolCall.function.arguments;
+          console.log(`📝 累积参数，当前参数: "${current.function.arguments}"`);
         }
 
         // 更新其他字段
-        if (toolCall.id && !current.id)
+        if (toolCall.id && !current.id) {
           current.id = toolCall.id;
-        if (toolCall.type)
+          console.log(`🆔 更新ID: ${current.id}`);
+        }
+        if (toolCall.type) {
           current.type = toolCall.type;
-        if (toolCall.function?.name)
+          console.log(`📋 更新类型: ${current.type}`);
+        }
+        if (toolCall.function?.name) {
           current.function.name = toolCall.function.name;
+          console.log(`🏷️ 更新函数名: ${current.function.name}`);
+        }
       }
     }
 
+    // 输出当前状态
+    console.log('📊 当前工具调用状态:', this.getDebugInfo());
+
     // 检查是否有完整的工具调用可以执行
     const readyToolCalls = this.getReadyToolCalls();
+    console.log(`✅ 检查到 ${readyToolCalls.length} 个准备就绪的工具调用`);
+
     return readyToolCalls.length > 0;
   }
 
@@ -83,14 +99,51 @@ export class ToolCallAggregator {
    * 获取准备好的工具调用
    */
   getReadyToolCalls(): ToolCall[] {
-    return this.toolCalls.filter((tc): tc is ToolCall =>
+    const ready = this.toolCalls.filter((tc): tc is ToolCall =>
       tc !== null
       && tc.id !== '' // 确保 ID 不为空
       && tc.function?.name !== ''
-      && tc.function?.arguments !== ''
-      && this.isValidJSON(tc.function.arguments)
+      && tc.function?.arguments !== null
+      && tc.function?.arguments !== undefined
+      && tc.function?.arguments !== '' && this.isValidJSON(tc.function.arguments)
       && !(tc as any)._executed,
     );
+
+    console.log(`🔍 ToolCallAggregator.getReadyToolCalls: 总共 ${this.toolCalls.length} 个工具调用，${ready.length} 个就绪`);
+
+    // 为不就绪的工具调用提供详细诊断信息
+    const notReady = this.toolCalls.filter((tc) => {
+      if (tc === null)
+        return true;
+      if (tc.id === '')
+        return true;
+      if (tc.function?.name === '')
+        return true;
+      if (tc.function?.arguments === null)
+        return true;
+      if (tc.function?.arguments === undefined)
+        return true;
+      if (tc.function?.arguments !== '' && !this.isValidJSON(tc.function.arguments))
+        return true;
+      if ((tc as any)._executed)
+        return true;
+      return false;
+    });
+
+    if (notReady.length > 0) {
+      console.log(`⚠️ 有 ${notReady.length} 个工具调用不就绪:`, notReady.map((tc, index) => ({
+        index,
+        isNull: tc === null,
+        hasId: tc ? tc.id !== '' : false,
+        hasName: tc ? tc.function?.name !== '' : false,
+        hasArgs: tc ? tc.function?.arguments !== null && tc.function?.arguments !== undefined : false,
+        isValidJSON: tc ? tc.function?.arguments === '' ? true : this.isValidJSON(tc.function?.arguments || '') : false,
+        isExecuted: tc ? (tc as any)._executed : false,
+        toolCall: tc,
+      })));
+    }
+
+    return ready;
   }
 
   /**

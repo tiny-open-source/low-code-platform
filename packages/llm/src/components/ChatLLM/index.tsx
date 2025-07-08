@@ -59,35 +59,8 @@ export default defineComponent({
       }
     }, { deep: true });
 
-    // 处理图片上传和分析
-    const processImage = async (message: string, image: string): Promise<string | undefined> => {
-      if (!image)
-        return;
-      // 如果有图片，切换到vision_model
-      activeModelType.value = ModelType.VISION;
-      try {
-        const response = await onSubmit({
-          message: `<user_image_query>${message || '开始分析'}</user_image_query>`,
-          image,
-        });
-        console.log('response.message:', response.message);
-
-        return response.message;
-      }
-      catch (error) {
-        console.error('发送消息失败:', error);
-        // 可以在这里添加错误提示
-      }
-    };
     // 发送消息
     const sendMessage = async ({ message, image }: { message: string;image: string }) => {
-      if (image) {
-        const res = await processImage(message, image);
-        if (res) {
-          message = res;
-          resetState();
-        }
-      }
       activeModelType.value = ModelType.MAIN;
       try {
         await onSubmit({

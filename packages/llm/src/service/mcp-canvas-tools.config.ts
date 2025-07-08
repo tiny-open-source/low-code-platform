@@ -1,6 +1,6 @@
 /**
- * MCP Canvas Tools 配置
- * 定义所有可用工具的元数据和JSON Schema
+ * MCP Canvas Tools Configuration
+ * Defines metadata and JSON Schema for all available tools
  */
 
 export interface MCPToolDefinition {
@@ -14,55 +14,55 @@ export interface MCPToolDefinition {
 }
 
 /**
- * 所有MCP工具的配置定义
+ * Configuration definitions for all MCP tools
  */
 export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
-  // 组件操作工具
+  // Component operation tools
   addComponent: {
     name: 'addComponent',
-    description: '在画布上添加新组件。支持设置组件类型、位置、样式和属性。',
+    description: 'Add a new component to the canvas. Supports setting component type, position, style and properties.',
     parameters: {
       type: 'object',
       properties: {
         type: {
           type: 'string',
-          description: '组件类型，如 button, text, container, img 等',
+          description: 'Component type, such as button, text, container, img, qrcode, etc.',
         },
         name: {
           type: 'string',
-          description: '组件显示名称',
+          description: 'Component display name',
         },
         style: {
           type: 'object',
-          description: '组件样式，如 { backgroundColor: "#ff0000", fontSize: 16 }',
+          description: 'Component styles, such as { backgroundColor: "#ff0000", fontSize: 16 }',
           properties: {
-            width: { type: 'number', description: '宽度（像素）' },
-            height: { type: 'number', description: '高度（像素）' },
-            backgroundColor: { type: 'string', description: '背景颜色' },
-            color: { type: 'string', description: '文字颜色' },
-            fontSize: { type: 'number', description: '字体大小' },
-            fontWeight: { type: ['string', 'number'], description: '字体粗细' },
-            borderRadius: { type: 'number', description: '圆角大小' },
-            padding: { type: 'string', description: '内边距' },
-            margin: { type: 'string', description: '外边距' },
+            width: { type: 'number', description: 'Width in pixels' },
+            height: { type: 'number', description: 'Height in pixels' },
+            backgroundColor: { type: 'string', description: 'Background color' },
+            color: { type: 'string', description: 'Text color' },
+            fontSize: { type: 'number', description: 'Font size' },
+            fontWeight: { type: ['string', 'number'], description: 'Font weight' },
+            borderRadius: { type: 'number', description: 'Border radius' },
+            padding: { type: 'string', description: 'Padding' },
+            margin: { type: 'string', description: 'Margin' },
           },
         },
         position: {
           type: 'object',
-          description: '组件位置坐标',
+          description: 'Component position coordinates',
           properties: {
-            x: { type: 'number', description: 'X坐标（像素）' },
-            y: { type: 'number', description: 'Y坐标（像素）' },
+            x: { type: 'number', description: 'X coordinate in pixels' },
+            y: { type: 'number', description: 'Y coordinate in pixels' },
           },
           required: ['x', 'y'],
         },
         parentId: {
           type: ['string', 'number'],
-          description: '父容器ID，如果不指定则添加到当前选中的容器',
+          description: 'Parent container ID. If not specified, will add to currently selected container',
         },
         properties: {
           type: 'object',
-          description: '组件特定属性，如按钮的文本、图片的URL等',
+          description: 'Component-specific properties, such as button text, image URL, etc.',
         },
       },
       required: ['type'],
@@ -71,13 +71,13 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   removeComponent: {
     name: 'removeComponent',
-    description: '从画布上删除指定组件',
+    description: 'Remove specified component from canvas',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要删除的组件ID',
+          description: 'ID of component to remove',
         },
       },
       required: ['id'],
@@ -86,25 +86,25 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   updateComponent: {
     name: 'updateComponent',
-    description: '更新组件的属性、样式或名称',
+    description: 'Update component properties, styles or name',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要更新的组件ID',
+          description: 'ID of component to update',
         },
         style: {
           type: 'object',
-          description: '新的样式属性，会与现有样式合并',
+          description: 'New style properties, will be merged with existing styles',
         },
         properties: {
           type: 'object',
-          description: '新的组件属性',
+          description: 'New component properties',
         },
         name: {
           type: 'string',
-          description: '新的组件名称',
+          description: 'New component name',
         },
       },
       required: ['id'],
@@ -113,29 +113,29 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   selectComponent: {
     name: 'selectComponent',
-    description: '选中指定组件。可以通过ID直接选中，或通过类型、名称等条件查找组件',
+    description: 'Select specified component. Can select directly by ID or find component by type, name and other conditions',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要选中的组件ID',
+          description: 'ID of component to select',
         },
         selector: {
           type: 'object',
-          description: '组件选择器，用于查找组件',
+          description: 'Component selector for finding components',
           properties: {
             type: {
               type: 'string',
-              description: '按组件类型查找',
+              description: 'Find by component type',
             },
             name: {
               type: 'string',
-              description: '按组件名称查找',
+              description: 'Find by component name',
             },
             index: {
               type: 'number',
-              description: '如果找到多个匹配项，选择第几个（从0开始）',
+              description: 'If multiple matches found, select the nth one (starting from 0)',
               default: 0,
             },
           },
@@ -146,30 +146,30 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   moveComponent: {
     name: 'moveComponent',
-    description: '移动组件位置。可以指定绝对位置或相对偏移量',
+    description: 'Move component position. Can specify absolute position or relative offset',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要移动的组件ID',
+          description: 'ID of component to move',
         },
         position: {
           type: 'object',
-          description: '新的绝对位置',
+          description: 'New absolute position',
           properties: {
-            x: { type: 'number', description: 'X坐标（像素）' },
-            y: { type: 'number', description: 'Y坐标（像素）' },
+            x: { type: 'number', description: 'X coordinate in pixels' },
+            y: { type: 'number', description: 'Y coordinate in pixels' },
           },
           required: ['x', 'y'],
         },
         deltaX: {
           type: 'number',
-          description: 'X轴相对偏移量（像素）',
+          description: 'Relative offset on X axis in pixels',
         },
         deltaY: {
           type: 'number',
-          description: 'Y轴相对偏移量（像素）',
+          description: 'Relative offset on Y axis in pixels',
         },
       },
       required: ['id'],
@@ -178,13 +178,13 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   copyComponent: {
     name: 'copyComponent',
-    description: '复制指定组件到剪贴板',
+    description: 'Copy specified component to clipboard',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要复制的组件ID',
+          description: 'ID of component to copy',
         },
       },
       required: ['id'],
@@ -193,16 +193,16 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   pasteComponent: {
     name: 'pasteComponent',
-    description: '粘贴剪贴板中的组件到指定位置',
+    description: 'Paste component from clipboard to specified position',
     parameters: {
       type: 'object',
       properties: {
         position: {
           type: 'object',
-          description: '粘贴位置，如果不指定则使用默认位置',
+          description: 'Paste position. If not specified, will use default position',
           properties: {
-            x: { type: 'number', description: 'X坐标（像素）' },
-            y: { type: 'number', description: 'Y坐标（像素）' },
+            x: { type: 'number', description: 'X coordinate in pixels' },
+            y: { type: 'number', description: 'Y coordinate in pixels' },
           },
           required: ['x', 'y'],
         },
@@ -212,29 +212,29 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   alignCenter: {
     name: 'alignCenter',
-    description: '将组件在其父容器中水平居中对齐',
+    description: 'Horizontally center-align component within its parent container',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '要居中对齐的组件ID',
+          description: 'ID of component to center-align',
         },
       },
       required: ['id'],
     },
   },
 
-  // 查询工具
+  // Query tools
   getComponentInfo: {
     name: 'getComponentInfo',
-    description: '获取指定组件的详细信息，包括属性、样式、位置、子组件等',
+    description: 'Get detailed information of specified component, including properties, styles, position, child components, etc.',
     parameters: {
       type: 'object',
       properties: {
         id: {
           type: ['string', 'number'],
-          description: '组件ID',
+          description: 'Component ID',
         },
       },
       required: ['id'],
@@ -243,7 +243,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   getCanvasState: {
     name: 'getCanvasState',
-    description: '获取当前画布状态，包括选中组件、总组件数、当前页面、撤销重做状态等',
+    description: 'Get current canvas state, including selected component, total component count, current page, undo/redo state, etc.',
     parameters: {
       type: 'object',
       properties: {},
@@ -252,17 +252,17 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   getPageStructure: {
     name: 'getPageStructure',
-    description: '获取当前页面的完整组件结构树，包括所有组件的层级关系',
+    description: 'Get complete component structure tree of current page, including hierarchical relationships of all components',
     parameters: {
       type: 'object',
       properties: {},
     },
   },
 
-  // 历史操作工具
+  // History operation tools
   undo: {
     name: 'undo',
-    description: '撤销上一次操作',
+    description: 'Undo last operation',
     parameters: {
       type: 'object',
       properties: {},
@@ -271,7 +271,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
 
   redo: {
     name: 'redo',
-    description: '重做上一次撤销的操作',
+    description: 'Redo last undone operation',
     parameters: {
       type: 'object',
       properties: {},

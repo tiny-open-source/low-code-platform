@@ -15,6 +15,7 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
 import { toolCallDebugger } from '../utils/tool-call-diagnostics';
+import { getToolDisplayConfig } from '../utils/tool-display-config';
 import { ToolCallAggregator } from '../utils/tool-handler';
 
 export interface Message {
@@ -27,13 +28,30 @@ export interface Message {
   id?: string;
   messageType?: string;
   generationInfo?: any;
+  toolCallStatus?: 'none' | 'executing' | 'completed' | 'failed';
+  currentToolCall?: {
+    name: string;
+    description?: string;
+    round?: number;
+    count?: number;
+  };
+  toolCallHistory?: Array<{
+    name: string;
+    status: 'completed' | 'failed';
+    description?: string;
+    round: number;
+    count: number;
+    timestamp?: number;
+  }>;
 }
 
 export type ChatHistory = {
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system' | 'tool';
   content: string;
   image?: string;
   messageType?: string;
+  toolCallId?: string;
+  toolName?: string;
 }[];
 
 export interface MessageOptions {
@@ -86,6 +104,30 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
   const responseCompleted = computed(() => !streaming.value && !isProcessing.value && !toolCallInProgress.value);
 
   let abortController: AbortController | undefined;
+  /**
+   * 检查历史记录完整性，用于调试 assistant 消息丢失问题
+   */
+  const validateHistoryIntegrity = (currentHistory: ChatHistory, label: string = '') => {
+    const stats = {
+      total: currentHistory.length,
+      user: 0,
+      assistant: 0,
+      system: 0,
+      tool: 0,
+      emptyAssistant: 0,
+    };
+
+    currentHistory.forEach((msg) => {
+      stats[msg.role]++;
+
+      if (msg.role === 'assistant' && (!msg.content || msg.content.trim() === '')) {
+        stats.emptyAssistant++;
+      }
+    });
+
+    console.log(`🔍 历史完整性 ${label}:`, stats);
+    return { stats };
+  };
 
   /**
    * 更新消息列表
@@ -105,12 +147,61 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     else {
       chatState.history = value;
     }
+
+    // 验证历史完整性
+    validateHistoryIntegrity(chatState.history, 'setHistory');
+
     onHistoryUpdate?.(chatState.history);
   };
 
   /**
-   * 重置流式状态
+   * 将 LangChain 消息转换为 ChatHistory 格式
    */
+  const convertLangChainMessagesToChatHistory = (messages: any[]): ChatHistory => {
+    const chatHistory: ChatHistory = [];
+
+    for (const message of messages) {
+      if (message._getType() === 'human') {
+        chatHistory.push({
+          role: 'user',
+          content: typeof message.content === 'string'
+            ? message.content
+            : Array.isArray(message.content)
+              ? message.content.map((c: any) => c.text || c.type || '').join(' ')
+              : String(message.content || ''),
+        });
+      }
+      else if (message._getType() === 'ai') {
+        // 处理 AIMessage，可能包含工具调用
+        const content = typeof message.content === 'string'
+          ? message.content
+          : Array.isArray(message.content)
+            ? message.content.map((c: any) => c.text || c.type || '').join(' ')
+            : String(message.content || '');
+
+        // 确保即使是空内容的 assistant 消息也被保存（可能只包含工具调用）
+        chatHistory.push({
+          role: 'assistant',
+          content: content || '', // 允许空内容，因为可能只是工具调用
+        });
+      }
+      else if (message._getType() === 'tool') {
+        // 处理 ToolMessage
+        chatHistory.push({
+          role: 'tool',
+          content: message.content || '',
+          toolCallId: message.tool_call_id,
+          toolName: message.name,
+        });
+      }
+      else {
+        console.warn('⚠️ 未识别的消息类型:', message._getType(), message);
+      }
+    }
+
+    return chatHistory;
+  };
+
   const resetStreamingState = () => {
     chatState.streaming = false;
     chatState.isProcessing = false;
@@ -144,16 +235,13 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     let toolCallRound = 0;
     const maxToolCallRounds = 10; // 防止无限循环
 
-    console.log('🚀 开始多轮工具调用流程');
-    const toolCallAggregator = new ToolCallAggregator(mcpCanvasTools.getTools());
-
     // 工具调用循环，支持多步工具链
     while (toolCallRound < maxToolCallRounds) {
       toolCallRound++;
-      console.log(`🎯 第 ${toolCallRound} 轮：请求模型决策`);
 
       let roundText = '';
-
+      generationInfo = undefined;
+      const toolCallAggregator = new ToolCallAggregator(mcpCanvasTools.getTools());
       // 向模型请求决策或最终回复
       const response = await ollama.stream(
         conversationMessages,
@@ -176,9 +264,11 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
       );
 
       // 处理响应
-      for await (const chunk of response) {
-        console.log(`📦 第 ${toolCallRound} 轮 chunk:`, chunk);
+      let hasToolCallsInThisRound = false;
+      let streamFinishReason = null;
+      let toolCallIndicatorShown = false; // 标记是否已显示工具调用指示器
 
+      for await (const chunk of response) {
         // 处理推理内容
         if (chunk?.additional_kwargs?.reasoning_content) {
           const reasoningContent = mergeReasoningContent(
@@ -191,8 +281,41 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
         // 聚合工具调用信息
         if (chunk?.additional_kwargs?.tool_calls) {
           const chunkToolCalls = chunk.additional_kwargs.tool_calls;
-          console.log(`🔧 第 ${toolCallRound} 轮接收到工具调用块:`, chunkToolCalls);
           toolCallAggregator.processToolCallChunks(chunkToolCalls);
+          hasToolCallsInThisRound = true;
+
+          // 首次检测到工具调用时立即显示 spinner
+          if (!toolCallIndicatorShown) {
+            toolCallIndicatorShown = true;
+            chatState.toolCallInProgress = true;
+
+            // 尝试获取工具名称（可能还在聚合中）
+            const firstToolCall = chunkToolCalls[0];
+            const toolName = firstToolCall?.function?.name || '';
+            const toolConfig = getToolDisplayConfig(toolName);
+
+            setMessages(messagesRef.value.map((msg) => {
+              if (msg.id === generateMessageId) {
+                return {
+                  ...msg,
+                  message: `${fullText}${roundText}`,
+                  toolCallStatus: 'executing' as const,
+                  currentToolCall: {
+                    name: toolName,
+                    description: toolName ? toolConfig.description : '正在准备工具调用...',
+                    round: toolCallRound,
+                    count: 1, // 初始显示为1，后续会更新
+                  },
+                };
+              }
+              return msg;
+            }));
+          }
+        }
+
+        // 记录流式响应的结束原因
+        if (generationInfo?.finish_reason) {
+          streamFinishReason = generationInfo.finish_reason;
         }
 
         // 处理常规内容
@@ -200,15 +323,19 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
 
         // 实时更新界面
         const displayText = toolCallRound === 1 ? `${fullText}${roundText}` : `${fullText}\n\n${roundText}`;
-        setMessages(messagesRef.value.map((msg) => {
-          if (msg.id === generateMessageId) {
-            return {
-              ...msg,
-              message: `${displayText}▋`,
-            };
-          }
-          return msg;
-        }));
+
+        // 只有在没有显示工具调用指示器时才更新常规内容
+        if (!toolCallIndicatorShown) {
+          setMessages(messagesRef.value.map((msg) => {
+            if (msg.id === generateMessageId) {
+              return {
+                ...msg,
+                message: `${displayText}▋`,
+              };
+            }
+            return msg;
+          }));
+        }
       }
 
       // 累积文本内容
@@ -219,19 +346,54 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
         fullText += `\n\n${roundText}`;
       }
 
-      // 检查是否有工具调用需要执行
-      const readyToolCalls = toolCallAggregator.getReadyToolCalls();
+      // 在检查工具调用之前，给聚合器一点时间完成处理
+      // 这对于处理可能分散在多个 chunks 中的工具调用很重要
+      if (hasToolCallsInThisRound) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      // 检查是否有工具调用需要执行 - 重要：确保在流式处理完全结束后检查
+      let readyToolCalls = toolCallAggregator.getReadyToolCalls();
+
+      // 如果有工具调用块但没有就绪的工具调用，可能是聚合未完成
+      if (hasToolCallsInThisRound && readyToolCalls.length === 0) {
+        // 如果 finish_reason 是 tool_calls，表示模型确实想要调用工具
+        if (streamFinishReason === 'tool_calls') {
+          // 给一点时间让最后的块处理完成
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+          readyToolCalls = toolCallAggregator.getReadyToolCalls();
+
+          if (readyToolCalls.length === 0) {
+            console.warn(`❌ 第 ${toolCallRound} 轮：模型表明有工具调用但无法聚合出完整的工具调用数据`);
+          }
+        }
+      }
 
       if (readyToolCalls.length > 0) {
-        console.log(`🛠️ 第 ${toolCallRound} 轮：执行 ${readyToolCalls.length} 个工具调用`);
-        chatState.toolCallInProgress = true;
+        // 确保工具调用状态已设置
+        if (!chatState.toolCallInProgress) {
+          chatState.toolCallInProgress = true;
+        }
 
-        // 更新界面，显示工具调用状态
+        // 更新界面，显示准确的工具调用状态（包含正确的工具数量）
         setMessages(messagesRef.value.map((msg) => {
           if (msg.id === generateMessageId) {
+            // 获取第一个工具调用的信息用于显示
+            const firstToolCall = readyToolCalls[0];
+            const toolName = firstToolCall?.function?.name || '';
+            const toolConfig = getToolDisplayConfig(toolName);
+
             return {
               ...msg,
-              message: `${fullText}\n\n🔧 正在执行第 ${toolCallRound} 轮工具调用...`,
+              message: `${fullText}`,
+              toolCallStatus: 'executing' as const,
+              currentToolCall: {
+                name: toolName,
+                description: toolConfig.description,
+                round: toolCallRound,
+                count: readyToolCalls.length,
+              },
             };
           }
           return msg;
@@ -239,7 +401,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
 
         // 执行工具调用
         const toolResults = await toolCallAggregator.executeReadyToolCalls();
-        console.log(`✅ 第 ${toolCallRound} 轮工具调用完成:`, toolResults);
 
         if (toolResults.length > 0) {
           // 验证工具调用数据的完整性
@@ -282,22 +443,11 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
             },
           });
 
-          console.log('🔍 构建的 AIMessage:', aiMessage);
-
-          // 使用诊断工具检查消息
-          toolCallDebugger.logMessage(aiMessage, '🤖');
-
           toolCallMessages.push(aiMessage);
 
           // 添加工具执行结果
-          console.log('🚀 ~ useEnhancedMessageOption ~ toolResults:', toolResults);
           for (const { toolCall, result } of toolResults) {
             const toolMessage = new ToolMessage(result, toolCall.id, toolCall.function.name);
-
-            console.log('🔍 构建的 ToolMessage:', toolMessage);
-
-            // 使用诊断工具检查消息
-            toolCallDebugger.logMessage(toolMessage, '🛠️');
 
             toolCallMessages.push(toolMessage);
           }
@@ -308,12 +458,88 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
             ...toolCallMessages,
           ];
 
-          console.log(`📝 第 ${toolCallRound} 轮工具调用完成，准备下一轮，当前消息数: ${conversationMessages.length}`);
+          // 更新界面，将工具调用添加到历史记录
+          setMessages(messagesRef.value.map((msg) => {
+            if (msg.id === generateMessageId) {
+              const firstToolCall = readyToolCalls[0];
+              const toolName = firstToolCall?.function?.name || '';
+              const isSuccess = toolResults.some(result => result.result && !result.result.includes('❌'));
+
+              // 创建当前工具调用的历史记录条目
+              const currentToolCallEntry = {
+                name: toolName,
+                status: isSuccess ? 'completed' as const : 'failed' as const,
+                description: `已执行 ${toolResults.length} 个工具调用`,
+                round: toolCallRound,
+                count: toolResults.length,
+                timestamp: Date.now(),
+              };
+
+              // 将当前工具调用添加到历史记录
+              const existingHistory = msg.toolCallHistory || [];
+              const updatedHistory = [...existingHistory, currentToolCallEntry];
+
+              return {
+                ...msg,
+                message: `${fullText}`,
+                toolCallStatus: isSuccess ? 'completed' as const : 'failed' as const,
+                currentToolCall: {
+                  name: toolName,
+                  description: `已执行 ${toolResults.length} 个工具调用`,
+                  round: toolCallRound,
+                  count: toolResults.length,
+                },
+                toolCallHistory: updatedHistory,
+              };
+            }
+            return msg;
+          }));
+
+          // 给用户一点时间看到完成状态
+          await new Promise(resolve => setTimeout(resolve, 800));
+        }
+        else {
+          // 即使工具调用执行失败，也需要保存 assistant 的回复
+          if (roundText.trim()) {
+            const aiMessage = new AIMessage({
+              content: roundText,
+            });
+            conversationMessages = [
+              ...conversationMessages,
+              aiMessage,
+            ];
+          }
         }
       }
       else {
         // 没有工具调用，说明模型已经生成了最终回复
-        console.log(`🎉 第 ${toolCallRound} 轮：模型生成最终回复，工具调用流程结束`);
+
+        // 重要：即使没有工具调用，也需要保存 assistant 的回复到对话历史中
+        if (roundText.trim()) {
+          const finalAiMessage = new AIMessage({
+            content: roundText,
+          });
+          conversationMessages = [
+            ...conversationMessages,
+            finalAiMessage,
+          ];
+        }
+
+        // 如果之前显示了工具调用指示器但最终没有执行工具调用，需要清除状态
+        if (hasToolCallsInThisRound && chatState.toolCallInProgress) {
+          setMessages(messagesRef.value.map((msg) => {
+            if (msg.id === generateMessageId) {
+              return {
+                ...msg,
+                message: fullText,
+                toolCallStatus: 'none' as const,
+                currentToolCall: undefined,
+              };
+            }
+            return msg;
+          }));
+        }
+
         break;
       }
     }
@@ -325,7 +551,23 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
 
     chatState.toolCallInProgress = false;
 
-    return { finalText: fullText, generationInfo };
+    // 最终更新，保留最后的工具调用状态作为历史记录
+    setMessages(messagesRef.value.map((msg) => {
+      if (msg.id === generateMessageId) {
+        return {
+          ...msg,
+          message: fullText,
+          // 保持最后的工具调用状态，不清除
+        };
+      }
+      return msg;
+    }));
+
+    return {
+      finalText: fullText,
+      generationInfo,
+      conversationMessages, // 返回完整的对话消息历史
+    };
   };
 
   /**
@@ -340,8 +582,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     signal: AbortSignal,
     retainContext: boolean = true,
   ) => {
-    console.log('🚀 开始标准工具调用流程:', message);
-
     const userDefaultModelSettings = await getAllDefaultModelSettings();
 
     if (image && image.length > 0 && !image.startsWith('data:')) {
@@ -456,18 +696,32 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
 
       // 更新历史记录
       if (retainContext) {
-        setHistory([
+        // 重要：正确提取新的对话历史
+        // applicationChatHistory 包含系统消息和历史消息，finalResult.conversationMessages 包含完整的对话
+        // 我们需要提取新添加的消息（从最后一个用户消息开始）
+
+        let startIndex = applicationChatHistory.length;
+
+        // 如果有系统消息，需要排除它
+        if (model.value.prompt) {
+          startIndex = applicationChatHistory.length; // 系统消息已在 applicationChatHistory 中
+        }
+
+        // 提取所有新的对话消息（包括用户消息、assistant 回复、工具调用等）
+        const newConversationHistory = finalResult.conversationMessages.slice(startIndex);
+
+        // 转换为 ChatHistory 格式
+        const newChatHistory = convertLangChainMessagesToChatHistory(newConversationHistory);
+
+        const updatedHistory = [
           ...historyRef.value,
-          {
-            role: 'user',
-            content: message,
-            image,
-          },
-          {
-            role: 'assistant',
-            content: finalResult.finalText,
-          },
-        ]);
+          ...newChatHistory,
+        ];
+
+        // 验证历史完整性
+        validateHistoryIntegrity(updatedHistory, '保存后');
+
+        setHistory(updatedHistory);
       }
 
       // 重置状态

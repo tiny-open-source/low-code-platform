@@ -33,7 +33,10 @@ export class CustomAIMessageChunk {
   ): NonNullable<BaseMessageFields['additional_kwargs']> {
     const merged = { ...left };
     for (const [key, value] of Object.entries(right)) {
-      if (merged[key] === undefined) {
+      if (value === undefined || value === null) {
+        continue; // Skip undefined or null values
+      }
+      if (merged[key] === undefined || merged[key] === null) {
         merged[key] = value;
       }
       else if (typeof merged[key] === 'string' && typeof value === 'string') {

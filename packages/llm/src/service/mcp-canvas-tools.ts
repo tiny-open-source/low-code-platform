@@ -71,8 +71,8 @@ export class MCPCanvasTools {
   /**
    * 删除组件
    */
-  public async removeComponent(id: Id): Promise<MCPToolResult> {
-    return this.executeTool(() => mcpCanvasToolsService.removeComponent(id));
+  public async removeComponent(params: { id: Id }): Promise<MCPToolResult> {
+    return this.executeTool(() => mcpCanvasToolsService.removeComponent(params.id));
   }
 
   /**

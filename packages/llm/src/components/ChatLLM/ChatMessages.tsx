@@ -6,6 +6,10 @@ import MarkdownIt from 'markdown-it';
 import { NImage } from 'naive-ui';
 import { defineComponent } from 'vue';
 import ThinkingArea from './ThinkingArea';
+import ToolCallHistory from './ToolCallHistory';
+import ToolCallIndicator from './ToolCallIndicator';
+import './ToolCallHistory.css';
+import './ToolCallIndicator.css';
 
 export default defineComponent({
   name: 'ChatMessages',
@@ -42,14 +46,35 @@ export default defineComponent({
             </span>
             <div class="lc-llm-chat-messages__body">
               {message.isBot
-                ? parseReasoning(message.message).map((e, i) => {
-                    if (e.type === 'reasoning') {
-                      return (
-                        <ThinkingArea content={e.content} key={i} />
-                      );
-                    }
-                    return <div class="prose dark:prose-invert lc-llm-chat-messages__text" key={i} innerHTML={renderMarkdown(e.content)} />;
-                  })
+                ? (
+                    <div>
+                      {/* 常规消息内容 */}
+                      {parseReasoning(message.message).map((e, i) => {
+                        if (e.type === 'reasoning') {
+                          return (
+                            <ThinkingArea content={e.content} key={i} />
+                          );
+                        }
+                        return <div class="prose dark:prose-invert lc-llm-chat-messages__text" key={i} innerHTML={renderMarkdown(e.content)} />;
+                      })}
+
+                      {/* 当前工具调用状态指示器 */}
+                      {message.toolCallStatus && message.toolCallStatus !== 'none' && (
+                        <ToolCallIndicator
+                          status={message.toolCallStatus}
+                          toolName={message.currentToolCall?.name || ''}
+                          description={message.currentToolCall?.description || ''}
+                          round={message.currentToolCall?.round || 1}
+                          toolCount={message.currentToolCall?.count || 1}
+                        />
+                      )}
+
+                      {/* 工具调用历史 */}
+                      {message.toolCallHistory && message.toolCallHistory.length > 0 && (
+                        <ToolCallHistory history={message.toolCallHistory} />
+                      )}
+                    </div>
+                  )
                 : (
                     <div>
                       <div
