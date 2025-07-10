@@ -43,6 +43,14 @@ export interface Message {
     count: number;
     timestamp?: number;
   }>;
+  // 新增：工具调用轮次确认状态
+  toolCallConfirmation?: {
+    show: boolean;
+    currentRound: number;
+    maxRound: number;
+    onContinue?: () => void;
+    onCancel?: () => void;
+  };
 }
 
 export type ChatHistory = {
@@ -233,11 +241,85 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     let generationInfo: any | undefined;
     let conversationMessages = [...messages];
     let toolCallRound = 0;
-    const maxToolCallRounds = 10; // 防止无限循环
+    const maxToolCallRounds = 20; // 工具调用轮次上限，防止无限循环
+
+    // 等待用户确认的函数
+    const waitForUserConfirmation = (): Promise<boolean> => {
+      return new Promise((resolve) => {
+        // 显示确认界面
+        setMessages(messagesRef.value.map((msg) => {
+          if (msg.id === generateMessageId) {
+            return {
+              ...msg,
+              message: fullText,
+              toolCallStatus: 'none' as const,
+              currentToolCall: undefined,
+              toolCallConfirmation: {
+                show: true,
+                currentRound: toolCallRound,
+                maxRound: maxToolCallRounds,
+                onContinue: () => {
+                  // 用户选择继续
+                  resolve(true);
+                  // 清除确认界面
+                  setMessages(messagesRef.value.map((m) => {
+                    if (m.id === generateMessageId) {
+                      return {
+                        ...m,
+                        toolCallConfirmation: undefined,
+                      };
+                    }
+                    return m;
+                  }));
+                },
+                onCancel: () => {
+                  // 用户选择取消
+                  resolve(false);
+                  // 清除确认界面
+                  setMessages(messagesRef.value.map((m) => {
+                    if (m.id === generateMessageId) {
+                      return {
+                        ...m,
+                        toolCallConfirmation: undefined,
+                      };
+                    }
+                    return m;
+                  }));
+                },
+              },
+            };
+          }
+          return msg;
+        }));
+      });
+    };
 
     // 工具调用循环，支持多步工具链
-    while (toolCallRound < maxToolCallRounds) {
+    let shouldContinueLoop = true;
+    while (shouldContinueLoop) {
       toolCallRound++;
+
+      // 检查是否达到轮次上限（在递增后检查）
+      if (toolCallRound > maxToolCallRounds) {
+        // 达到上限时，等待用户确认是否继续
+        console.log(`⚠️ 工具调用轮数达到上限 ${maxToolCallRounds}，等待用户确认...`);
+
+        const shouldContinue = await waitForUserConfirmation();
+
+        if (shouldContinue) {
+          // 用户选择继续，重置轮次计数
+          console.log(`✅ 用户选择继续，重置轮次计数`);
+          toolCallRound = 1; // 重置为1，因为这是新的一轮开始
+          // 继续循环
+        }
+        else {
+          // 用户选择取消，停止执行
+          console.log(`❌ 用户选择取消，停止工具调用流程`);
+          fullText += '\n\n⚠️ 用户选择停止执行工具调用。';
+          shouldContinueLoop = false;
+          break; // 直接跳出循环
+        }
+      }
 
       let roundText = '';
       generationInfo = undefined;
@@ -544,11 +626,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
       }
     }
 
-    if (toolCallRound >= maxToolCallRounds) {
-      console.warn('⚠️ 工具调用轮数达到上限，强制结束');
-      fullText += '\n\n⚠️ 工具调用轮数达到上限，可能存在循环调用问题。';
-    }
-
     chatState.toolCallInProgress = false;
 
     // 最终更新，保留最后的工具调用状态作为历史记录
@@ -592,7 +669,7 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
     const modelParams = {
       model: model.value,
       keepAlive: undefined,
-      temperature: 0.0,
+      temperature: 0.3,
       topK: userDefaultModelSettings?.topK,
       topP: userDefaultModelSettings?.topP,
       numCtx: 4096,

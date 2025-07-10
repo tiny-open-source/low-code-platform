@@ -62,10 +62,10 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
         },
         properties: {
           type: 'object',
-          description: 'Component-specific properties, such as button text, image URL, etc.',
+          description: 'Component-specific properties, such as text, src, etc.',
         },
       },
-      required: ['type'],
+      required: ['type', 'name', 'style', 'position'],
     },
   },
 
@@ -100,7 +100,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
         },
         properties: {
           type: 'object',
-          description: 'New component properties',
+          description: 'New component properties, such as text, src, etc.',
         },
         name: {
           type: 'string',

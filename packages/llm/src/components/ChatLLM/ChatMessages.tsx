@@ -6,8 +6,10 @@ import MarkdownIt from 'markdown-it';
 import { NImage } from 'naive-ui';
 import { defineComponent } from 'vue';
 import ThinkingArea from './ThinkingArea';
+import ToolCallConfirmation from './ToolCallConfirmation';
 import ToolCallHistory from './ToolCallHistory';
 import ToolCallIndicator from './ToolCallIndicator';
+import './ToolCallConfirmation.css';
 import './ToolCallHistory.css';
 import './ToolCallIndicator.css';
 
@@ -72,6 +74,16 @@ export default defineComponent({
                       {/* 工具调用历史 */}
                       {message.toolCallHistory && message.toolCallHistory.length > 0 && (
                         <ToolCallHistory history={message.toolCallHistory} />
+                      )}
+
+                      {/* 工具调用轮次确认 */}
+                      {message.toolCallConfirmation?.show && (
+                        <ToolCallConfirmation
+                          currentRound={message.toolCallConfirmation.currentRound}
+                          maxRound={message.toolCallConfirmation.maxRound}
+                          onContinue={message.toolCallConfirmation.onContinue || (() => {})}
+                          onCancel={message.toolCallConfirmation.onCancel || (() => {})}
+                        />
                       )}
                     </div>
                   )
