@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { getToolDisplayConfig } from '../../utils/tool-display-config';
 
 export default defineComponent({
@@ -17,6 +17,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const showHistory = ref(false);
+
+    const toggleHistory = () => {
+      showHistory.value = !showHistory.value;
+    };
+
     const formatTime = (timestamp?: number) => {
       if (!timestamp)
         return '';
@@ -45,71 +51,99 @@ export default defineComponent({
         return null;
       }
 
+      const completedCount = props.history.filter(item => item.status === 'completed').length;
+      const failedCount = props.history.filter(item => item.status === 'failed').length;
+
       return (
         <div class="lc-llm-tool-history">
-          <div class="lc-llm-tool-history__header">
-            <span class="lc-llm-tool-history__title">🔧 工具调用历史</span>
-            <span class="lc-llm-tool-history__count">
-              共
-              {' '}
-              {props.history.length}
-              {' '}
-              次调用
-            </span>
+          {/* 简洁历史显示 */}
+          <div
+            class="lc-llm-tool-history__simple"
+            onClick={toggleHistory}
+          >
+            <div class="lc-llm-tool-history__simple-content">
+              <span class="lc-llm-tool-history__simple-icon">🔧</span>
+              <span class="lc-llm-tool-history__simple-text">
+                工具调用历史 (
+                {completedCount}
+                个完成
+                {failedCount > 0 ? `, ${failedCount}个失败` : ''}
+                )
+              </span>
+              <span class="lc-llm-tool-history__expand-icon">
+                {showHistory.value ? '▼' : '▶'}
+              </span>
+            </div>
           </div>
 
-          <div class="lc-llm-tool-history__list">
-            {props.history.map((item, index) => {
-              const toolConfig = getToolConfig(item.name);
+          {/* 详细历史（展开时显示） */}
+          {showHistory.value && (
+            <div class="lc-llm-tool-history__expanded">
+              <div class="lc-llm-tool-history__header">
+                <span class="lc-llm-tool-history__title">🔧 工具调用历史</span>
+                <span class="lc-llm-tool-history__count">
+                  共
+                  {' '}
+                  {props.history.length}
+                  {' '}
+                  次调用
+                </span>
+              </div>
 
-              return (
-                <div
-                  key={index}
-                  class={`lc-llm-tool-history-item ${getStatusClass(item.status)}`}
-                >
-                  <div class="lc-llm-tool-history-item__header">
-                    <span class="lc-llm-tool-history-item__icon">
-                      {toolConfig.icon}
-                    </span>
-                    <span class="lc-llm-tool-history-item__name">
-                      {toolConfig.name}
-                    </span>
-                    <span class="lc-llm-tool-history-item__status">
-                      {getStatusIcon(item.status)}
-                    </span>
-                    {item.round > 1 && (
-                      <span class="lc-llm-tool-history-item__round">
-                        第
-                        {item.round}
-                        轮
-                      </span>
-                    )}
-                    {item.timestamp && (
-                      <span class="lc-llm-tool-history-item__time">
-                        {formatTime(item.timestamp)}
-                      </span>
-                    )}
-                  </div>
+              <div class="lc-llm-tool-history__list">
+                {props.history.map((item, index) => {
+                  const toolConfig = getToolConfig(item.name);
 
-                  {item.description && (
-                    <div class="lc-llm-tool-history-item__description">
-                      {item.description}
+                  return (
+                    <div
+                      key={index}
+                      class={`lc-llm-tool-history-item ${getStatusClass(item.status)}`}
+                    >
+                      <div class="lc-llm-tool-history-item__header">
+                        <span class="lc-llm-tool-history-item__icon">
+                          {toolConfig.icon}
+                        </span>
+                        <span class="lc-llm-tool-history-item__name">
+                          {toolConfig.name}
+                        </span>
+                        <span class="lc-llm-tool-history-item__status">
+                          {getStatusIcon(item.status)}
+                        </span>
+                        {item.round > 1 && (
+                          <span class="lc-llm-tool-history-item__round">
+                            第
+                            {item.round}
+                            轮
+                          </span>
+                        )}
+                        {item.timestamp && (
+                          <span class="lc-llm-tool-history-item__time">
+                            {formatTime(item.timestamp)}
+                          </span>
+                        )}
+                      </div>
+
+                      {item.description && (
+                        <div class="lc-llm-tool-history-item__description">
+                          {item.description}
+                        </div>
+                      )}
+
+                      {item.count > 1 && (
+                        <div class="lc-llm-tool-history-item__count">
+                          批量执行
+                          {' '}
+                          {item.count}
+                          {' '}
+                          个操作
+                        </div>
+                      )}
                     </div>
-                  )}
-
-                  {item.count > 1 && (
-                    <div class="lc-llm-tool-history-item__count">
-                      批量执行
-                      {' '}
-                      {item.count}
-                      {' '}
-                      个操作
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       );
     };

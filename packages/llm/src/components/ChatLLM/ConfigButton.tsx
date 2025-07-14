@@ -15,7 +15,6 @@ import {
   NInput,
   NSelect,
   NSpace,
-  NSwitch,
   NTabPane,
   NTabs,
   useMessage,
@@ -422,11 +421,11 @@ export default defineComponent({
           </div>
         </NTabPane>
         <NTabPane
-          name={ModelType.VISION}
+          name={ModelType.INTENTION_INFERENCE}
           tab={(
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <NIcon><EyeOutlined /></NIcon>
-              {MODEL_TYPE_LABELS[ModelType.VISION]}
+              {MODEL_TYPE_LABELS[ModelType.INTENTION_INFERENCE]}
             </div>
           )}
         >
@@ -476,15 +475,6 @@ export default defineComponent({
                   >
                   </NSelect>
                 </NFormItem>
-
-                <NFormItem label="启用视觉能力" path="visionEnabled">
-                  <NSwitch
-                    value={!!formValues.value.visionEnabled}
-                    onUpdateValue={value => formValues.value.visionEnabled = value}
-                  />
-                </NFormItem>
-
-                <NDivider />
 
                 <NDivider />
                 <div class="prompt-template-config">

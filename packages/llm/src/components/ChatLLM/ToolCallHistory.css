@@ -2,14 +2,103 @@
 .lc-llm-tool-history {
   margin-top: 12px;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: #f8fafc;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .dark .lc-llm-tool-history {
   border-color: #374151;
   background-color: #1e293b;
+}
+
+/* 简洁历史显示 */
+.lc-llm-tool-history__simple {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 10px;
+}
+
+.lc-llm-tool-history__simple:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+}
+
+.dark .lc-llm-tool-history__simple:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.lc-llm-tool-history__simple-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lc-llm-tool-history__simple-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.lc-llm-tool-history__simple-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  flex: 1;
+  margin-left: 2px;
+}
+
+.dark .lc-llm-tool-history__simple-text {
+  color: #cbd5e1;
+}
+
+.lc-llm-tool-history__expand-icon {
+  font-size: 10px;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.lc-llm-tool-history__simple:hover .lc-llm-tool-history__expand-icon {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.dark .lc-llm-tool-history__expand-icon {
+  color: #6b7280;
+}
+
+.dark .lc-llm-tool-history__simple:hover .lc-llm-tool-history__expand-icon {
+  color: #9ca3af;
+}
+
+/* 详细历史展开区域 */
+.lc-llm-tool-history__expanded {
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.dark .lc-llm-tool-history__expanded {
+  border-top-color: #374151;
+  background-color: #111827;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .lc-llm-tool-history__header {

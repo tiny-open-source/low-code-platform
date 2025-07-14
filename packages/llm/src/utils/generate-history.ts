@@ -65,6 +65,20 @@ export function generateHistory(messages: {
                   text: removeReasoning(content),
                 },
               ],
+          additional_kwargs: message.toolName && message.toolCallId
+            ? {
+                tool_calls: [
+                  {
+                    function: {
+                      name: message.toolName || '',
+                      arguments: message.toolCallId || '',
+                    },
+                    id: message.toolCallId || '',
+                    type: 'function',
+                  },
+                ],
+              }
+            : undefined,
         }),
       );
     }
