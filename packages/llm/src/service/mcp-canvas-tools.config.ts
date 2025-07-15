@@ -26,7 +26,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
       properties: {
         type: {
           type: 'string',
-          description: 'Component type, such as button, text, container, img, qrcode, etc.',
+          description: 'Component type, supports button, text, container, img, qrcode, overlay',
         },
         name: {
           type: 'string',
@@ -36,15 +36,62 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
           type: 'object',
           description: 'Component styles, such as { backgroundColor: "#ff0000", fontSize: 16 }',
           properties: {
-            width: { type: 'number', description: 'Width in pixels' },
-            height: { type: 'number', description: 'Height in pixels' },
-            backgroundColor: { type: 'string', description: 'Background color' },
-            color: { type: 'string', description: 'Text color' },
-            fontSize: { type: 'number', description: 'Font size' },
-            fontWeight: { type: ['string', 'number'], description: 'Font weight' },
-            borderRadius: { type: 'number', description: 'Border radius' },
-            padding: { type: 'string', description: 'Padding' },
-            margin: { type: 'string', description: 'Margin' },
+            display: { type: 'string' },
+            flexDirection: { type: 'string' },
+            justifyContent: { type: 'string' },
+            alignItems: { type: 'string' },
+            flexWrap: { type: 'string' },
+            marginTop: { type: 'string' },
+            marginRight: { type: 'string' },
+            marginBottom: { type: 'string' },
+            marginLeft: { type: 'string' },
+            paddingTop: { type: 'string' },
+            paddingRight: { type: 'string' },
+            paddingBottom: { type: 'string' },
+            paddingLeft: { type: 'string' },
+            width: { type: 'string' },
+            height: { type: 'string' },
+            overflow: { type: 'string' },
+            fontSize: { type: 'string' },
+            lineHeight: { type: 'string' },
+            fontWeight: { type: 'string' },
+            color: { type: 'string' },
+            textAlign: { type: 'string' },
+            backgroundColor: { type: 'string' },
+            backgroundImage: { type: 'string' },
+            backgroundSize: { type: 'string' },
+            backgroundPosition: { type: 'string' },
+            backgroundRepeat: { type: 'string' },
+            position: { type: 'string' },
+            zIndex: { type: 'number' },
+            top: { type: 'string' },
+            right: { type: 'string' },
+            bottom: { type: 'string' },
+            left: { type: 'string' },
+            borderTopLeftRadius: { type: 'string' },
+            borderTopRightRadius: { type: 'string' },
+            borderBottomRightRadius: { type: 'string' },
+            borderBottomLeftRadius: { type: 'string' },
+            borderTopWidth: { type: 'string' },
+            borderTopStyle: { type: 'string' },
+            borderTopColor: { type: 'string' },
+            borderRightColor: { type: 'string' },
+            borderRightWidth: { type: 'string' },
+            borderRightStyle: { type: 'string' },
+            borderBottomWidth: { type: 'string' },
+            borderBottomStyle: { type: 'string' },
+            borderBottomColor: { type: 'string' },
+            borderLeftStyle: { type: 'string' },
+            borderLeftWidth: { type: 'string' },
+            borderLeftColor: { type: 'string' },
+            borderWidth: { type: 'string' },
+            borderStyle: { type: 'string' },
+            borderColor: { type: 'string' },
+            transform: { type: 'object', description: 'CSS transform property', properties: {
+              translate: { type: 'object', description: 'Translation values, such as "0px,0px"' },
+              rotate: { type: 'string', description: 'Rotation value, such as "45deg"' },
+              scale: { type: 'string', description: 'Scale value, such as "1,1"' },
+            } },
           },
         },
         position: {
@@ -96,7 +143,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
         },
         style: {
           type: 'object',
-          description: 'New style properties, will be merged with existing styles',
+          description: 'Similar to the style attribute of addComponent, new style properties will be merged with existing styles',
         },
         properties: {
           type: 'object',
@@ -209,22 +256,6 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
       },
     },
   },
-
-  alignCenter: {
-    name: 'alignCenter',
-    description: 'Horizontally center-align component within its parent container',
-    parameters: {
-      type: 'object',
-      properties: {
-        id: {
-          type: ['string', 'number'],
-          description: 'ID of component to center-align',
-        },
-      },
-      required: ['id'],
-    },
-  },
-
   // Query tools
   getComponentInfo: {
     name: 'getComponentInfo',
@@ -253,25 +284,6 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
   getPageStructure: {
     name: 'getPageStructure',
     description: 'Get complete component structure tree of current page, including hierarchical relationships of all components',
-    parameters: {
-      type: 'object',
-      properties: {},
-    },
-  },
-
-  // History operation tools
-  undo: {
-    name: 'undo',
-    description: 'Undo last operation',
-    parameters: {
-      type: 'object',
-      properties: {},
-    },
-  },
-
-  redo: {
-    name: 'redo',
-    description: 'Redo last undone operation',
     parameters: {
       type: 'object',
       properties: {},
