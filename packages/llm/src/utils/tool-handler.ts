@@ -105,7 +105,7 @@ export class ToolCallAggregator {
       && tc.function?.name !== ''
       && tc.function?.arguments !== null
       && tc.function?.arguments !== undefined
-      && tc.function?.arguments !== '' && this.isValidJSON(tc.function.arguments)
+      && (tc.function?.arguments === '' || this.isValidJSON(tc.function.arguments))
       && !(tc as any)._executed,
     );
 
@@ -123,7 +123,7 @@ export class ToolCallAggregator {
         return true;
       if (tc.function?.arguments === undefined)
         return true;
-      if (tc.function?.arguments !== '' && !this.isValidJSON(tc.function.arguments))
+      if (tc.function?.arguments === '' || this.isValidJSON(tc.function.arguments))
         return true;
       if ((tc as any)._executed)
         return true;
@@ -137,7 +137,7 @@ export class ToolCallAggregator {
         hasId: tc ? tc.id !== '' : false,
         hasName: tc ? tc.function?.name !== '' : false,
         hasArgs: tc ? tc.function?.arguments !== null && tc.function?.arguments !== undefined : false,
-        isValidJSON: tc ? tc.function?.arguments === '' ? true : this.isValidJSON(tc.function?.arguments || '') : false,
+        isValidJSON: tc ? tc.function?.arguments === '' || this.isValidJSON(tc.function?.arguments || '') : false,
         isExecuted: tc ? (tc as any)._executed : false,
         toolCall: tc,
       })));
@@ -186,7 +186,7 @@ export class ToolCallAggregator {
     try {
       console.log(`🔧 准备执行工具: ${name}, 参数: ${argsStr}`);
 
-      const args = JSON.parse(argsStr);
+      const args = argsStr ? JSON.parse(argsStr) : {};
       console.log(`🛠️ 调用工具: ${name}`, args);
 
       const handler = this.handlers[name];

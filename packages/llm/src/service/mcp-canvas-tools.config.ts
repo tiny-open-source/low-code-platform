@@ -34,7 +34,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
         },
         style: {
           type: 'object',
-          description: 'Component styles, such as { backgroundColor: "#ff0000", fontSize: 16 }',
+          description: 'Component styles',
           properties: {
             display: { type: 'string' },
             flexDirection: { type: 'string' },
@@ -91,6 +91,7 @@ export const MCP_CANVAS_TOOLS: Record<string, MCPToolDefinition> = {
               translate: { type: 'object', description: 'Translation values, such as "0px,0px"' },
               rotate: { type: 'string', description: 'Rotation value, such as "45deg"' },
               scale: { type: 'string', description: 'Scale value, such as "1,1"' },
+              matrix: { type: 'string', description: 'Matrix transformation value, such as "1,0,0,1,0,0"' },
             } },
           },
         },

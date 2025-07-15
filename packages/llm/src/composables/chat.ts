@@ -498,12 +498,14 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
               console.error('❌ 工具调用缺少函数名:', tc);
               throw new Error(`工具调用缺少函数名`);
             }
-            try {
-              JSON.parse(tc.function.arguments);
-            }
-            catch {
-              console.error('❌ 工具调用参数不是有效的 JSON:', tc);
-              throw new Error(`工具调用 ${tc.function.name} 的参数不是有效的 JSON`);
+            if (tc.function.arguments) {
+              try {
+                JSON.parse(tc.function.arguments);
+              }
+              catch {
+                console.error('❌ 工具调用参数不是有效的 JSON:', tc);
+                throw new Error(`工具调用 ${tc.function.name} 的参数不是有效的 JSON`);
+              }
             }
           }
 

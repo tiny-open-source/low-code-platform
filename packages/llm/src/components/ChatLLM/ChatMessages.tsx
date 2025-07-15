@@ -9,9 +9,6 @@ import ThinkingArea from './ThinkingArea';
 import ToolCallConfirmation from './ToolCallConfirmation';
 import ToolCallHistory from './ToolCallHistory';
 import ToolCallIndicator from './ToolCallIndicator';
-import './ToolCallConfirmation.css';
-import './ToolCallHistory.css';
-import './ToolCallIndicator.css';
 
 export default defineComponent({
   name: 'ChatMessages',

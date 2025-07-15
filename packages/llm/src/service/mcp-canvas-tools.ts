@@ -99,8 +99,8 @@ export class MCPCanvasTools {
   /**
    * 复制组件
    */
-  public async copyComponent(id: Id): Promise<MCPToolResult> {
-    return this.executeTool(() => mcpCanvasToolsService.copyComponent(id));
+  public async copyComponent(params: { id: Id }): Promise<MCPToolResult> {
+    return this.executeTool(() => mcpCanvasToolsService.copyComponent(params.id));
   }
 
   /**
@@ -113,8 +113,8 @@ export class MCPCanvasTools {
   /**
    * 居中对齐组件
    */
-  public async alignCenter(id: Id): Promise<MCPToolResult> {
-    return this.executeTool(() => mcpCanvasToolsService.alignCenter(id));
+  public async alignCenter(params: { id: Id }): Promise<MCPToolResult> {
+    return this.executeTool(() => mcpCanvasToolsService.alignCenter(params.id));
   }
 
   // ========== 查询工具 ==========
@@ -122,9 +122,9 @@ export class MCPCanvasTools {
   /**
    * 获取组件信息
    */
-  public getComponentInfo(id: Id): MCPToolResult {
+  public getComponentInfo(params: { id: Id }): MCPToolResult {
     try {
-      const data = mcpCanvasToolsService.getComponentInfo(id);
+      const data = mcpCanvasToolsService.getComponentInfo(params.id);
       return {
         success: true,
         data,
