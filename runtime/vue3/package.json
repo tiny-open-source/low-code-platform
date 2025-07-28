@@ -32,7 +32,7 @@
     "@low-code/core": "workspace:^",
     "@low-code/utils": "workspace:^",
     "axios": "^1.11.0",
-    "vue": "^3.5.18"
+    "vue": "3.5.17"
   },
   "devDependencies": {
     "@low-code/schema": "workspace:^",
