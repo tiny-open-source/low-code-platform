@@ -5,7 +5,7 @@ export default defineConfig({
   leading: ['git pull --rebase', 'pnpm i'],
   trailing: [],
   publish: false,
-  changelog: true,
+  changelog: false,
   mode: 'monorepo',
   allowedBranches: ['main'],
   packages: ['packages/**', 'playground/*', 'runtime/**'],
