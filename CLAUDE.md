@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development
 - `pnpm dev` - Start development mode for all packages with hot reload
-- `pnpm bootstrap` - Install dependencies and build all packages
+- `pnpm bootstrap` - Install dependencies and build all packages  
 - `pnpm build` - Build all packages (includes TypeScript declarations and bundling)
 - `pnpm build:dts` - Build TypeScript declarations only
 - `pnpm build:playground` - Build the playground demo application
@@ -14,6 +14,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Code Quality
 - `pnpm lint` - Run ESLint across all packages
 - `turbo lint` - Run linter with Turbo's parallel execution
+
+### Building Individual Packages
+- `node scripts/build.mjs --package <package-name>` - Build a specific package (ES and UMD formats)
+- Custom build script handles both packages/ and runtime/ directories with Vite
 
 ### Package Management
 - Uses pnpm workspaces with Turbo for monorepo management
