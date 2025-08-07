@@ -80,6 +80,9 @@ export default defineComponent({
         message,
         image,
       });
+      nextTick(() => {
+        divRef.value?.scrollIntoView({ behavior: 'smooth' });
+      });
     };
     const handleNewChat = () => {
       // 重制状态

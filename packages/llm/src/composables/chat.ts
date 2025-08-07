@@ -15,7 +15,6 @@ import { getAllDefaultModelSettings } from '../service/model-settings';
 import { generateHistory } from '../utils/generate-history';
 import { humanMessageFormatter } from '../utils/human-message';
 import { toolCallDebugger } from '../utils/tool-call-diagnostics';
-import { getToolDisplayConfig } from '../utils/tool-display-config';
 import { ToolCallAggregator } from '../utils/tool-handler';
 
 export interface Message {
@@ -28,21 +27,6 @@ export interface Message {
   id?: string;
   messageType?: string;
   generationInfo?: any;
-  toolCallStatus?: 'none' | 'executing' | 'completed' | 'failed';
-  currentToolCall?: {
-    name: string;
-    description?: string;
-    round?: number;
-    count?: number;
-  };
-  toolCallHistory?: Array<{
-    name: string;
-    status: 'completed' | 'failed';
-    description?: string;
-    round: number;
-    count: number;
-    timestamp?: number;
-  }>;
   // 新增：工具调用轮次确认状态
   toolCallConfirmation?: {
     show: boolean;
@@ -60,6 +44,15 @@ export type ChatHistory = {
   messageType?: string;
   toolCallId?: string;
   toolName?: string;
+  // 新增：用于保存assistant消息中的工具调用信息
+  toolCalls?: Array<{
+    id: string;
+    type: 'function';
+    function: {
+      name: string;
+      arguments: string;
+    };
+  }>;
 }[];
 
 export interface MessageOptions {
@@ -187,10 +180,32 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
             ? message.content.map((c: any) => c.text || c.type || '').join(' ')
             : String(message.content || '');
 
+        // 提取工具调用信息
+        let toolCalls: Array<{
+          id: string;
+          type: 'function';
+          function: {
+            name: string;
+            arguments: string;
+          };
+        }> | undefined;
+
+        if (message.additional_kwargs?.tool_calls && Array.isArray(message.additional_kwargs.tool_calls)) {
+          toolCalls = message.additional_kwargs.tool_calls.map((tc: any) => ({
+            id: tc.id,
+            type: 'function' as const,
+            function: {
+              name: tc.function.name,
+              arguments: tc.function.arguments,
+            },
+          }));
+        }
+
         // 确保即使是空内容的 assistant 消息也被保存（可能只包含工具调用）
         chatHistory.push({
           role: 'assistant',
           content: content || '', // 允许空内容，因为可能只是工具调用
+          toolCalls, // 保存工具调用信息
         });
       }
       else if (message._getType() === 'tool') {
@@ -228,6 +243,41 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
   };
 
   /**
+   * 创建工具调用标记
+   */
+  const createToolCallMarker = (
+    status: 'executing' | 'completed' | 'failed',
+    toolName: string,
+    round: number,
+    details?: {
+      arguments?: string;
+      result?: string;
+      error?: string;
+    },
+  ): string => {
+    let marker = `\n<tool-call status="${status}" name="${toolName}" round="${round}"`;
+
+    if (details) {
+      if (details.arguments) {
+        // 对 JSON 字符串进行 base64 编码以避免属性值中的特殊字符
+        const encodedArgs = btoa(encodeURIComponent(details.arguments));
+        marker += ` arguments="${encodedArgs}"`;
+      }
+      if (details.result) {
+        const encodedResult = btoa(encodeURIComponent(details.result));
+        marker += ` result="${encodedResult}"`;
+      }
+      if (details.error) {
+        const encodedError = btoa(encodeURIComponent(details.error));
+        marker += ` error="${encodedError}"`;
+      }
+    }
+
+    marker += ' />\n';
+    return marker;
+  };
+
+  /**
    * 执行多轮工具调用流程，支持工具链
    */
   const executeToolCallFlow = async (
@@ -252,8 +302,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
             return {
               ...msg,
               message: fullText,
-              toolCallStatus: 'none' as const,
-              currentToolCall: undefined,
               toolCallConfirmation: {
                 show: true,
                 currentRound: toolCallRound,
@@ -366,28 +414,48 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
           toolCallAggregator.processToolCallChunks(chunkToolCalls);
           hasToolCallsInThisRound = true;
 
-          // 首次检测到工具调用时立即显示 spinner
-          if (!toolCallIndicatorShown) {
+          // 检查当前已聚合的工具调用
+          const currentReadyToolCalls = toolCallAggregator.getReadyToolCalls();
+
+          if (currentReadyToolCalls.length > 0) {
+            // 如果还没有显示过工具调用指示器，或者工具调用数量有变化，就更新显示
+            const currentMessage = messagesRef.value.find(msg => msg.id === generateMessageId);
+            const currentToolCallCount = currentMessage
+              ? (currentMessage.message.match(/<tool-call[^>]*>/g) || []).length
+              : 0;
+
+            if (!toolCallIndicatorShown || currentReadyToolCalls.length > currentToolCallCount) {
+              toolCallIndicatorShown = true;
+              chatState.toolCallInProgress = true;
+
+              const toolCallMarkers = currentReadyToolCalls.map(toolCall =>
+                createToolCallMarker('executing', toolCall?.function?.name || '', toolCallRound),
+              ).join('');
+
+              setMessages(messagesRef.value.map((msg) => {
+                if (msg.id === generateMessageId) {
+                  return {
+                    ...msg,
+                    message: `${fullText}${roundText}${toolCallMarkers}`,
+                  };
+                }
+                return msg;
+              }));
+            }
+          }
+          else if (!toolCallIndicatorShown) {
+            // 如果还没有完整的工具调用聚合出来，显示一个通用的加载指示器
             toolCallIndicatorShown = true;
             chatState.toolCallInProgress = true;
 
-            // 尝试获取工具名称（可能还在聚合中）
             const firstToolCall = chunkToolCalls[0];
             const toolName = firstToolCall?.function?.name || '';
-            const toolConfig = getToolDisplayConfig(toolName);
 
             setMessages(messagesRef.value.map((msg) => {
               if (msg.id === generateMessageId) {
                 return {
                   ...msg,
-                  message: `${fullText}${roundText}`,
-                  toolCallStatus: 'executing' as const,
-                  currentToolCall: {
-                    name: toolName,
-                    description: toolName ? toolConfig.description : '正在准备工具调用...',
-                    round: toolCallRound,
-                    count: 1, // 初始显示为1，后续会更新
-                  },
+                  message: `${fullText}${roundText}${createToolCallMarker('executing', toolName, toolCallRound)}`,
                 };
               }
               return msg;
@@ -428,6 +496,20 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
         fullText += `\n\n${roundText}`;
       }
 
+      // // 流式处理结束，移除光标（如果没有工具调用指示器）
+      // if (!toolCallIndicatorShown) {
+      //   const finalDisplayText = toolCallRound === 1 ? fullText : `${fullText}`;
+      //   setMessages(messagesRef.value.map((msg) => {
+      //     if (msg.id === generateMessageId) {
+      //       return {
+      //         ...msg,
+      //         message: finalDisplayText, // 移除光标
+      //       };
+      //     }
+      //     return msg;
+      //   }));
+      // }
+
       // 在检查工具调用之前，给聚合器一点时间完成处理
       // 这对于处理可能分散在多个 chunks 中的工具调用很重要
       if (hasToolCallsInThisRound) {
@@ -458,28 +540,49 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
           chatState.toolCallInProgress = true;
         }
 
-        // 更新界面，显示准确的工具调用状态（包含正确的工具数量）
-        setMessages(messagesRef.value.map((msg) => {
-          if (msg.id === generateMessageId) {
-            // 获取第一个工具调用的信息用于显示
-            const firstToolCall = readyToolCalls[0];
-            const toolName = firstToolCall?.function?.name || '';
-            const toolConfig = getToolDisplayConfig(toolName);
+        // 只有在还没有显示工具调用指示器时才更新界面
+        // 避免重复显示，因为在流式处理期间可能已经显示了
+        if (!toolCallIndicatorShown) {
+          setMessages(messagesRef.value.map((msg) => {
+            if (msg.id === generateMessageId) {
+              // 为每个工具调用创建执行中的标记，但都使用相同的轮次编号
+              const toolCallMarkers = readyToolCalls.map(toolCall =>
+                createToolCallMarker('executing', toolCall?.function?.name || '', toolCallRound),
+              ).join('');
 
-            return {
-              ...msg,
-              message: `${fullText}`,
-              toolCallStatus: 'executing' as const,
-              currentToolCall: {
-                name: toolName,
-                description: toolConfig.description,
-                round: toolCallRound,
-                count: readyToolCalls.length,
-              },
-            };
+              return {
+                ...msg,
+                message: `${fullText}${toolCallMarkers}`,
+              };
+            }
+            return msg;
+          }));
+        }
+        else {
+          // 如果已经显示了工具调用指示器，检查是否需要更新（可能有更多的工具调用）
+          const currentMessage = messagesRef.value.find(msg => msg.id === generateMessageId);
+          if (currentMessage) {
+            // 计算当前显示的工具调用数量
+            const currentToolCallCount = (currentMessage.message.match(/<tool-call[^>]*>/g) || []).length;
+
+            // 如果实际的工具调用数量比当前显示的多，需要更新
+            if (readyToolCalls.length > currentToolCallCount) {
+              const toolCallMarkers = readyToolCalls.map(toolCall =>
+                createToolCallMarker('executing', toolCall?.function?.name || '', toolCallRound),
+              ).join('');
+
+              setMessages(messagesRef.value.map((msg) => {
+                if (msg.id === generateMessageId) {
+                  return {
+                    ...msg,
+                    message: `${fullText}${toolCallMarkers}`,
+                  };
+                }
+                return msg;
+              }));
+            }
           }
-          return msg;
-        }));
+        }
 
         // 执行工具调用
         const toolResults = await toolCallAggregator.executeReadyToolCalls();
@@ -542,42 +645,76 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
             ...toolCallMessages,
           ];
 
-          // 更新界面，将工具调用添加到历史记录
+          // 更新界面，将工具调用添加到消息内容中
           setMessages(messagesRef.value.map((msg) => {
             if (msg.id === generateMessageId) {
-              const firstToolCall = readyToolCalls[0];
-              const toolName = firstToolCall?.function?.name || '';
-              const isSuccess = toolResults.some(result => result.result && !result.result.includes('❌'));
+              let updatedMessage = fullText;
 
-              // 创建当前工具调用的历史记录条目
-              const currentToolCallEntry = {
-                name: toolName,
-                status: isSuccess ? 'completed' as const : 'failed' as const,
-                description: `已执行 ${toolResults.length} 个工具调用`,
-                round: toolCallRound,
-                count: toolResults.length,
-                timestamp: Date.now(),
-              };
+              // 处理每个工具调用的状态更新
+              readyToolCalls.forEach((toolCall) => {
+                const toolName = toolCall?.function?.name || '';
+                const toolResult = toolResults.find(result => result.toolCall.id === toolCall.id);
+                const isSuccess = toolResult && toolResult.result && !toolResult.result.includes('❌');
 
-              // 将当前工具调用添加到历史记录
-              const existingHistory = msg.toolCallHistory || [];
-              const updatedHistory = [...existingHistory, currentToolCallEntry];
+                // 创建执行中和完成的标记，都使用相同的轮次编号
+                const executingMarker = createToolCallMarker('executing', toolName, toolCallRound);
+                const completedMarker = createToolCallMarker(
+                  isSuccess ? 'completed' : 'failed',
+                  toolName,
+                  toolCallRound,
+                  {
+                    arguments: toolCall?.function?.arguments,
+                    result: toolResult?.result,
+                    error: isSuccess ? undefined : (toolResult?.result || '执行失败'),
+                  },
+                );
+
+                // 替换该工具调用的执行标记为完成标记
+                if (updatedMessage.includes(executingMarker)) {
+                  updatedMessage = updatedMessage.replace(executingMarker, completedMarker);
+                }
+                else {
+                  // 如果没有找到执行标记，直接添加完成标记
+                  updatedMessage = updatedMessage + completedMarker;
+                }
+              });
 
               return {
                 ...msg,
-                message: `${fullText}`,
-                toolCallStatus: isSuccess ? 'completed' as const : 'failed' as const,
-                currentToolCall: {
-                  name: toolName,
-                  description: `已执行 ${toolResults.length} 个工具调用`,
-                  round: toolCallRound,
-                  count: toolResults.length,
-                },
-                toolCallHistory: updatedHistory,
+                message: updatedMessage,
               };
             }
             return msg;
           }));
+
+          // 更新fullText以保持状态同步
+          let updatedFullText = fullText;
+          readyToolCalls.forEach((toolCall) => {
+            const toolName = toolCall?.function?.name || '';
+            const toolResult = toolResults.find(result => result.toolCall.id === toolCall.id);
+            const isSuccess = toolResult && toolResult.result && !toolResult.result.includes('❌');
+
+            const executingMarker = createToolCallMarker('executing', toolName, toolCallRound);
+            const completedMarker = createToolCallMarker(
+              isSuccess ? 'completed' : 'failed',
+              toolName,
+              toolCallRound,
+              {
+                arguments: toolCall?.function?.arguments,
+                result: toolResult?.result,
+                error: isSuccess ? undefined : (toolResult?.result || '执行失败'),
+              },
+            );
+
+            if (updatedFullText.includes(executingMarker)) {
+              updatedFullText = updatedFullText.replace(executingMarker, completedMarker);
+            }
+            else {
+              updatedFullText = updatedFullText + completedMarker;
+            }
+          });
+
+          fullText = updatedFullText;
 
           // 给用户一点时间看到完成状态
           await new Promise(resolve => setTimeout(resolve, 800));
@@ -616,8 +753,6 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
               return {
                 ...msg,
                 message: fullText,
-                toolCallStatus: 'none' as const,
-                currentToolCall: undefined,
               };
             }
             return msg;
@@ -630,17 +765,26 @@ export function useEnhancedMessageOption(model: ComputedRef<ModelConfig>, option
 
     chatState.toolCallInProgress = false;
 
-    // 最终更新，保留最后的工具调用状态作为历史记录
-    setMessages(messagesRef.value.map((msg) => {
-      if (msg.id === generateMessageId) {
-        return {
-          ...msg,
-          message: fullText,
-          // 保持最后的工具调用状态，不清除
-        };
-      }
-      return msg;
-    }));
+    // 最终更新，确保消息内容正确（仅在有工具调用执行时需要）
+    // 如果没有工具调用，流式处理已经正确更新了消息内容，不需要重复更新
+    const currentMessage = messagesRef.value.find(msg => msg.id === generateMessageId);
+    const needsFinalUpdate = currentMessage && (
+      currentMessage.message.includes('<tool-call') // 包含工具调用标记
+      || currentMessage.message.endsWith('▋') // 还在显示光标
+      || currentMessage.message !== fullText // 内容不一致
+    );
+
+    if (needsFinalUpdate) {
+      setMessages(messagesRef.value.map((msg) => {
+        if (msg.id === generateMessageId) {
+          return {
+            ...msg,
+            message: fullText,
+          };
+        }
+        return msg;
+      }));
+    }
 
     return {
       finalText: fullText,
