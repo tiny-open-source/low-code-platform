@@ -7,6 +7,7 @@ import { asyncLoadJs, figmaParser } from '@low-code/utils';
 import { CodeOutlined, ImportOutlined, PlayCircleOutlined, SaveOutlined } from '@vicons/antd';
 import { dateZhCN, NConfigProvider, NDialogProvider, NMessageProvider, zhCN } from 'naive-ui';
 import serialize from 'serialize-javascript';
+import pkg from '../../package.json';
 import { ThemeColorConfig } from '../theme.config';
 import DeviceGroup from './components/DeviceGroup';
 import GlobalMessageSetup from './components/GlobalMessageSetup';
@@ -125,7 +126,7 @@ const menu: MenuBarData = {
   left: [
     {
       type: 'text',
-      text: '模板编辑器',
+      text: `模板编辑器 v${pkg.version}`,
     },
   ],
   center: ['delete', 'undo', 'redo', 'guides', 'rule', 'zoom'],
